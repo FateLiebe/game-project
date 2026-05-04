@@ -1,0 +1,53 @@
+# =============== UNITY .GITIGNORE ===============
+# Thư mục tự sinh ra của Unity (KHÔNG ĐƯỢC PUSH)
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+
+# Các thư mục bộ nhớ cache và ghi hình
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# File cấu hình của Visual Studio / Rider / IDE
+.vs/
+.gradle/
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Các file meta tự sinh không cần thiết
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# File báo cáo lỗi của Unity
+sysinfo.txt
+
+# Các file build sản phẩm (Nặng, không nên push lên git)
+*.apk
+*.aab
+*.unitypackage
+*.app
+*.exe
+
+# Addressables và StreamingAssets tạm thời
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*

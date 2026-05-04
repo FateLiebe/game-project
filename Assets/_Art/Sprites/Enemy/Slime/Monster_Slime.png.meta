@@ -1,0 +1,1642 @@
+fileFormatVersion: 2
+guid: 9698bbc3075572e43ae80d710164a960
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2013698182933852923
+    second: Monster_Slime_0
+  - first:
+      213: 7796970016017655592
+    second: Monster_Slime_1
+  - first:
+      213: -260991374033074756
+    second: Monster_Slime_2
+  - first:
+      213: -4432407052984358493
+    second: Monster_Slime_3
+  - first:
+      213: 5285804459346503263
+    second: Monster_Slime_4
+  - first:
+      213: 3491422908062058436
+    second: Monster_Slime_5
+  - first:
+      213: 679171327426524334
+    second: Monster_Slime_6
+  - first:
+      213: 2984476211602737767
+    second: Monster_Slime_7
+  - first:
+      213: 1121287077864846453
+    second: Monster_Slime_8
+  - first:
+      213: 5755607827487428154
+    second: Monster_Slime_9
+  - first:
+      213: -29787594630853572
+    second: Monster_Slime_10
+  - first:
+      213: -2975302528989548683
+    second: Monster_Slime_11
+  - first:
+      213: -6656161466313828939
+    second: Monster_Slime_12
+  - first:
+      213: -4451674240644721711
+    second: Monster_Slime_13
+  - first:
+      213: -5755500363960937766
+    second: Monster_Slime_14
+  - first:
+      213: -5303261706466020852
+    second: Monster_Slime_15
+  - first:
+      213: -5288926434547206173
+    second: Monster_Slime_16
+  - first:
+      213: 3785303416823934120
+    second: Monster_Slime_17
+  - first:
+      213: -6926807105072425826
+    second: Monster_Slime_18
+  - first:
+      213: 1656311513342196439
+    second: Monster_Slime_19
+  - first:
+      213: 4076317270108351122
+    second: Monster_Slime_20
+  - first:
+      213: 2849518219957461359
+    second: Monster_Slime_21
+  - first:
+      213: 2563271035893106
+    second: Monster_Slime_22
+  - first:
+      213: -882007350134450631
+    second: Monster_Slime_23
+  - first:
+      213: 6963419635046861064
+    second: Monster_Slime_24
+  - first:
+      213: -5172812015974119458
+    second: Monster_Slime_25
+  - first:
+      213: 5679395593603640895
+    second: Monster_Slime_26
+  - first:
+      213: 463755389677078642
+    second: Monster_Slime_27
+  - first:
+      213: -7844122573281165944
+    second: Monster_Slime_28
+  - first:
+      213: 4590070847703269453
+    second: Monster_Slime_29
+  - first:
+      213: -5398058105900357885
+    second: Monster_Slime_30
+  - first:
+      213: -8839340089272399765
+    second: Monster_Slime_31
+  - first:
+      213: -1513755443961213060
+    second: Monster_Slime_32
+  - first:
+      213: -8027967116919742503
+    second: Monster_Slime_33
+  - first:
+      213: -4983463644124588553
+    second: Monster_Slime_34
+  - first:
+      213: 8575895660162822555
+    second: Monster_Slime_35
+  - first:
+      213: 5755857418652871907
+    second: Monster_Slime_36
+  - first:
+      213: 618051925224214306
+    second: Monster_Slime_37
+  - first:
+      213: -4046444909668187310
+    second: Monster_Slime_38
+  - first:
+      213: -4284774863110264242
+    second: Monster_Slime_39
+  - first:
+      213: -2115032707489765550
+    second: Monster_Slime_40
+  - first:
+      213: -6355209767406409278
+    second: Monster_Slime_41
+  - first:
+      213: 3224912406434675
+    second: Monster_Slime_42
+  - first:
+      213: -1018418409526637210
+    second: Monster_Slime_43
+  - first:
+      213: -7816662627635051429
+    second: Monster_Slime_44
+  - first:
+      213: -834577994956492422
+    second: Monster_Slime_45
+  - first:
+      213: 7977168369915258881
+    second: Monster_Slime_46
+  - first:
+      213: 9072225839016850670
+    second: Monster_Slime_47
+  - first:
+      213: -4167288366644009267
+    second: Monster_Slime_48
+  - first:
+      213: -2370715847190331350
+    second: Monster_Slime_49
+  - first:
+      213: 3977776007289927464
+    second: Monster_Slime_50
+  - first:
+      213: -7147633746949404520
+    second: Monster_Slime_51
+  - first:
+      213: -6353306432352039094
+    second: Monster_Slime_52
+  - first:
+      213: 3058353880106758982
+    second: Monster_Slime_53
+  - first:
+      213: 2315077843261025193
+    second: Monster_Slime_54
+  - first:
+      213: -5055631953976411808
+    second: Monster_Slime_55
+  - first:
+      213: 2362528248442983196
+    second: Monster_Slime_56
+  - first:
+      213: -4557913601652711249
+    second: Monster_Slime_57
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Monster_Slime_0
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 708
+        width: 17
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf23f9e04d712fb10800000000000000
+      internalID: 2013698182933852923
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_1
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 708
+        width: 17
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 827aa116be6643c60800000000000000
+      internalID: 7796970016017655592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_2
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 708
+        width: 17
+        height: 13
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb541556ab5c06cf0800000000000000
+      internalID: -260991374033074756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_3
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 708
+        width: 19
+        height: 12
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a96eeae44dec72c0800000000000000
+      internalID: -4432407052984358493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_4
+      rect:
+        serializedVersion: 2
+        x: 422
+        y: 708
+        width: 19
+        height: 12
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f56268f7623fa5940800000000000000
+      internalID: 5285804459346503263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_5
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 708
+        width: 19
+        height: 13
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c743b3f2a6047030800000000000000
+      internalID: 3491422908062058436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_6
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 612
+        width: 17
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea473e059b6ec6900800000000000000
+      internalID: 679171327426524334
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_7
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 612
+        width: 17
+        height: 15
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76a4f215d4dfa6920800000000000000
+      internalID: 2984476211602737767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_8
+      rect:
+        serializedVersion: 2
+        x: 232
+        y: 612
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 574be5f08ac9f8f00800000000000000
+      internalID: 1121287077864846453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_9
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 612
+        width: 16
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3e88d713d600ef40800000000000000
+      internalID: 5755607827487428154
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_10
+      rect:
+        serializedVersion: 2
+        x: 424
+        y: 612
+        width: 16
+        height: 15
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3c805b275c269ff0800000000000000
+      internalID: -29787594630853572
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_11
+      rect:
+        serializedVersion: 2
+        x: 520
+        y: 612
+        width: 16
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57fa14c1d1a95b6d0800000000000000
+      internalID: -2975302528989548683
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_12
+      rect:
+        serializedVersion: 2
+        x: 615
+        y: 612
+        width: 18
+        height: 13
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b598b8896090a3a0800000000000000
+      internalID: -6656161466313828939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_13
+      rect:
+        serializedVersion: 2
+        x: 710
+        y: 612
+        width: 19
+        height: 13
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d35d963dd97832c0800000000000000
+      internalID: -4451674240644721711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_14
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 516
+        width: 17
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad21a75b9ea5020b0800000000000000
+      internalID: -5755500363960937766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_15
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 516
+        width: 17
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c02392b63970766b0800000000000000
+      internalID: -5303261706466020852
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_16
+      rect:
+        serializedVersion: 2
+        x: 232
+        y: 516
+        width: 15
+        height: 20
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e7f3a10e65f996b0800000000000000
+      internalID: -5288926434547206173
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_17
+      rect:
+        serializedVersion: 2
+        x: 329
+        y: 522
+        width: 12
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8acecd6f669188430800000000000000
+      internalID: 3785303416823934120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_18
+      rect:
+        serializedVersion: 2
+        x: 425
+        y: 522
+        width: 12
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e94918243a90fdf90800000000000000
+      internalID: -6926807105072425826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_19
+      rect:
+        serializedVersion: 2
+        x: 520
+        y: 516
+        width: 15
+        height: 20
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7dab62ebb866cf610800000000000000
+      internalID: 1656311513342196439
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_20
+      rect:
+        serializedVersion: 2
+        x: 329
+        y: 516
+        width: 13
+        height: 5
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29a299cb5fcf19830800000000000000
+      internalID: 4076317270108351122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_21
+      rect:
+        serializedVersion: 2
+        x: 425
+        y: 516
+        width: 13
+        height: 5
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f61619149b58b8720800000000000000
+      internalID: 2849518219957461359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_22
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 420
+        width: 17
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 275be8b084b190000800000000000000
+      internalID: 2563271035893106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_23
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 420
+        width: 17
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 936d3f5fcfa72c3f0800000000000000
+      internalID: -882007350134450631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_24
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 420
+        width: 19
+        height: 17
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 809c2f8a34903a060800000000000000
+      internalID: 6963419635046861064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_25
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 420
+        width: 19
+        height: 17
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed78df1d0ea7638b0800000000000000
+      internalID: -5172812015974119458
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_26
+      rect:
+        serializedVersion: 2
+        x: 421
+        y: 420
+        width: 22
+        height: 18
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3ee9af933441de40800000000000000
+      internalID: 5679395593603640895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_27
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 420
+        width: 18
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2780060e1179f6600800000000000000
+      internalID: 463755389677078642
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_28
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 324
+        width: 17
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88df3fc5414142390800000000000000
+      internalID: -7844122573281165944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_29
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 324
+        width: 17
+        height: 15
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d40ca33ed1533bf30800000000000000
+      internalID: 4590070847703269453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_30
+      rect:
+        serializedVersion: 2
+        x: 232
+        y: 324
+        width: 17
+        height: 17
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30724e8b0ce3615b0800000000000000
+      internalID: -5398058105900357885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_31
+      rect:
+        serializedVersion: 2
+        x: 329
+        y: 324
+        width: 17
+        height: 19
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b688c0a850b545580800000000000000
+      internalID: -8839340089272399765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_32
+      rect:
+        serializedVersion: 2
+        x: 426
+        y: 324
+        width: 31
+        height: 18
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7fc0e5a17f0efae0800000000000000
+      internalID: -1513755443961213060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_33
+      rect:
+        serializedVersion: 2
+        x: 522
+        y: 324
+        width: 31
+        height: 18
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9df5b7fe07ee69090800000000000000
+      internalID: -8027967116919742503
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_34
+      rect:
+        serializedVersion: 2
+        x: 611
+        y: 324
+        width: 28
+        height: 13
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f551ec183e27dab0800000000000000
+      internalID: -4983463644124588553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_35
+      rect:
+        serializedVersion: 2
+        x: 710
+        y: 324
+        width: 19
+        height: 13
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b91b1d67aa3b30770800000000000000
+      internalID: 8575895660162822555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_36
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 228
+        width: 17
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ece99093d9e0ef40800000000000000
+      internalID: 5755857418652871907
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_37
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 228
+        width: 19
+        height: 17
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22f4cbf83f2c39800800000000000000
+      internalID: 618051925224214306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_38
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 228
+        width: 20
+        height: 18
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2534a0c2bc328d7c0800000000000000
+      internalID: -4046444909668187310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_39
+      rect:
+        serializedVersion: 2
+        x: 324
+        y: 228
+        width: 41
+        height: 18
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4a2ac5b6fb6984c0800000000000000
+      internalID: -4284774863110264242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_40
+      rect:
+        serializedVersion: 2
+        x: 421
+        y: 228
+        width: 41
+        height: 18
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2576dbd55f4e5a2e0800000000000000
+      internalID: -2115032707489765550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_41
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 228
+        width: 40
+        height: 18
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c9e5ac4362cdc7a0800000000000000
+      internalID: -6355209767406409278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_42
+      rect:
+        serializedVersion: 2
+        x: 614
+        y: 228
+        width: 20
+        height: 17
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 373da6e6a057b0000800000000000000
+      internalID: 3224912406434675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_43
+      rect:
+        serializedVersion: 2
+        x: 710
+        y: 228
+        width: 18
+        height: 16
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66d42733ad9ddd1f0800000000000000
+      internalID: -1018418409526637210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_44
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 132
+        width: 17
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b54cdbe21c2a58390800000000000000
+      internalID: -7816662627635051429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_45
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 132
+        width: 18
+        height: 15
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a71b2414cbbfa64f0800000000000000
+      internalID: -834577994956492422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_46
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 132
+        width: 19
+        height: 15
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 108e74a1e5894be60800000000000000
+      internalID: 7977168369915258881
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_47
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 132
+        width: 18
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee438b8755507ed70800000000000000
+      internalID: 9072225839016850670
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_48
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 36
+        width: 17
+        height: 14
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc6e09d4f41da26c0800000000000000
+      internalID: -4167288366644009267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_49
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 36
+        width: 17
+        height: 13
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a20c4d06f76891fd0800000000000000
+      internalID: -2370715847190331350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_50
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 36
+        width: 19
+        height: 11
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82776961436e33730800000000000000
+      internalID: 3977776007289927464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_51
+      rect:
+        serializedVersion: 2
+        x: 325
+        y: 36
+        width: 21
+        height: 9
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8988c781af08ecc90800000000000000
+      internalID: -7147633746949404520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_52
+      rect:
+        serializedVersion: 2
+        x: 421
+        y: 36
+        width: 21
+        height: 10
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4fc376067584d7a0800000000000000
+      internalID: -6353306432352039094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_53
+      rect:
+        serializedVersion: 2
+        x: 517
+        y: 36
+        width: 21
+        height: 9
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 643733d66a4717a20800000000000000
+      internalID: 3058353880106758982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_54
+      rect:
+        serializedVersion: 2
+        x: 613
+        y: 36
+        width: 21
+        height: 9
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ab63fa580fc02020800000000000000
+      internalID: 2315077843261025193
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_55
+      rect:
+        serializedVersion: 2
+        x: 709
+        y: 36
+        width: 21
+        height: 9
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0693f141689c6d9b0800000000000000
+      internalID: -5055631953976411808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_56
+      rect:
+        serializedVersion: 2
+        x: 805
+        y: 36
+        width: 21
+        height: 9
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c13154cbce269c020800000000000000
+      internalID: 2362528248442983196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Monster_Slime_57
+      rect:
+        serializedVersion: 2
+        x: 901
+        y: 36
+        width: 21
+        height: 9
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa0a1986ab90fb0c0800000000000000
+      internalID: -4557913601652711249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 20547846714b0184aa8c4c47a2adbe4b
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceOnImport
+        value: True
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":true,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.0},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":7,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      Monster_Slime_0: 2013698182933852923
+      Monster_Slime_1: 7796970016017655592
+      Monster_Slime_10: -29787594630853572
+      Monster_Slime_11: -2975302528989548683
+      Monster_Slime_12: -6656161466313828939
+      Monster_Slime_13: -4451674240644721711
+      Monster_Slime_14: -5755500363960937766
+      Monster_Slime_15: -5303261706466020852
+      Monster_Slime_16: -5288926434547206173
+      Monster_Slime_17: 3785303416823934120
+      Monster_Slime_18: -6926807105072425826
+      Monster_Slime_19: 1656311513342196439
+      Monster_Slime_2: -260991374033074756
+      Monster_Slime_20: 4076317270108351122
+      Monster_Slime_21: 2849518219957461359
+      Monster_Slime_22: 2563271035893106
+      Monster_Slime_23: -882007350134450631
+      Monster_Slime_24: 6963419635046861064
+      Monster_Slime_25: -5172812015974119458
+      Monster_Slime_26: 5679395593603640895
+      Monster_Slime_27: 463755389677078642
+      Monster_Slime_28: -7844122573281165944
+      Monster_Slime_29: 4590070847703269453
+      Monster_Slime_3: -4432407052984358493
+      Monster_Slime_30: -5398058105900357885
+      Monster_Slime_31: -8839340089272399765
+      Monster_Slime_32: -1513755443961213060
+      Monster_Slime_33: -8027967116919742503
+      Monster_Slime_34: -4983463644124588553
+      Monster_Slime_35: 8575895660162822555
+      Monster_Slime_36: 5755857418652871907
+      Monster_Slime_37: 618051925224214306
+      Monster_Slime_38: -4046444909668187310
+      Monster_Slime_39: -4284774863110264242
+      Monster_Slime_4: 5285804459346503263
+      Monster_Slime_40: -2115032707489765550
+      Monster_Slime_41: -6355209767406409278
+      Monster_Slime_42: 3224912406434675
+      Monster_Slime_43: -1018418409526637210
+      Monster_Slime_44: -7816662627635051429
+      Monster_Slime_45: -834577994956492422
+      Monster_Slime_46: 7977168369915258881
+      Monster_Slime_47: 9072225839016850670
+      Monster_Slime_48: -4167288366644009267
+      Monster_Slime_49: -2370715847190331350
+      Monster_Slime_5: 3491422908062058436
+      Monster_Slime_50: 3977776007289927464
+      Monster_Slime_51: -7147633746949404520
+      Monster_Slime_52: -6353306432352039094
+      Monster_Slime_53: 3058353880106758982
+      Monster_Slime_54: 2315077843261025193
+      Monster_Slime_55: -5055631953976411808
+      Monster_Slime_56: 2362528248442983196
+      Monster_Slime_57: -4557913601652711249
+      Monster_Slime_6: 679171327426524334
+      Monster_Slime_7: 2984476211602737767
+      Monster_Slime_8: 1121287077864846453
+      Monster_Slime_9: 5755607827487428154
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
