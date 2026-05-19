@@ -78,6 +78,8 @@ public class PlayerController : BaseEntity
         {
             perfectDodgeTimer -= Time.deltaTime;
         }
+        UIManager.Instance.UpdateDodgeCD(perfectDodgeTimer, perfectDodgeCooldown);
+
     }
 
     private void FixedUpdate()
@@ -393,7 +395,6 @@ public class PlayerController : BaseEntity
         }
     }
 
-    // [KIẾN TRÚC AAA]: Chỉ bỏ qua va chạm với CÁC COLLIDER CỦA RIÊNG KẺ ĐỊCH NÀY
     private IEnumerator PhaseThroughSpecificEntity(GameObject enemyObj)
     {
         isPhasingThrough = true; // Bật cờ I-frame chống sát thương đè
@@ -499,7 +500,7 @@ public class PlayerController : BaseEntity
         {
             anim.SetTrigger("Hurt");
             CancelAttack();
-            if (dashCoroutine != null) StopCoroutine(dashCoroutine);
+            CancelDash();
             
             rb.linearVelocity = Vector2.zero;
             rb.AddForce(actualKnockback, ForceMode2D.Impulse);
@@ -558,6 +559,25 @@ public class PlayerController : BaseEntity
         isAttacking = false;
         anim.SetBool("isAttacking", false);
         DisableHitbox(); 
+    }
+
+    private void CancelDash()
+    {
+        // 1. Giết chết Logic lướt đang chạy ngầm
+        if (dashCoroutine != null) StopCoroutine(dashCoroutine);
+        
+        // 2. Thu hồi toàn bộ quyền né tránh đề phòng lỗi bất tử
+        if (hurtbox != null) hurtbox.isPerfectDodging = false;
+        isPerfectDodge = false;
+        rb.gravityScale = originalGravity; 
+
+        // 3. [TRIỆT TIÊU TRIỆT ĐỂ LỖI BUFFER]: Xóa sạch lệnh chờ trong Animator
+        if (anim != null)
+        {
+            anim.ResetTrigger("Dash");
+            anim.ResetTrigger("Backdash");
+            anim.SetBool("isDashingUpward", false);
+        }
     }
 
     public void EnableHitbox() { if (attackHitbox != null) attackHitbox.SetActive(true); }
