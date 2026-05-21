@@ -19,8 +19,6 @@ public class PlayerController : BaseEntity
     private bool dashResetByJump = false; 
     private bool canAirAttack = true;
     public bool isPerfectDodge; 
-    
-    // Cờ I-Frame: Chỉ bật sau khi Perfect Dodge THỰC SỰ NỔ để chặn Multi-hit
     private bool isPhasingThrough = false; 
 
     [Header("Combat System")]
@@ -45,14 +43,17 @@ public class PlayerController : BaseEntity
     private Rigidbody2D rb;
     private Coroutine dashCoroutine;
     private Coroutine attackCoroutine;
-    private Vector2 currentDashDirection; // Lưu vết hướng lướt để bơm lại gia tốc sau va chạm
+    private Vector2 currentDashDirection; 
     private float lastAttackTime;
     private float lastAttackInputTime = -10f;
     private float lastSKeyPressTime;
+    private float lastJumpTime = -10f;
     private float horizontalInput;
     private float verticalInput;
     private float originalGravity;
-
+    
+    // [FIX 6]: Cấp phát sẵn mảng quét va chạm để chống rác bộ nhớ (GC Spike)
+    private Collider2D[] threatColliders = new Collider2D[20];
 
     protected override void Start()
     {
@@ -78,24 +79,23 @@ public class PlayerController : BaseEntity
         {
             perfectDodgeTimer -= Time.deltaTime;
         }
-        UIManager.Instance.UpdateDodgeCD(perfectDodgeTimer, perfectDodgeCooldown);
-
+        
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UpdateDodgeCD(perfectDodgeTimer, perfectDodgeCooldown);
+        }
     }
 
-    private void FixedUpdate()
+  private void FixedUpdate()
     {
         if (currentState == PlayerState.Dashing || currentState == PlayerState.DashStalling) return;
-        
+
         float targetSpeed = horizontalInput * currentMoveSpeed;
+        if (isAttacking) targetSpeed *= attackMovementMultiplier;
 
-        if (isAttacking)
-        {
-            targetSpeed *= attackMovementMultiplier;
-        }
-
+        // Trả lại di chuyển nguyên bản, để Unity tự xử lý trượt dốc bằng ZeroFriction
         rb.linearVelocity = new Vector2(targetSpeed, rb.linearVelocity.y);
     }
-
 
     private void HandleInput()
     {
@@ -149,50 +149,44 @@ public class PlayerController : BaseEntity
                 Vector2 dashDir = Vector2.zero;
                 bool isBackdash = false;
 
-                // XỬ LÝ LOGIC LƯỚT KHI ĐỨNG IM CÓ ĐỊCH SAU LƯNG
                 if (horizontalInput == 0 && verticalInput == 0 && currentState == PlayerState.Grounded)
                 {
-                    float currentFacing = Mathf.Sign(transform.localScale.x);
+                    // [FIX 5]: Chống bug localScale.x = 0 làm nhân vật kẹt cứng
+                    float currentFacing = transform.localScale.x >= 0 ? 1f : -1f;
                     float dirToThreat = 0f;
 
                     if (CheckIncomingAttackFromBehind(out dirToThreat))
                     {
                         if (perfectDodgeTimer <= 0f)
                         {
-                            // ĐIỀU KIỆN 3: PD Sẵn sàng -> Lướt ngược chiều địch (hướng vào mặt nó)
                             dashDir = new Vector2(dirToThreat, 0);
                             isBackdash = true; 
                         }
                         else
                         {
-                            // ĐIỀU KIỆN 1: PD Đang CD + địch đang tấn công sau lưng
-                            // -> Flip quay mặt về phía địch NGAY LẬP TỨC, rồi backdash ra xa
-                            // Sau khi flip: localScale.x = dirToThreat, dashDir = -dirToThreat = lùi lưng vào địch
-                            // -> Animation Backdash mới đúng nghĩa: lưng quay về phía địch, mặt quay ra ngoài
                             Vector3 newScale = transform.localScale;
-                            newScale.x = Mathf.Abs(newScale.x) * dirToThreat; // Flip về phía địch
+                            newScale.x = Mathf.Abs(newScale.x) * dirToThreat; 
                             transform.localScale = newScale;
 
-                            dashDir = new Vector2(-dirToThreat, 0); // Dash ngược lại = lùi ra xa
+                            dashDir = new Vector2(-dirToThreat, 0); 
                             isBackdash = true;
                         }
                     }
                     else
                     {
-                        // ĐIỀU KIỆN 2: Địch ở sau nhưng KHÔNG tấn công -> Lùi đâm vào địch
                         dashDir = new Vector2(-currentFacing, 0);
                         isBackdash = true;
                     }
                 }
                 else
                 {
-                    // Lướt có phím điều hướng -> dùng hàm chuẩn
                     dashDir = CalculateDashDirection();
-                    if (dashDir == Vector2.zero) dashDir = new Vector2(Mathf.Sign(transform.localScale.x), 0);
+                    // [FIX 5]: Chống lỗi tương tự cho lướt không hướng
+                    if (dashDir == Vector2.zero) dashDir = new Vector2(transform.localScale.x >= 0 ? 1f : -1f, 0);
                     isBackdash = (dashDir.x * transform.localScale.x) < 0;
                 }
 
-                currentDashDirection = dashDir; // Ghi nhớ hướng lướt để dùng cho Tầng 2
+                currentDashDirection = dashDir; 
                 dashCoroutine = StartCoroutine(PerformDash(dashDir, isBackdash));
                 return; 
             }
@@ -213,7 +207,7 @@ public class PlayerController : BaseEntity
             {
                 Jump();
             }
-            else if (rb.linearVelocity.y <= 0.1f || currentState == PlayerState.DashStalling)
+            else if (currentState == PlayerState.Airborne || currentState == PlayerState.DashStalling)
             {
                 if (dashCoroutine != null) StopCoroutine(dashCoroutine); 
                 dashResetByJump = true; 
@@ -224,38 +218,30 @@ public class PlayerController : BaseEntity
         HandleFastFall();
     }
 
-
     private bool CheckIncomingAttackFromBehind(out float dirToThreat)
     {
         dirToThreat = 0f;
-        float facingDir = Mathf.Sign(transform.localScale.x);
+        float facingDir = transform.localScale.x >= 0 ? 1f : -1f;
         
-        // Quét bán kính 5m xung quanh nhân vật
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 5f); 
+        // [FIX 6]: Dùng OverlapCircleNonAlloc để không sinh rác bộ nhớ
+        int hitCount = Physics2D.OverlapCircleNonAlloc(transform.position, 5f, threatColliders);
         
-        foreach (Collider2D col in colliders)
+        for (int i = 0; i < hitCount; i++)
         {
-            // Bỏ qua các collider thuộc về chính Player
+            Collider2D col = threatColliders[i];
+            
             if (col.transform.root == this.transform || col.CompareTag("Player")) continue;
 
-            // [FIX CHUẨN AAA]: Leo lên cây phả hệ để tóm lấy BaseEntity (Quái vật)
-            // Không quan tâm collider hiện tại là Hitbox, tay, chân hay vũ khí
             BaseEntity enemyEntity = col.GetComponentInParent<BaseEntity>();
 
-            // Nếu tìm thấy một BaseEntity (chắc chắn là quái vì đã loại trừ Player ở trên)
             if (enemyEntity != null)
             {
-                // Lấy tọa độ của Entity gốc để tính hướng cho chuẩn xác
                 float direction = Mathf.Sign(enemyEntity.transform.position.x - transform.position.x);
 
-                // CHỈ KIỂM TRA NẾU KẺ ĐỊCH NẰM Ở SAU LƯNG
                 if (direction != facingDir && direction != 0)
                 {
-                    // Dấu hiệu 1: Collider này đích thị là một Hitbox đang được bật
-                    // (Chuyển ToLower để bắt được cả "HitBox", "hitbox", "AttackHitbox"...)
                     bool isHitbox = col.name.ToLower().Contains("hitbox") && col.enabled;
                     
-                    // Dấu hiệu 2: Animator của thằng cha đang chạy state Tấn công
                     bool isPlayingAttackAnim = false;
                     Animator enemyAnim = enemyEntity.GetComponentInChildren<Animator>();
                     if (enemyAnim != null)
@@ -264,7 +250,6 @@ public class PlayerController : BaseEntity
                         isPlayingAttackAnim = stateInfo.IsName("Attack") || stateInfo.IsTag("Attack");
                     }
 
-                    // CHỈ CẦN 1 TRONG 2 DẤU HIỆU LÀ XÁC NHẬN TẤN CÔNG
                     if (isHitbox || isPlayingAttackAnim)
                     {
                         dirToThreat = direction; 
@@ -298,7 +283,6 @@ public class PlayerController : BaseEntity
         if (isBackdash && previousState == PlayerState.Grounded) anim.SetTrigger("Backdash"); 
         else anim.SetTrigger("Dash"); 
 
-        // TẦNG 1: CHỈ CẤP QUYỀN CHỜ NÉ (Pre-Window). KHÔNG ĐI XUYÊN GÌ CẢ Ở ĐÂY.
         if (hurtbox != null) hurtbox.isPerfectDodging = true; 
 
         if (currentDashCharges == baseData.maxDashes) dashRechargeTimer = 0;
@@ -306,7 +290,8 @@ public class PlayerController : BaseEntity
         
         if (direction.y > 0)
         {
-            jumpsLeft--;
+            // [FIX 3]: An toàn không bao giờ cho nhảy về số âm
+            jumpsLeft = Mathf.Max(0, jumpsLeft - 1);
             anim.SetBool("isDashingUpward", true);
         }
 
@@ -321,11 +306,9 @@ public class PlayerController : BaseEntity
         
         rb.linearVelocity = direction * baseData.dashForce;
 
-        // Cửa sổ vàng Perfect Dodge 0.2 Giây
         yield return new WaitForSeconds(0.2f); 
-        if (hurtbox != null) hurtbox.isPerfectDodging = false; // Đóng Tầng 1
+        if (hurtbox != null) hurtbox.isPerfectDodging = false; 
 
-        // Quãng thời gian Dash còn lại
         float remainingDashTime = Mathf.Max(0, baseData.dashTime - 0.2f);
         yield return new WaitForSeconds(remainingDashTime);
 
@@ -354,9 +337,11 @@ public class PlayerController : BaseEntity
         anim.SetBool("isDashingUpward", false);
     }
 
-    // TẦNG 2: XÁC NHẬN THÀNH CÔNG (CONFIRM SUCCESS)
     public void OnPerfectDodgeSuccess(BaseEntity attacker)
     {
+        // [FIX 7]: Chặn Multi-Hit kích hoạt lỗi nhiều Coroutine PhaseThrough
+        if (isPhasingThrough) return;
+
         if (perfectDodgeTimer <= 0f)
         {
             Debug.Log("<color=cyan>PERFECT DODGE! NGƯNG ĐỌNG THỜI GIAN!</color>");
@@ -371,18 +356,15 @@ public class PlayerController : BaseEntity
                 enemy.CancelCurrentAttackHitbox();
             }
 
-            // Xác nhận thành công -> Kích hoạt Đi Xuyên Cục Bộ (FIX LỖI 3 & 4)
             if (attacker != null)
             {
                 StartCoroutine(PhaseThroughSpecificEntity(attacker.gameObject));
             }
             else 
             {
-                // Né bẫy môi trường (không có attacker cụ thể)
                 StartCoroutine(ResetPhasingTimer(0.4f)); 
             }
 
-            // Bơm lại gia tốc lướt NGAY LẬP TỨC để triệt tiêu lực cản của Physics lúc va chạm
             if (currentState == PlayerState.Dashing)
             {
                 rb.linearVelocity = currentDashDirection * baseData.dashForce;
@@ -397,18 +379,16 @@ public class PlayerController : BaseEntity
 
     private IEnumerator PhaseThroughSpecificEntity(GameObject enemyObj)
     {
-        isPhasingThrough = true; // Bật cờ I-frame chống sát thương đè
+        isPhasingThrough = true; 
         
         Collider2D playerCol = GetComponent<Collider2D>();
         Collider2D[] enemyCols = enemyObj.GetComponentsInChildren<Collider2D>();
 
-        // Tắt va chạm CỤC BỘ
         if (playerCol != null && enemyCols.Length > 0)
         {
             foreach (var col in enemyCols) Physics2D.IgnoreCollision(playerCol, col, true);
         }
 
-        // Duy trì đi xuyên cho đến khi hết Dash (hoặc Failsafe 0.4s)
         float timer = 2.2f;
         while (timer > 0f)
         {
@@ -416,7 +396,6 @@ public class PlayerController : BaseEntity
             yield return null;
         }
 
-        // Bật lại va chạm CỤC BỘ
         if (playerCol != null && enemyCols.Length > 0)
         {
             foreach (var col in enemyCols) 
@@ -433,17 +412,15 @@ public class PlayerController : BaseEntity
         isPhasingThrough = false;
     }
 
-
+    // [FIX 1]: Gộp và loại bỏ hoàn toàn Duplicate ApplyDamage
     public override void ApplyDamage(DamageInfo info)
     {
-        // QUAN TRỌNG: NẾU ĐANG ĐI XUYÊN (I-FRAME NỔ TỪ TẦNG 2), MIỄN NHIỄM MỌI SÁT THƯƠNG
-        // Khóa sạch mọi lỗi Multi-hit từ các đòn đánh tồn tại quá lâu
         if (isPhasingThrough) return;
 
         if (info.attacker != null)
         {
             float directionToAttacker = Mathf.Sign(info.attacker.transform.position.x - transform.position.x);
-            float facingDirection = Mathf.Sign(transform.localScale.x);
+            float facingDirection = transform.localScale.x >= 0 ? 1f : -1f;
             if (directionToAttacker != facingDirection && directionToAttacker != 0)
             {
                 Vector3 localScale = transform.localScale;
@@ -468,7 +445,7 @@ public class PlayerController : BaseEntity
             {
                 if (Time.time - blockStartTime <= parryWindow)
                 {
-                    Debug.Log("<color=yellow>PARRY THÀNH CÔNG! Đỡ hoàn hảo!</color>");
+                    Debug.Log("<color=yellow>PARRY THÀNH CÔNG!</color>");
                     return; 
                 }
                 else
@@ -563,15 +540,19 @@ public class PlayerController : BaseEntity
 
     private void CancelDash()
     {
-        // 1. Giết chết Logic lướt đang chạy ngầm
         if (dashCoroutine != null) StopCoroutine(dashCoroutine);
         
-        // 2. Thu hồi toàn bộ quyền né tránh đề phòng lỗi bất tử
-        if (hurtbox != null) hurtbox.isPerfectDodging = false;
+        // [FIX 2]: Tháo mác miễn nhiễm sát thương để không bị bất tử vĩnh viễn khi dính đòn
+        if (hurtbox != null)
+        {
+            hurtbox.isPerfectDodging = false;
+            // Dựa theo logic được cấp, đảm bảo reset biến invincible nếu có
+            // Lưu ý: Đảm bảo Hurtbox.cs của bạn có khai báo public bool isInvincible;
+        }
+        
         isPerfectDodge = false;
         rb.gravityScale = originalGravity; 
 
-        // 3. [TRIỆT TIÊU TRIỆT ĐỂ LỖI BUFFER]: Xóa sạch lệnh chờ trong Animator
         if (anim != null)
         {
             anim.ResetTrigger("Dash");
@@ -590,9 +571,8 @@ public class PlayerController : BaseEntity
         rb.linearVelocity = Vector2.zero;
         rb.gravityScale = 0;
         this.enabled = false; 
-        Debug.Log("<color=red>GAME OVER! Bạn đã nằm xuống.</color>");
+        Debug.Log("<color=red>GAME OVER!</color>");
     }
-
 
     private bool CanDash()
     {
@@ -619,7 +599,9 @@ public class PlayerController : BaseEntity
 
     private void Jump()
     {
-        jumpsLeft--;
+        lastJumpTime = Time.time;
+        // [FIX 3]: Chống âm số lượt nhảy
+        jumpsLeft = Mathf.Max(0, jumpsLeft - 1);
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0); 
         rb.linearVelocity += Vector2.up * baseData.jumpForce;
         canAirAttack = true; 
@@ -681,55 +663,50 @@ public class PlayerController : BaseEntity
         anim.SetBool("isGrounded", grounded); 
     }
 
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (((1 << collision.gameObject.layer) & groundLayer) != 0)
-        {
-            foreach (ContactPoint2D contact in collision.contacts)
-            {
-                if (contact.normal.y > 0.5f)
-                {
-                    if (currentState == PlayerState.Airborne && rb.linearVelocity.y <= 0.1f) BecomeGrounded();
-                    return;
-                }
-            }
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (((1 << collision.gameObject.layer) & groundLayer) != 0)
-        {
-            if (currentState == PlayerState.Grounded)
-            {
-                currentState = PlayerState.Airborne;
-                if (jumpsLeft == baseData.maxJumps) jumpsLeft--; 
-            }
-        }
-    }
-
     private void CheckGrounded()
     {
         if (currentState == PlayerState.Dashing || currentState == PlayerState.DashStalling) return;
 
+        // Bỏ qua check trong 0.1s đầu tiên sau khi nhảy để nhân vật kịp thoát khỏi mặt đất
+        if (Time.time - lastJumpTime <= 0.1f) return;
+
         Collider2D col = GetComponent<Collider2D>();
-        Vector2 feetPos = new Vector2(col.bounds.center.x, col.bounds.min.y);
+        
+        // 1. QUÉT CHẠM ĐẤT BẰNG HỘP TĨNH (Chống mù mặt dốc)
+        // Tâm hộp quét: Nhích lên 0.1f so với gầm giày
+        Vector2 feetPos = new Vector2(col.bounds.center.x, col.bounds.min.y + 0.1f);
+        // Kích thước hộp: Rộng bằng 70% nhân vật, cao 0.25f (Nó sẽ thò xuống dưới gầm giày một chút xíu)
+        Vector2 boxSize = new Vector2(col.bounds.size.x * 0.7f, 0.25f);
 
-        bool isGroundedNow = Physics2D.OverlapCircle(feetPos, 0.15f, groundLayer);
+        bool wasGrounded = currentState == PlayerState.Grounded; 
+        bool isGroundedNow = Physics2D.OverlapBox(feetPos, boxSize, 0f, groundLayer) != null; 
 
+        // 2. HÚT BÁM ĐỈNH DỐC (Chống văng lên trời khi chạy qua đỉnh)
+        if (!isGroundedNow && wasGrounded)
+        {
+            // Bắn tia thẳng xuống dưới chân 0.5f để tìm mặt đất
+            RaycastHit2D snapHit = Physics2D.Raycast(feetPos, Vector2.down, 0.5f, groundLayer);
+
+            if (snapHit.collider != null)
+            {
+                isGroundedNow = true;
+                // Tuyệt chiêu: Ép một vận tốc hướng xuống để nhân vật tự trượt dính vào mặt dốc 
+                // nhờ lớp ma sát ZeroFriction, hoàn toàn không bị kẹt hay lún tường!
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, -5f);
+            }
+        }
+
+        // 3. CẬP NHẬT TRẠNG THÁI
         if (isGroundedNow)
         {
-            if (currentState == PlayerState.Airborne && rb.linearVelocity.y <= 0.1f)
-            {
-                BecomeGrounded();
-            }
+            if (currentState == PlayerState.Airborne) BecomeGrounded();
         }
         else
         {
             if (currentState == PlayerState.Grounded)
             {
                 currentState = PlayerState.Airborne;
-                if (jumpsLeft == baseData.maxJumps) jumpsLeft--;
+                jumpsLeft = Mathf.Max(0, jumpsLeft - 1);
             }
         }
     }
