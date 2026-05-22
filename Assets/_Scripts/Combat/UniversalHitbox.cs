@@ -3,7 +3,6 @@ using UnityEngine;
 public class UniversalHitbox : MonoBehaviour 
 {
     [Header("Damage Settings")]
-    public float damage = 10f;
     public Vector2 baseKnockback = new Vector2(5f, 2f);
     
     [Header("Hitbox Owner")]
@@ -16,15 +15,43 @@ public class UniversalHitbox : MonoBehaviour
         
         if (targetHurtbox != null)
         {
-            // Tự động tính toán hướng văng dựa trên vị trí Owner
             int pushDirection = targetHurtbox.transform.position.x < owner.transform.position.x ? -1 : 1;
             Vector2 finalKnockback = new Vector2(baseKnockback.x * pushDirection, baseKnockback.y);
 
+            // --- TÍNH TOÁN SÁT THƯƠNG ĐỘNG TỪ CHỈ SỐ ---
+            float finalDamage = 0f;
+            bool isCriticalHit = false;
+
+            if (owner != null)
+            {
+                PlayerController player = owner.GetComponent<PlayerController>();
+                if (player != null)
+                {
+                    // Nếu chủ nhân là Player -> Lấy Sát thương có tính Combo và Crit
+                    finalDamage = player.GetCurrentMeleeDamage(out isCriticalHit);
+                }
+                else
+                {
+                    BaseEntity enemy = owner.GetComponent<BaseEntity>();
+                    if (enemy != null)
+                    {
+                        // Nếu chủ nhân là Quái -> Lấy thẳng chỉ số Attack (không Crit, không Combo)
+                        finalDamage = enemy.Attack;
+                    }
+                }
+            }
+            else 
+            {
+                // Fallback (phòng hờ bạn tạo bẫy chông môi trường không có chủ)
+                finalDamage = 10f; 
+            }
+
             DamageInfo info = new DamageInfo
             {
-                damage = this.damage,
+                damage = finalDamage,
                 knockbackForce = finalKnockback,
-                attacker = this.owner
+                attacker = this.owner,
+                isCritical = isCriticalHit // Gắn cờ Crit vào Info
             };
 
             targetHurtbox.TakeDamage(info);

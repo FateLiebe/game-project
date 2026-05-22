@@ -24,11 +24,13 @@ public class PlayerController : BaseEntity
     [Header("Combat System")]
     [SerializeField] private GameObject attackHitbox;
     [SerializeField] private float[] attackDurations = new float[] { 0.3f, 0.4f, 0.6f }; 
+    [SerializeField] private float[] comboDamageMultipliers = new float[] { 0.8f, 1.1f, 1.3f };
     [SerializeField] private float attackInputBufferTime = 0.2f; 
     [SerializeField] [Range(0f, 1f)] private float attackMovementMultiplier = 0.3f;
     [SerializeField] private float parryWindow = 0.2f; 
     [SerializeField] private float blockDamageReduction = 0.2f; 
     [SerializeField] private float perfectDodgeCooldown = 15f;
+    
     
     private float perfectDodgeTimer = 0f;
     private float blockStartTime;
@@ -709,5 +711,25 @@ public class PlayerController : BaseEntity
                 jumpsLeft = Mathf.Max(0, jumpsLeft - 1);
             }
         }
+    }
+
+    public float GetCurrentMeleeDamage(out bool isCrit)
+    {
+        isCrit = false;
+        
+        // 1. Tính sát thương dựa trên Step Combo hiện tại (comboStep bắt đầu từ 1 nên index mảng là comboStep - 1)
+        int currentComboIndex = Mathf.Clamp(comboStep - 1, 0, comboDamageMultipliers.Length - 1);
+        float multiplier = comboDamageMultipliers[currentComboIndex];
+        
+        float finalDamage = Attack * multiplier;
+
+        // 2. Tính tỉ lệ bạo kích
+        if (UnityEngine.Random.Range(0f, 100f) <= CritRate)
+        {
+            finalDamage *= baseData.critDamageMultiplier; // x1.7 sát thương
+            isCrit = true;
+        }
+
+        return finalDamage; 
     }
 }

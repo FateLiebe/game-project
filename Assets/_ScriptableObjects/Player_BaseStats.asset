@@ -12,9 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a0712c07d5164498e71fd8cd2c3224, type: 3}
   m_Name: Player_BaseStats
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDataSO
-  maxHealth: 100
-  defense: 5
-  moveSpeed: 9
+  moveSpeed: 8
   jumpForce: 12.5
   fastFallSpeed: 18
   maxJumps: 2
@@ -26,3 +24,13 @@ MonoBehaviour:
   maxAirDashes: 2
   comboResetTime: 0.6
   doubleTapThreshold: 0.25
+  baseMaxHealth: 30
+  baseAttack: 10
+  baseDefense: 4
+  baseCritRate: 5
+  critDamageMultiplier: 1.7
+  healthGrowth: 10
+  attackGrowth: 5
+  defenseGrowth: 3
+  critRateGrowth: 1
+  statPointsPerLevel: 5
