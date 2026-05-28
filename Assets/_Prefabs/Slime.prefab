@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 6424415695244603377}
   m_Layer: 6
   m_Name: Slime
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -163,11 +163,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   baseData: {fileID: 11400000, guid: 15d431dc04dcd254c8139f3bac89be8a, type: 2}
   damagePopupPrefab: {fileID: 4376294689076033710, guid: 44f05228ddad8ca4c88eeac3e598a23e, type: 3}
+  currentHealth: 0
   timeMultiplier: 1
   currentLevel: 1
   currentStatPoints: 0
   currentEXP: 0
   expToNextLevel: 30
+  equipHealthBonus: 0
+  equipAttackBonus: 0
+  equipDefenseBonus: 0
+  equipCritRateBonus: 0
+  equipCritDamageBonus: 0
+  equipSpeedBonus: 0
   addedHealthPoints: 0
   addedAttackPoints: 0
   addedDefensePoints: 0

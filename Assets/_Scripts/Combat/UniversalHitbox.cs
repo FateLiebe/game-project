@@ -15,6 +15,19 @@ public class UniversalHitbox : MonoBehaviour
         
         if (targetHurtbox != null)
         {
+            // ==========================================
+            // --- BỘ LỌC MỤC TIÊU (CHẶN QUÁI ĐÁNH LUNG TUNG) ---
+            // ==========================================
+            if (owner != null && owner.CompareTag("Enemy"))
+            {
+                // Kiểm tra xem nạn nhân có mang tag "Player" không (quét bản thân nó và đối tượng cha)
+                bool isHittingPlayer = collision.gameObject.CompareTag("Player") || collision.transform.root.CompareTag("Player");
+                
+                // Nếu nạn nhân KHÔNG PHẢI Player (mà là Thùng, Cây, v.v...) -> Hủy đòn đánh!
+                if (!isHittingPlayer) return; 
+            }
+            // ==========================================
+
             int pushDirection = targetHurtbox.transform.position.x < owner.transform.position.x ? -1 : 1;
             Vector2 finalKnockback = new Vector2(baseKnockback.x * pushDirection, baseKnockback.y);
 

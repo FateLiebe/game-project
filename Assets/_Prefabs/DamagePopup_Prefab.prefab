@@ -127,7 +127,7 @@ MonoBehaviour:
     bottomLeft: {r: 1, g: 1, b: 1, a: 1}
     bottomRight: {r: 1, g: 1, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
+  m_spriteAsset: {fileID: 11400000, guid: edc4b701bf3ff1e4d985886e661f400e, type: 2}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
   m_TextStyleHashCode: -1183493901
@@ -204,7 +204,7 @@ SortingGroup:
   m_GameObject: {fileID: 4376294689076033710}
   m_Enabled: 1
   m_SortingLayerID: -1618298831
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: 10
   m_SortAtRoot: 0
   m_Sort3DAs2D: 0

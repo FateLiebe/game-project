@@ -23,7 +23,6 @@ public class EnemyController : EnemyBase
     [SerializeField] private LayerMask playerLayer;
 
     private Animator anim;
-    private Rigidbody2D rb;
     private Transform playerTarget;
     
     private float stateTimer;
@@ -32,9 +31,8 @@ public class EnemyController : EnemyBase
 
     protected override void Start()
     {
-        base.Start(); // Gọi Start của EnemyBase để lấy máu
+        base.Start(); // Gọi Start của EnemyBase để lấy máu, nó tự gán 'rb' luôn rồi!
         anim = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
 
         RaycastHit2D hit = Physics2D.Raycast(
         transform.position,

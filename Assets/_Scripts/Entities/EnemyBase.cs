@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyBase : BaseEntity 
 {
     private SpriteRenderer sr;
-    private Rigidbody2D rb;
+    protected Rigidbody2D rb;
 
     protected override void Start()
     {

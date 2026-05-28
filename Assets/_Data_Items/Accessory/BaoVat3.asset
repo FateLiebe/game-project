@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3124a28971ba53044a7e1af36f0e447a, type: 3}
+  m_Name: BaoVat3
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: "B\u1EA3o V\u1EADt 3"
+  description: 
+  icon: {fileID: 1866985168, guid: 3004fc65676a97e469c78fa733b779c3, type: 3}
+  itemType: 6
+  rarity: 3
+  healthBonus: 0
+  attackBonus: 0
+  defenseBonus: 0
+  critRateBonus: 5
+  critDamageBonus: 15
+  speedBonus: 0
+  healAmount: 0

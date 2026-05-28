@@ -70,22 +70,38 @@ public class PlayerController : BaseEntity
 
     private void Update()
     {
+        // 1. Cho phép các đồng hồ đếm ngược (như hồi Dash, hồi Dodge) vẫn chạy ngầm khi đang mở túi
         HandleDashRecharge();
+        if (perfectDodgeTimer > 0)
+        {
+            perfectDodgeTimer -= Time.deltaTime;
+        }
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UpdateDodgeCD(perfectDodgeTimer, perfectDodgeCooldown);
+        }
+
+        // ========================================================
+        // 2. CHẶN THAO TÁC NGAY TRƯỚC KHI NHẬN NÚT (SỬA TẠI ĐÂY)
+        // ========================================================
+        if (StatsUIManager.Instance != null && StatsUIManager.Instance.IsOpen)
+        {
+            horizontalInput = 0; // Ép nhả nút phím điều hướng
+            verticalInput = 0;
+            
+            // Dừng trượt ngang nhưng vẫn cho phép rơi tự do nếu mở túi trên không
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y); 
+            
+            UpdateAnimations(); // Ép nhân vật đứng im (Idle)
+            return; // Đuổi code quay về, NGẮT TOÀN BỘ việc gọi các hàm bên dưới!
+        }
+
+        // 3. Nếu túi đồ KHÔNG mở, đoạn code dưới đây mới được phép chạy
         HandleInput();
         HandleComboReset();
         Flip();
         UpdateAnimations();
         CheckGrounded();
-
-        if (perfectDodgeTimer > 0)
-        {
-            perfectDodgeTimer -= Time.deltaTime;
-        }
-        
-        if (UIManager.Instance != null)
-        {
-            UIManager.Instance.UpdateDodgeCD(perfectDodgeTimer, perfectDodgeCooldown);
-        }
     }
 
   private void FixedUpdate()

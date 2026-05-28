@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3124a28971ba53044a7e1af36f0e447a, type: 3}
+  m_Name: Bua skill 1
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: "\xDD Ch\u1EC9 Th\u1EA7n S\u1EA5m"
+  description: "G\u1ECDi s\u1EA5m s\xE9t h\u1ED7 tr\u1EE3 g\xE2y s\xE1t th\u01B0\u01A1ng"
+  icon: {fileID: 1210084849, guid: b435831bd28698245b39e1b4daee86e9, type: 3}
+  itemType: 7
+  rarity: 2
+  healthBonus: 0
+  attackBonus: 0
+  defenseBonus: 0
+  critRateBonus: 0
+  critDamageBonus: 0
+  speedBonus: 0
+  healAmount: 0

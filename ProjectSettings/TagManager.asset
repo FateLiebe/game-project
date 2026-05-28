@@ -17,7 +17,7 @@ TagManager:
   - EnemyHitbox
   - PlayerHitbox
   - Player
-  - 
+  - Item
   - 
   - 
   - 
@@ -39,11 +39,11 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Background
-    uniqueID: 3494849709
-    locked: 0
   - name: UI
     uniqueID: 2676668465
+    locked: 0
+  - name: Background
+    uniqueID: 3494849709
     locked: 0
   - name: Default
     uniqueID: 0
