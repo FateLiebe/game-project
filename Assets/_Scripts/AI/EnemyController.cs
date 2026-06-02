@@ -3,7 +3,6 @@ using System.Collections;
 
 public class EnemyController : EnemyBase
 {
-    // BỘ NÃO FSM: 6 Trạng thái cốt lõi
     public enum EnemyState { Idle, Patrol, Chase, Attack, Hurt, Dead }
     
     [Header("AI State")]
@@ -12,13 +11,13 @@ public class EnemyController : EnemyBase
     [Header("Movement & Vision Settings")]
     [SerializeField] private float patrolSpeed = 2f;
     [SerializeField] private float chaseSpeed = 3.5f;
-    [SerializeField] private float lineOfSight = 6f;       // Tầm nhìn quét Player
-    [SerializeField] private float attackRange = 1.2f;     // Tầm vung kiếm
-    [SerializeField] private float idleDuration = 1.5f;    // Thời gian đứng thở
+    [SerializeField] private float lineOfSight = 6f;       
+    [SerializeField] private float attackRange = 1.2f;     
+    [SerializeField] private float idleDuration = 1.5f;    
     
     [Header("Detection (Kẻ tia)")]
-    [SerializeField] private Transform wallCheck;          // Điểm gắn ở bụng để check tường
-    [SerializeField] private Transform ledgeCheck;         // Điểm gắn ở mép chân check vực
+    [SerializeField] private Transform wallCheck;          
+    [SerializeField] private Transform ledgeCheck;         
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask playerLayer;
 
@@ -26,12 +25,12 @@ public class EnemyController : EnemyBase
     private Transform playerTarget;
     
     private float stateTimer;
-    private int facingDir = 1; // -1: quay trái, 1: quay phải
-    private bool canAction = true; // Khóa AI khi đang bị đánh hoặc đang chém
+    private int facingDir = 1; 
+    private bool canAction = true; 
 
     protected override void Start()
     {
-        base.Start(); // Gọi Start của EnemyBase để lấy máu, nó tự gán 'rb' luôn rồi!
+        base.Start(); 
         anim = GetComponent<Animator>();
 
         RaycastHit2D hit = Physics2D.Raycast(
@@ -48,16 +47,13 @@ public class EnemyController : EnemyBase
             transform.position = pos;
         }
         
-        // Khởi tạo FSM
         SwitchState(EnemyState.Patrol);
     }
 
     private void Update()
     {
-        // Nếu đã chết hoặc đang bị choáng/đang chém thì không cho AI suy nghĩ
         if (currentState == EnemyState.Dead || !canAction) return;
 
-        // VÒNG LẶP SUY NGHĨ (FSM)
         switch (currentState)
         {
             case EnemyState.Idle:
@@ -70,26 +66,21 @@ public class EnemyController : EnemyBase
                 UpdateChase();
                 break;
             case EnemyState.Attack:
-                // Logic Attack được xử lý qua Coroutine
                 break;
         }
 
         UpdateAnimations();
     }
 
-    // ==========================================
-    // CÁC HÀM XỬ LÝ TRẠNG THÁI
-    // ==========================================
     private void UpdateIdle()
     {
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         
-        // Luôn kiểm tra xem có ai đứng sát mặt không
+        // Nhờ DetectPlayer nâng cấp, nếu trả về true nghĩa là Player chắc chắn CÒN SỐNG
         if (DetectPlayer()) 
         {
             float dist = Vector2.Distance(transform.position, playerTarget.position);
             
-            // [ĐÃ SỬA]: Chỉ chém nếu sát mặt VÀ chiêu đã hồi xong
             if (dist <= attackRange && CanAttack(0)) 
             {
                 SwitchState(EnemyState.Attack);
@@ -101,7 +92,6 @@ public class EnemyController : EnemyBase
             return;
         }
 
-        // Đếm ngược chậm đi nếu bị ngưng đọng thời gian
         stateTimer -= Time.deltaTime * timeMultiplier; 
         if (stateTimer <= 0)
         {
@@ -112,17 +102,14 @@ public class EnemyController : EnemyBase
 
     private void UpdatePatrol()
     {
-        // Vừa đi vừa check vực và tường
         if (CheckWall() || !CheckLedge())
         {
             SwitchState(EnemyState.Idle);
             return;
         }
 
-        // Tốc độ đi tuần bị bóp theo timeMultiplier
         rb.linearVelocity = new Vector2(patrolSpeed * facingDir * timeMultiplier, rb.linearVelocity.y);
 
-        // Đang đi tuần mà quét thấy Player
         if (DetectPlayer())
         {
             SwitchState(EnemyState.Chase);
@@ -137,7 +124,15 @@ public class EnemyController : EnemyBase
             return;
         }
 
-        // Nếu Player chạy ra khỏi tầm nhìn (x2 để đuổi dai hơn 1 chút)
+        // KIỂM TRA SINH TỬ: Kẻ địch đang rượt có lỡ đột tử không?
+        BaseEntity targetEntity = playerTarget.GetComponentInParent<BaseEntity>();
+        if (targetEntity == null || targetEntity.currentHealth <= 0)
+        {
+            playerTarget = null;
+            SwitchState(EnemyState.Idle); // Lập tức quay xe đi tuần tra
+            return;
+        }
+
         float distToPlayer = Vector2.Distance(transform.position, playerTarget.position);
         if (distToPlayer > lineOfSight * 1.5f)
         {
@@ -146,34 +141,28 @@ public class EnemyController : EnemyBase
             return;
         }
 
-        // Đã vào tầm chém
         if (distToPlayer <= attackRange)
         {
-            // [ĐÃ SỬA]: Kiểm tra xem Đòn đánh số 0 đã hồi chưa?
             if (CanAttack(0))
             {
                 SwitchState(EnemyState.Attack);
             }
             else
             {
-                // Nếu chưa hồi: Đứng nhìn chằm chằm (giữ vận tốc = 0) chờ hồi chiêu
                 FacePlayer();
                 rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
             }
             return;
         }
 
-        // Quay mặt theo Player và rượt
         FacePlayer();
         
-        // Cảnh báo: Rượt nhưng vẫn phải check vực kẻo rơi xuống hố
         if (!CheckLedge() || CheckWall())
         {
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         }
         else
         {
-            // Tốc độ rượt đuổi bị bóp theo timeMultiplier
             rb.linearVelocity = new Vector2(chaseSpeed * facingDir * timeMultiplier, rb.linearVelocity.y);
         }
     }
@@ -181,14 +170,12 @@ public class EnemyController : EnemyBase
     private IEnumerator PerformAttack()
     {
         canAction = false;
-        rb.linearVelocity = Vector2.zero; // Dừng lại để chém
+        rb.linearVelocity = Vector2.zero; 
         
         anim.SetTrigger("Attack");
 
-        // [ĐÃ SỬA]: Gọi hàm ghi sổ, bắt đầu đếm ngược Cooldown cho chiêu số 0
         RecordAttackUsage(0); 
 
-        // Dùng vòng lặp bị ảnh hưởng bởi làm chậm thay vì WaitForSeconds(1f)
         float timer = 0f;
         while(timer < 1f)
         {
@@ -197,7 +184,7 @@ public class EnemyController : EnemyBase
         }
         
         canAction = true;
-        SwitchState(EnemyState.Chase); // Chém xong check xem còn đuổi được không
+        SwitchState(EnemyState.Chase); 
     }
 
     public void CancelCurrentAttackHitbox()
@@ -208,21 +195,16 @@ public class EnemyController : EnemyBase
         }
     }
 
-    // ==========================================
-    // HỆ THỐNG GIAO TIẾP VỚI ENEMY_BASE
-    // ==========================================
     public override void ApplyDamage(DamageInfo info)
     {
-        base.ApplyDamage(info); // Vẫn gọi nháy đỏ và văng lùi ở file Base
+        base.ApplyDamage(info); 
 
         if (currentHealth > 0)
         {
-            // Ngắt các hành động hiện tại
             StopAllCoroutines();
             SwitchState(EnemyState.Hurt);
             anim.SetTrigger("Hurt");
             
-            // Tìm ra kẻ đánh mình để quay mặt lại thù hận
             if (info.attacker != null)
             {
                 playerTarget = info.attacker.transform;
@@ -237,7 +219,6 @@ public class EnemyController : EnemyBase
     {
         canAction = false;
 
-        // Thời gian choáng lâu hơn nếu bị Time Stop
         float timer = 0f;
         while(timer < 0.4f)
         {
@@ -246,7 +227,7 @@ public class EnemyController : EnemyBase
         }
 
         canAction = true;
-        SwitchState(EnemyState.Chase); // Ăn đòn xong là điên lên rượt luôn
+        SwitchState(EnemyState.Chase); 
     }
 
     protected override void Die()
@@ -257,12 +238,9 @@ public class EnemyController : EnemyBase
         anim.SetBool("isDead", true);
         rb.linearVelocity = Vector2.zero;
         GetComponent<Collider2D>().enabled = false;
-        this.enabled = false; // Tắt bộ não AI
+        this.enabled = false; 
     }
 
-    // ==========================================
-    // HỆ THỐNG GIÁC QUAN (SENSORS)
-    // ==========================================
     private void SwitchState(EnemyState newState)
     {
         currentState = newState;
@@ -284,31 +262,36 @@ public class EnemyController : EnemyBase
 
     private bool DetectPlayer()
     {
-        // 1. QUÉT TẦM XA (Tia đỏ): Để bắt đầu đuổi theo khi thấy mục tiêu từ xa
+        // [NÂNG CẤP]: Cả 2 hệ thống quét giờ đây đều phải kiểm tra Máu của nạn nhân
+        
         if (wallCheck != null)
         {
             RaycastHit2D hit = Physics2D.Raycast(wallCheck.position, Vector2.right * facingDir, lineOfSight, playerLayer);
             if (hit.collider != null)
             {
-                playerTarget = hit.transform;
-                return true;
+                BaseEntity target = hit.collider.GetComponentInParent<BaseEntity>();
+                if (target != null && target.currentHealth > 0)
+                {
+                    playerTarget = target.transform;
+                    return true;
+                }
             }
         }
 
-        // 2. QUÉT CỰ LY GẦN (Vòng tròn cam): Đứng sát mặt là dính ngay, không cần nhìn
         Collider2D closeHit = Physics2D.OverlapCircle(transform.position, attackRange, playerLayer);
         if (closeHit != null)
         {
-            playerTarget = closeHit.transform;
-            return true;
+            BaseEntity target = closeHit.GetComponentInParent<BaseEntity>();
+            if (target != null && target.currentHealth > 0)
+            {
+                playerTarget = target.transform;
+                return true;
+            }
         }
 
         return false;
     }
 
-    // ==========================================
-    // TIỆN ÍCH DI CHUYỂN & ANIMATION
-    // ==========================================
     private void Flip()
     {
         facingDir *= -1;
@@ -326,21 +309,17 @@ public class EnemyController : EnemyBase
 
     private void UpdateAnimations()
     {
-        // Gửi vận tốc cho Animator để biết đang đi chậm (Patrol) hay chạy nhanh (Chase)
         anim.SetFloat("speed", Mathf.Abs(rb.linearVelocity.x));
     }
 
-    // Khối code này chỉ chạy trong màn hình Scene để dễ Debug, không hiện ra trong game thật
     private void OnDrawGizmos()
     {
-        // 1. Vẽ tia quét Player (Màu Đỏ)
         if (wallCheck != null)
         {
             Gizmos.color = Color.red;
             Gizmos.DrawLine(wallCheck.position, wallCheck.position + Vector3.right * facingDir * lineOfSight);
         }
 
-        // 2. Vẽ vòng tròn tầm chém Attack Range (Màu Cam)
         Gizmos.color = new Color(1f, 0.5f, 0f, 0.5f);
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }

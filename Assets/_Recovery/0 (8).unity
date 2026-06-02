@@ -52941,17 +52941,16 @@ MonoBehaviour:
   isPerfectDodge: 0
   attackHitbox: {fileID: 828317575}
   attackDurations:
-  - 0.25
-  - 0.5
-  - 0.583
+  - 0.214
+  - 0.429
+  - 0.438
   comboDamageMultipliers:
   - 0.8
   - 1.1
   - 1.3
   attackInputBufferTime: 0.01
   attackMovementMultiplier: 0.3
-  parryWindow: 0.2
-  blockDamageReduction: 0.2
+  perfectDodgeWindow: 0.4
   perfectDodgeCooldown: 15
   groundLayer:
     serializedVersion: 2

@@ -157,12 +157,11 @@ public class ItemTooltipUI : MonoBehaviour
         // ===== BAT TOOLTIP =====
         tooltipPanel.SetActive(true);
 
-        // Ep Unity rebuild UI ngay lap tuc
-        Canvas.ForceUpdateCanvases();
-
         if (rectTransform != null)
         {
+            Canvas.ForceUpdateCanvases();
             LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
+            Canvas.ForceUpdateCanvases();
 
             // Dat tooltip tai vi tri chuot
             if (parentRect != null)
@@ -176,11 +175,40 @@ public class ItemTooltipUI : MonoBehaviour
                     out localPoint
                 );
 
-                // [ĐÃ SỬA]: Nhích Tooltip sang phải 15 pixel và xuống dưới 15 pixel
-                // Để nó hoàn toàn né con trỏ chuột, trả lại vùng không gian cho cú click thứ 2
-                localPoint += new Vector2(15f, -15f);
+                // Kich thuoc tooltip sau khi rebuild
+                Vector2 tooltipSize = rectTransform.rect.size;
 
-                rectTransform.anchoredPosition = localPoint;
+                // Kich thuoc canvas
+                Vector2 canvasSize = parentRect.rect.size;
+
+                // Mac dinh hien ben phai duoi chuot
+                Vector2 offset = new Vector2(15f, -15f);
+
+                // ===== KIEM TRA MEP PHAI =====
+                if (localPoint.x + tooltipSize.x > canvasSize.x * 0.5f)
+                {
+                    offset.x = -tooltipSize.x - 15f;
+                }
+
+                // ===== KIEM TRA MEP TRAI =====
+                if (localPoint.x - tooltipSize.x < -canvasSize.x * 0.5f)
+                {
+                    offset.x = 15f;
+                }
+
+                // ===== KIEM TRA MEP DUOI =====
+                if (localPoint.y - tooltipSize.y < -canvasSize.y * 0.5f)
+                {
+                    offset.y = tooltipSize.y + 15f;
+                }
+
+                // ===== KIEM TRA MEP TREN =====
+                if (localPoint.y > canvasSize.y * 0.5f - 50f)
+                {
+                    offset.y = -15f;
+                }
+
+                rectTransform.anchoredPosition = localPoint + offset;
             }
         }
 

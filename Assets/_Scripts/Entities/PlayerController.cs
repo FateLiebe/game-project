@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PlayerController : BaseEntity
 {
-    public enum PlayerState { Grounded, Airborne, Dashing, DashStalling, Attacking, Blocking }
+    public enum PlayerState { Grounded, Airborne, Dashing, DashStalling, Attacking }
 
     [Header("State Machine")]
     [SerializeField] private PlayerState currentState = PlayerState.Airborne;
@@ -27,12 +27,12 @@ public class PlayerController : BaseEntity
     [SerializeField] private float[] comboDamageMultipliers = new float[] { 0.8f, 1.1f, 1.3f };
     [SerializeField] private float attackInputBufferTime = 0.2f; 
     [SerializeField] [Range(0f, 1f)] private float attackMovementMultiplier = 0.3f;
-    [SerializeField] private float parryWindow = 0.2f; 
-    [SerializeField] private float blockDamageReduction = 0.2f; 
+    
+    // [ĐÃ SỬA]: Biến độc lập quản lý thời gian dễ dãi của Perfect Dodge
+    [SerializeField] private float perfectDodgeWindow = 0.4f; 
     [SerializeField] private float perfectDodgeCooldown = 15f;
     
     private float perfectDodgeTimer = 0f;
-    private float blockStartTime;
     private float currentAttackDuration = 0f;
     private bool isAttacking = false;
     private Hurtbox hurtbox;
@@ -106,17 +106,6 @@ public class PlayerController : BaseEntity
 
     private void HandleInput()
     {
-        if (currentState == PlayerState.Blocking) 
-        {
-            horizontalInput = 0; 
-            if (Input.GetKeyUp(KeyCode.R))
-            {
-                currentState = PlayerState.Grounded;
-                anim.SetBool("isBlocking", false);
-            }
-            return; 
-        }
-
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
@@ -197,15 +186,6 @@ public class PlayerController : BaseEntity
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.R) && currentState == PlayerState.Grounded && !isAttacking)
-        {
-            currentState = PlayerState.Blocking;
-            blockStartTime = Time.time; 
-            anim.SetBool("isBlocking", true); 
-            rb.linearVelocity = Vector2.zero; 
-            return;
-        }
-
         if (Input.GetKeyDown(KeyCode.Space) && jumpsLeft > 0)
         {
             if (currentState == PlayerState.Grounded)
@@ -277,6 +257,14 @@ public class PlayerController : BaseEntity
         return new Vector2(h, v).normalized; 
     }
 
+    // Tách riêng đồng hồ đếm Perfect Dodge để dễ tùy chỉnh
+    private IEnumerator PerfectDodgeWindowActive()
+    {
+        if (hurtbox != null) hurtbox.isPerfectDodging = true;
+        yield return new WaitForSeconds(perfectDodgeWindow); // Mở cửa sổ né đòn trong 0.4s
+        if (hurtbox != null) hurtbox.isPerfectDodging = false;
+    }
+
     private IEnumerator PerformDash(Vector2 direction, bool isBackdash)
     {
         PlayerState previousState = currentState;
@@ -287,7 +275,8 @@ public class PlayerController : BaseEntity
         if (isBackdash && previousState == PlayerState.Grounded) anim.SetTrigger("Backdash"); 
         else anim.SetTrigger("Dash"); 
 
-        if (hurtbox != null) hurtbox.isPerfectDodging = true; 
+        // Bật cửa sổ Perfect Dodge độc lập
+        StartCoroutine(PerfectDodgeWindowActive());
 
         if (currentDashCharges == baseData.maxDashes) dashRechargeTimer = 0;
         if (!isPerfectDodge) currentDashCharges--;
@@ -309,11 +298,7 @@ public class PlayerController : BaseEntity
         
         rb.linearVelocity = direction * baseData.dashForce;
 
-        yield return new WaitForSeconds(0.2f); 
-        if (hurtbox != null) hurtbox.isPerfectDodging = false; 
-
-        float remainingDashTime = Mathf.Max(0, baseData.dashTime - 0.2f);
-        yield return new WaitForSeconds(remainingDashTime);
+        yield return new WaitForSeconds(baseData.dashTime); 
 
         if (direction.y != 0) 
         {
@@ -342,7 +327,6 @@ public class PlayerController : BaseEntity
 
     public void OnPerfectDodgeSuccess(BaseEntity attacker)
     {
-        // [FIX 7]: Chặn Multi-Hit kích hoạt lỗi nhiều Coroutine PhaseThrough
         if (isPhasingThrough) return;
 
         if (perfectDodgeTimer <= 0f)
@@ -417,7 +401,8 @@ public class PlayerController : BaseEntity
 
     public override void ApplyDamage(DamageInfo info)
     {
-        if (isPhasingThrough) return;
+        // [CHỐT CHẶN]: Tránh bị dính đòn oan khi đang lướt hoặc đã chết
+        if (isPhasingThrough || currentHealth <= 0) return;
 
         if (info.attacker != null)
         {
@@ -436,41 +421,6 @@ public class PlayerController : BaseEntity
         {
             float pushDirection = Mathf.Sign(transform.position.x - info.attacker.transform.position.x);
             actualKnockback = new Vector2(Mathf.Abs(info.knockbackForce.x) * pushDirection, info.knockbackForce.y);
-        }
-
-        if (currentState == PlayerState.Blocking && info.attacker != null)
-        {
-            float attackerDirection = info.attacker.transform.position.x - transform.position.x;
-            float facingDirection = transform.localScale.x;
-
-            if (attackerDirection * facingDirection > 0)
-            {
-                if (Time.time - blockStartTime <= parryWindow)
-                {
-                    Debug.Log("<color=yellow>PARRY THÀNH CÔNG!</color>");
-                    return; 
-                }
-                else
-                {
-                    Debug.Log("<color=cyan>BLOCK! Đỡ thành công một phần!</color>");
-                    info.damage *= blockDamageReduction; 
-                    actualKnockback *= 0.5f; 
-                    
-                    base.ApplyDamage(info);
-                    if (currentHealth > 0)
-                    {
-                        rb.linearVelocity = Vector2.zero;
-                        rb.AddForce(actualKnockback, ForceMode2D.Impulse);
-                    }
-                    return;
-                }
-            }
-            else
-            {
-                Debug.Log("<color=red>Bị chém lén sau lưng! Vỡ Block!</color>");
-                currentState = PlayerState.Grounded;
-                anim.SetBool("isBlocking", false);
-            }
         }
 
         base.ApplyDamage(info); 
@@ -563,12 +513,18 @@ public class PlayerController : BaseEntity
     public void EnableHitbox() { if (attackHitbox != null) attackHitbox.SetActive(true); }
     public void DisableHitbox() { if (attackHitbox != null) attackHitbox.SetActive(false); }
 
+    // Xử lý chuẩn vật lý và Layer khi chết
     protected override void Die()
     {
         anim.SetBool("isDead", true);
-        GetComponent<Collider2D>().enabled = false;
-        rb.linearVelocity = Vector2.zero;
-        rb.gravityScale = 0;
+        
+        // [ĐÃ SỬA]: Tắt hẳn cái bóng vật lý (Hurtbox) để cấm quái vật chém trúng xác
+        if (hurtbox != null) hurtbox.gameObject.SetActive(false);
+
+        // Chuyển xác Player sang Layer "Default" để bộ não quái vật tự động mù
+        gameObject.layer = LayerMask.NameToLayer("Default");
+        
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         this.enabled = false; 
         Debug.Log("<color=red>GAME OVER!</color>");
     }
@@ -599,7 +555,6 @@ public class PlayerController : BaseEntity
     private void Jump()
     {
         lastJumpTime = Time.time;
-        // [FIX 3]: Chống âm số lượt nhảy
         jumpsLeft = Mathf.Max(0, jumpsLeft - 1);
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0); 
         rb.linearVelocity += Vector2.up * baseData.jumpForce;
@@ -666,13 +621,10 @@ public class PlayerController : BaseEntity
     {
         if (currentState == PlayerState.Dashing || currentState == PlayerState.DashStalling) return;
 
-        // Bỏ qua check trong 0.1s đầu tiên sau khi nhảy để nhân vật kịp thoát khỏi mặt đất
         if (Time.time - lastJumpTime <= 0.1f) return;
 
         Collider2D col = GetComponent<Collider2D>();
         
-        // 1. QUÉT CHẠM ĐẤT BẰNG HỘP TĨNH (Chống mù mặt dốc)
-        // Tâm hộp quét: Nhích lên 0.1f so với gầm giày
         Vector2 feetPos = new Vector2(col.bounds.center.x, col.bounds.min.y + 0.1f);
         Vector2 boxSize = new Vector2(col.bounds.size.x * 0.7f, 0.25f);
 
@@ -708,13 +660,11 @@ public class PlayerController : BaseEntity
     {
         isCrit = false;
         
-        // 1. Tính sát thương dựa trên Step Combo hiện tại (comboStep bắt đầu từ 1 nên index mảng là comboStep - 1)
         int currentComboIndex = Mathf.Clamp(comboStep - 1, 0, comboDamageMultipliers.Length - 1);
         float multiplier = comboDamageMultipliers[currentComboIndex];
         
         float finalDamage = Attack * multiplier;
 
-        // 2. Tính tỉ lệ bạo kích
         if (UnityEngine.Random.Range(0f, 100f) <= CritRate)
         {
             finalDamage *= baseData.critDamageMultiplier; 

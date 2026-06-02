@@ -59,6 +59,9 @@ public class BaseEntity : MonoBehaviour
 
     public virtual void ApplyDamage(DamageInfo info)
     {
+
+        if (currentHealth <= 0) return;
+
         lastCombatTime = Time.time; 
         
         if (info.attacker != null)

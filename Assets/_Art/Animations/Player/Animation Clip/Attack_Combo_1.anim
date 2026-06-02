@@ -22,16 +22,16 @@ AnimationClip:
     curve:
     - time: 0
       value: {fileID: -817223447185994114, guid: 8c55837e8c58b9242ba449c33d659994, type: 3}
-    - time: 0.083333336
+    - time: 0.071428575
       value: {fileID: 7021625484444776659, guid: 8c55837e8c58b9242ba449c33d659994, type: 3}
-    - time: 0.16666667
+    - time: 0.14285715
       value: {fileID: 7282760613219019248, guid: 8c55837e8c58b9242ba449c33d659994, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
     script: {fileID: 0}
     flags: 2
-  m_SampleRate: 12
+  m_SampleRate: 14
   m_WrapMode: 0
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
@@ -56,7 +56,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.25
+    m_StopTime: 0.21428573
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -83,7 +83,7 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.16666667
+  - time: 0.14285715
     functionName: DisableHitbox
     data: 
     objectReferenceParameter: {fileID: 0}
