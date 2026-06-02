@@ -88,8 +88,16 @@ public class EnemyController : EnemyBase
         if (DetectPlayer()) 
         {
             float dist = Vector2.Distance(transform.position, playerTarget.position);
-            if (dist <= attackRange) SwitchState(EnemyState.Attack); // Tấn công ngay nếu sát mặt
-            else SwitchState(EnemyState.Chase); // Rượt nếu ở xa
+            
+            // [ĐÃ SỬA]: Chỉ chém nếu sát mặt VÀ chiêu đã hồi xong
+            if (dist <= attackRange && CanAttack(0)) 
+            {
+                SwitchState(EnemyState.Attack);
+            }
+            else 
+            {
+                SwitchState(EnemyState.Chase); 
+            }
             return;
         }
 
@@ -138,10 +146,20 @@ public class EnemyController : EnemyBase
             return;
         }
 
-        // Nếu Player vào tầm chém
+        // Đã vào tầm chém
         if (distToPlayer <= attackRange)
         {
-            SwitchState(EnemyState.Attack);
+            // [ĐÃ SỬA]: Kiểm tra xem Đòn đánh số 0 đã hồi chưa?
+            if (CanAttack(0))
+            {
+                SwitchState(EnemyState.Attack);
+            }
+            else
+            {
+                // Nếu chưa hồi: Đứng nhìn chằm chằm (giữ vận tốc = 0) chờ hồi chiêu
+                FacePlayer();
+                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            }
             return;
         }
 
@@ -166,6 +184,9 @@ public class EnemyController : EnemyBase
         rb.linearVelocity = Vector2.zero; // Dừng lại để chém
         
         anim.SetTrigger("Attack");
+
+        // [ĐÃ SỬA]: Gọi hàm ghi sổ, bắt đầu đếm ngược Cooldown cho chiêu số 0
+        RecordAttackUsage(0); 
 
         // Dùng vòng lặp bị ảnh hưởng bởi làm chậm thay vì WaitForSeconds(1f)
         float timer = 0f;

@@ -86,8 +86,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 441982573
+  m_SortingLayer: -2
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 2013698182933852923, guid: 9698bbc3075572e43ae80d710164a960, type: 3}
@@ -169,6 +169,7 @@ MonoBehaviour:
   currentStatPoints: 0
   currentEXP: 0
   expToNextLevel: 30
+  lastCombatTime: -99
   equipHealthBonus: 0
   equipAttackBonus: 0
   equipDefenseBonus: 0
@@ -179,6 +180,10 @@ MonoBehaviour:
   addedAttackPoints: 0
   addedDefensePoints: 0
   addedCritPoints: 0
+  rank: 0
+  expMultiplier: 10
+  attackCooldowns:
+  - 3
   attackHitbox: {fileID: 7305838578618818254}
   currentState: 0
   patrolSpeed: 2

@@ -39,11 +39,23 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: UI
-    uniqueID: 2676668465
-    locked: 0
   - name: Background
     uniqueID: 3494849709
+    locked: 0
+  - name: Midground
+    uniqueID: 2676668465
+    locked: 0
+  - name: Ground
+    uniqueID: 2206470449
+    locked: 0
+  - name: Interactable
+    uniqueID: 2884637699
+    locked: 0
+  - name: Entity
+    uniqueID: 441982573
+    locked: 0
+  - name: UI_Floating
+    uniqueID: 780179811
     locked: 0
   - name: Default
     uniqueID: 0

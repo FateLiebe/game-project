@@ -80,8 +80,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1410329597
+  m_SortingLayer: -3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -855298285791758126, guid: 4d6075cb9ac138f4aabb87e170c90851, type: 3}
@@ -154,11 +154,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BreakableCrate
   baseData: {fileID: 0}
   damagePopupPrefab: {fileID: 4376294689076033710, guid: 44f05228ddad8ca4c88eeac3e598a23e, type: 3}
+  currentHealth: 0
   timeMultiplier: 1
   currentLevel: 1
   currentStatPoints: 0
   currentEXP: 0
   expToNextLevel: 30
+  lastCombatTime: -99
+  equipHealthBonus: 0
+  equipAttackBonus: 0
+  equipDefenseBonus: 0
+  equipCritRateBonus: 0
+  equipCritDamageBonus: 0
+  equipSpeedBonus: 0
   addedHealthPoints: 0
   addedAttackPoints: 0
   addedDefensePoints: 0

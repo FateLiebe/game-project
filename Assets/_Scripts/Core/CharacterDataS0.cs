@@ -32,8 +32,8 @@ public class CharacterDataSO : ScriptableObject
     public float healthGrowth = 10f;
     public float attackGrowth = 5f;
     public float defenseGrowth = 3f;
-    public float critRateGrowth = 1f;
+    public float critRateGrowth = 0.5f;
 
     [Header("--- RPG PROGRESSION ---")]
-    public int statPointsPerLevel = 5; // Nhận 5 điểm tiềm năng mỗi cấp
+    public int statPointsPerLevel = 3; // [ĐÃ CHUẨN HOÁ]: Mỗi cấp được 3 điểm
 }

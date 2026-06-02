@@ -7,18 +7,14 @@ public class BaseEntity : MonoBehaviour
     public CharacterDataSO baseData;
 
     [Header("--- UI SETTINGS ---")]
-    public GameObject damagePopupPrefab; // Nơi nhét Prefab vừa tạo
+    public GameObject damagePopupPrefab; 
 
     protected float currentMoveSpeed;
     public float currentHealth;
 
-    // Đồng hồ thời gian cục bộ của sinh vật này
     [HideInInspector] public float timeMultiplier = 1f;
 
-    // Sự kiện phát thanh báo cho UI biết mỗi khi máu thay đổi
     public event Action<float, float> OnHealthChanged;
-    
-    // Kênh phát thanh cho Level và EXP
     public event Action<int> OnLevelChanged;
     public event Action<float, float> OnExpChanged;
 
@@ -32,31 +28,28 @@ public class BaseEntity : MonoBehaviour
 
     [Header("--- COMBAT STATE ---")]
     public float lastCombatTime = -99f;
-    // Nếu thời gian hiện tại trừ đi lúc đánh nhau gần nhất mà nhỏ hơn 5 giây -> Đang trong combat
     public bool IsInCombat => Time.time - lastCombatTime < 5f;
 
-    [Header("--- EQUIPMENT BONUS (Từ Đồ Mặc) ---")]
+    [Header("--- EQUIPMENT BONUS ---")]
     public float equipHealthBonus = 0f;
     public float equipAttackBonus = 0f;
     public float equipDefenseBonus = 0f;
     public float equipCritRateBonus = 0f;
     public float equipCritDamageBonus = 0f;
-    public float equipSpeedBonus = 0f; // [MỚI THÊM]: Bonus Tốc độ
+    public float equipSpeedBonus = 0f; 
 
-    [Header("--- ALLOCATED POINTS (Điểm đã cộng) ---")]
+    [Header("--- ALLOCATED POINTS ---")]
     public int addedHealthPoints = 0;
     public int addedAttackPoints = 0;
     public int addedDefensePoints = 0;
     public int addedCritPoints = 0;
 
-    // Các chỉ số linh động, tự động tính toán từ Data gốc + Cấp độ + Điểm Tiềm Năng
-    public float MaxHealth => baseData.baseMaxHealth + ((currentLevel - 1) * baseData.healthGrowth) + (addedHealthPoints * 10f) + equipHealthBonus;
-    public float Attack => baseData.baseAttack + ((currentLevel - 1) * baseData.attackGrowth) + (addedAttackPoints * 2f) + equipAttackBonus;
-    public float Defense => baseData.baseDefense + ((currentLevel - 1) * baseData.defenseGrowth) + (addedDefensePoints * 2f) + equipDefenseBonus;
-    public float CritRate => baseData.baseCritRate + ((currentLevel - 1) * baseData.critRateGrowth) + (addedCritPoints * 1f) + equipCritRateBonus;
+    // Các chỉ số linh động, đã thay đổi hệ số nhân (HP +5, ATK +1, DEF +1)
+    public virtual float MaxHealth => baseData.baseMaxHealth + ((currentLevel - 1) * baseData.healthGrowth) + (addedHealthPoints * 5f) + equipHealthBonus;
+    public virtual float Attack => baseData.baseAttack + ((currentLevel - 1) * baseData.attackGrowth) + (addedAttackPoints * 1f) + equipAttackBonus;
+    public virtual float Defense => baseData.baseDefense + ((currentLevel - 1) * baseData.defenseGrowth) + (addedDefensePoints * 1f) + equipDefenseBonus;
+    public float CritRate => baseData.baseCritRate + ((currentLevel - 1) * baseData.critRateGrowth) + (addedCritPoints * 0.2f) + equipCritRateBonus;
     public float CritDamage => (baseData.critDamageMultiplier * 100f) + equipCritDamageBonus;    
-    
-    // [ĐÃ SỬA]: Tốc độ giờ đã được cộng dồn với trang bị (Giày)
     public float Speed => baseData.moveSpeed + equipSpeedBonus;
 
     protected virtual void Start()
@@ -66,11 +59,8 @@ public class BaseEntity : MonoBehaviour
 
     public virtual void ApplyDamage(DamageInfo info)
     {
-
-        // Ghi nhận thời gian bị ăn đòn
         lastCombatTime = Time.time; 
         
-        // Ghi nhận luôn thời gian của kẻ vừa đánh mình (để cả 2 cùng vào trạng thái combat)
         if (info.attacker != null)
         {
             BaseEntity attackerEntity = info.attacker.GetComponent<BaseEntity>();
@@ -84,29 +74,34 @@ public class BaseEntity : MonoBehaviour
         
         OnHealthChanged?.Invoke(currentHealth, MaxHealth);
         
-        // ==========================================
-        // [ĐÃ SỬA] ---- HIỂN THỊ POPUP SÁT THƯƠNG ----
-        // ==========================================
         if (damagePopupPrefab != null)
         {
             GameObject popup = Instantiate(damagePopupPrefab, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
             DamagePopup popupScript = popup.GetComponent<DamagePopup>();
             if (popupScript != null) 
             {
-                // Kiểm tra xem nạn nhân có phải là Player không để chọn màu Đỏ/Trắng
                 bool isPlayer = gameObject.CompareTag("Player");
                 popupScript.SetupDamage(finalDamage, info.isCritical, isPlayer);
             }
         }
 
+        // ==========================================
+        // [ĐÃ SỬA] LOGIC NHẬN EXP TỪ QUÁI (GỌI HÀM)
+        // ==========================================
         if (currentHealth <= 0)
         {
             if (info.attacker != null)
             {
                 BaseEntity attackerEntity = info.attacker.GetComponent<BaseEntity>();
+
                 if (attackerEntity != null && info.attacker.CompareTag("Player"))
                 {
-                    attackerEntity.GainEXP(finalDamage * 1.5f); 
+                    EnemyBase enemy = this as EnemyBase;
+
+                    if (enemy != null)
+                    {
+                        attackerEntity.GainEXP(enemy.GetExpReward());
+                    }
                 }
             }
             Die();
@@ -126,7 +121,6 @@ public class BaseEntity : MonoBehaviour
             currentMoveSpeed = Speed; 
             currentHealth = MaxHealth; 
             
-            // Báo cho UI cập nhật lần đầu tiên khi vừa chạy game
             OnHealthChanged?.Invoke(currentHealth, MaxHealth);
             OnLevelChanged?.Invoke(currentLevel);
             OnExpChanged?.Invoke(currentEXP, expToNextLevel);
@@ -137,17 +131,11 @@ public class BaseEntity : MonoBehaviour
     {
         currentEXP += amount;
         
-        // Hét lên cho thanh EXP biết để chạy hiệu ứng
         OnExpChanged?.Invoke(currentEXP, expToNextLevel);
-        
         Debug.Log($"<color=cyan>Hấp thụ {amount} EXP!</color> (Tiến trình: {currentEXP}/{expToNextLevel})");
 
-        // ==========================================
-        // [MỚI THÊM] HIỂN THỊ POPUP KINH NGHIỆM
-        // ==========================================
         if (damagePopupPrefab != null)
         {
-            // Bắn popup văng hơi lệch sang phải một chút để không đè lên sát thương
             GameObject popup = Instantiate(damagePopupPrefab, transform.position + new Vector3(0.5f, 1f, 0), Quaternion.identity);
             DamagePopup popupScript = popup.GetComponent<DamagePopup>();
             if (popupScript != null) popupScript.SetupEXP(amount);
@@ -174,14 +162,10 @@ public class BaseEntity : MonoBehaviour
 
         currentHealth = MaxHealth; 
         
-        // Cập nhật toàn bộ UI sau khi lên cấp
         OnHealthChanged?.Invoke(currentHealth, MaxHealth);
         OnLevelChanged?.Invoke(currentLevel);
         OnExpChanged?.Invoke(currentEXP, expToNextLevel);
 
-        // ==========================================
-        // [ĐÃ SỬA] HIỂN THỊ POPUP LEVEL UP (NHẤP NHÁY)
-        // ==========================================
         if (damagePopupPrefab != null)
         {
             GameObject popup = Instantiate(damagePopupPrefab, transform.position + new Vector3(0, 1.5f, 0), Quaternion.identity);
@@ -190,7 +174,6 @@ public class BaseEntity : MonoBehaviour
         }
     }
 
-    // --- HÀM MỚI: Xử lý khi người chơi bấm nút (+) trên giao diện ---
     public void AllocateStatPoint(string statType)
     {
         if (currentStatPoints <= 0) return; 
@@ -201,7 +184,7 @@ public class BaseEntity : MonoBehaviour
         {
             case "HP":
                 addedHealthPoints++;
-                currentHealth += 10f; 
+                currentHealth += 5f; // [ĐÃ SỬA]: Chỉ hồi 5 máu khi cộng điểm
                 break;
             case "ATK":
                 addedAttackPoints++;
@@ -214,7 +197,6 @@ public class BaseEntity : MonoBehaviour
                 break;
         }
         
-        // Hét lên cho thanh máu trên đầu nhân vật cập nhật giới hạn máu mới
         OnHealthChanged?.Invoke(currentHealth, MaxHealth);
     }
 
@@ -227,20 +209,17 @@ public class BaseEntity : MonoBehaviour
         Debug.Log($"<color=green>Hồi phục {amount} máu! ({currentHealth}/{MaxHealth})</color>");
     }
 
-    // [ĐÃ SỬA]: Thêm tham số critDmg và speedBonus (đặt mặc định = 0f để không lỗi code cũ)
     public void UpdateEquipmentStats(float hp, float atk, float def, float crit, float critDmg = 0f, float speedBonus = 0f)
     {
         equipHealthBonus = hp;
         equipAttackBonus = atk;
         equipDefenseBonus = def;
         equipCritRateBonus = crit;
-        equipCritDamageBonus = critDmg;   // Cập nhật Sát thương bạo kích
-        equipSpeedBonus = speedBonus;     // Cập nhật Tốc độ
+        equipCritDamageBonus = critDmg;   
+        equipSpeedBonus = speedBonus;     
 
         currentHealth = Mathf.Clamp(currentHealth, 0, MaxHealth);
         
         OnHealthChanged?.Invoke(currentHealth, MaxHealth);
-        
-        Debug.Log($"<color=orange>Chỉ số mới -> ATK: {Attack} | DEF: {Defense} | CRIT: {CritRate}% | CRIT DMG: {CritDamage}% | TỐC ĐỘ: {Speed}</color>");
     }
 }
