@@ -113,7 +113,6 @@ public class BaseEntity : MonoBehaviour
 
     protected virtual void Die()
     {
-        gameObject.SetActive(false);
         Debug.Log(gameObject.name + " đã ngỏm!");
     }
 

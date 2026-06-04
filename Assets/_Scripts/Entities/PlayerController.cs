@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic; // [MỚI]: Dùng để chứa danh sách kẻ địch bị đưa vào "Sổ đen"
 
 public class PlayerController : BaseEntity
 {
@@ -28,7 +29,6 @@ public class PlayerController : BaseEntity
     [SerializeField] private float attackInputBufferTime = 0.2f; 
     [SerializeField] [Range(0f, 1f)] private float attackMovementMultiplier = 0.3f;
     
-    // [ĐÃ SỬA]: Biến độc lập quản lý thời gian dễ dãi của Perfect Dodge
     [SerializeField] private float perfectDodgeWindow = 0.4f; 
     [SerializeField] private float perfectDodgeCooldown = 15f;
     
@@ -54,6 +54,9 @@ public class PlayerController : BaseEntity
     private float originalGravity;
     
     private Collider2D[] threatColliders = new Collider2D[20];
+    
+    // Lưu BaseEntity để đồng nhất danh tính của kẻ địch
+    private List<BaseEntity> ignoredAttackers = new List<BaseEntity>();
 
     protected override void Start()
     {
@@ -257,11 +260,41 @@ public class PlayerController : BaseEntity
         return new Vector2(h, v).normalized; 
     }
 
-    // Tách riêng đồng hồ đếm Perfect Dodge để dễ tùy chỉnh
+    private void TryProactivePerfectDodge()
+    {
+        if (perfectDodgeTimer > 0f) return; 
+
+        int hitCount = Physics2D.OverlapCircleNonAlloc(transform.position, 3.5f, threatColliders);
+        
+        for (int i = 0; i < hitCount; i++)
+        {
+            Collider2D col = threatColliders[i];
+            
+            if (col.transform.root == this.transform || col.CompareTag("Player")) continue;
+
+            BaseEntity enemyEntity = col.GetComponentInParent<BaseEntity>();
+
+            if (enemyEntity != null && enemyEntity.currentHealth > 0)
+            {
+                Animator enemyAnim = enemyEntity.GetComponentInChildren<Animator>();
+                if (enemyAnim != null)
+                {
+                    AnimatorStateInfo stateInfo = enemyAnim.GetCurrentAnimatorStateInfo(0);
+                    if (stateInfo.IsName("Attack") || stateInfo.IsTag("Attack"))
+                    {
+                        OnPerfectDodgeSuccess(enemyEntity);
+                        return; 
+                    }
+                }
+            }
+        }
+    }
+
     private IEnumerator PerfectDodgeWindowActive()
     {
+        // Vẫn giữ lại I-frames mặc định của lướt (0.4s đầu tiên) để né các đòn cơ bản
         if (hurtbox != null) hurtbox.isPerfectDodging = true;
-        yield return new WaitForSeconds(perfectDodgeWindow); // Mở cửa sổ né đòn trong 0.4s
+        yield return new WaitForSeconds(perfectDodgeWindow); 
         if (hurtbox != null) hurtbox.isPerfectDodging = false;
     }
 
@@ -275,7 +308,7 @@ public class PlayerController : BaseEntity
         if (isBackdash && previousState == PlayerState.Grounded) anim.SetTrigger("Backdash"); 
         else anim.SetTrigger("Dash"); 
 
-        // Bật cửa sổ Perfect Dodge độc lập
+        TryProactivePerfectDodge();
         StartCoroutine(PerfectDodgeWindowActive());
 
         if (currentDashCharges == baseData.maxDashes) dashRechargeTimer = 0;
@@ -345,6 +378,8 @@ public class PlayerController : BaseEntity
 
             if (attacker != null)
             {
+                // Truyền thẳng attacker (vốn đã là BaseEntity) vào sổ đen
+                StartCoroutine(IgnoreSpecificAttackerRoutine(attacker, 2.2f));
                 StartCoroutine(PhaseThroughSpecificEntity(attacker.gameObject));
             }
             else 
@@ -362,6 +397,18 @@ public class PlayerController : BaseEntity
             Debug.Log("<color=orange>Perfect Dodge đang CD! Chỉ hồi 1 Dash Charge.</color>");
             if (currentDashCharges < baseData.maxDashes) currentDashCharges++;
         }
+    }
+
+    // [MỚI]: Hàm ghi nhớ kẻ địch bị né để chặn sát thương
+    private IEnumerator IgnoreSpecificAttackerRoutine(BaseEntity enemyEntity, float duration)
+    {
+        if (enemyEntity == null) yield break;
+
+        if (!ignoredAttackers.Contains(enemyEntity)) ignoredAttackers.Add(enemyEntity);
+        
+        yield return new WaitForSeconds(duration);
+        
+        if (ignoredAttackers.Contains(enemyEntity)) ignoredAttackers.Remove(enemyEntity);
     }
 
     private IEnumerator PhaseThroughSpecificEntity(GameObject enemyObj)
@@ -401,8 +448,21 @@ public class PlayerController : BaseEntity
 
     public override void ApplyDamage(DamageInfo info)
     {
-        // [CHỐT CHẶN]: Tránh bị dính đòn oan khi đang lướt hoặc đã chết
-        if (isPhasingThrough || currentHealth <= 0) return;
+        bool isDodging = (hurtbox != null && hurtbox.isPerfectDodging);
+        if (currentHealth <= 0 || isDodging) return;
+
+        // Truy ngược từ info.attacker (có thể là Hitbox) lên BaseEntity gốc
+        if (info.attacker != null)
+        {
+            BaseEntity attackingEntity = info.attacker.GetComponentInParent<BaseEntity>();
+            
+            // Nếu kẻ đang đánh mình nằm trong sổ đen -> Vô hiệu hóa sát thương!
+            if (attackingEntity != null && ignoredAttackers.Contains(attackingEntity))
+            {
+                Debug.Log("<color=green>Miễn nhiễm sát thương! Đòn này đến từ kẻ địch đang bị Time Stop!</color>");
+                return;
+            }
+        }
 
         if (info.attacker != null)
         {
@@ -513,15 +573,12 @@ public class PlayerController : BaseEntity
     public void EnableHitbox() { if (attackHitbox != null) attackHitbox.SetActive(true); }
     public void DisableHitbox() { if (attackHitbox != null) attackHitbox.SetActive(false); }
 
-    // Xử lý chuẩn vật lý và Layer khi chết
     protected override void Die()
     {
         anim.SetBool("isDead", true);
         
-        // [ĐÃ SỬA]: Tắt hẳn cái bóng vật lý (Hurtbox) để cấm quái vật chém trúng xác
         if (hurtbox != null) hurtbox.gameObject.SetActive(false);
 
-        // Chuyển xác Player sang Layer "Default" để bộ não quái vật tự động mù
         gameObject.layer = LayerMask.NameToLayer("Default");
         
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
@@ -628,19 +685,7 @@ public class PlayerController : BaseEntity
         Vector2 feetPos = new Vector2(col.bounds.center.x, col.bounds.min.y + 0.1f);
         Vector2 boxSize = new Vector2(col.bounds.size.x * 0.7f, 0.25f);
 
-        bool wasGrounded = currentState == PlayerState.Grounded; 
         bool isGroundedNow = Physics2D.OverlapBox(feetPos, boxSize, 0f, groundLayer) != null; 
-
-        if (!isGroundedNow && wasGrounded)
-        {
-            RaycastHit2D snapHit = Physics2D.Raycast(feetPos, Vector2.down, 0.5f, groundLayer);
-
-            if (snapHit.collider != null)
-            {
-                isGroundedNow = true;
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, -5f);
-            }
-        }
 
         if (isGroundedNow)
         {
@@ -672,5 +717,11 @@ public class PlayerController : BaseEntity
         }
 
         return finalDamage; 
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, 3.5f);
     }
 }

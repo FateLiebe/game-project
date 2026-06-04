@@ -12,7 +12,7 @@ public class EnemyController : EnemyBase
     [SerializeField] private float patrolSpeed = 2f;
     [SerializeField] private float chaseSpeed = 3.5f;
     [SerializeField] private float lineOfSight = 6f;       
-    [SerializeField] private float attackRange = 1.2f;     
+    [SerializeField] private float attackRange = 1.8f;     
     [SerializeField] private float idleDuration = 1.5f;    
     
     [Header("Detection (Kẻ tia)")]
@@ -50,8 +50,10 @@ public class EnemyController : EnemyBase
         SwitchState(EnemyState.Patrol);
     }
 
-    private void Update()
+    protected override void Update()
     {
+        base.Update(); // Kích hoạt hệ thống đếm lùi thời gian hồi chiêu từ EnemyBase
+
         if (currentState == EnemyState.Dead || !canAction) return;
 
         switch (currentState)
@@ -232,7 +234,6 @@ public class EnemyController : EnemyBase
 
     protected override void Die()
     {
-        base.Die();
         StopAllCoroutines();
         SwitchState(EnemyState.Dead);
         anim.SetBool("isDead", true);

@@ -16,14 +16,14 @@ public class EnemyBase : BaseEntity
     [SerializeField] protected float expMultiplier = 10f;
 
     // ==========================================
-    // HỆ THỐNG COOLDOWN KỸ NĂNG (MỚI THÊM)
+    // HỆ THỐNG COOLDOWN KỸ NĂNG
     // ==========================================
     [Header("--- ATTACK COOLDOWNS ---")]
     [Tooltip("Khai báo CD cho từng chiêu. Normal 1 chiêu, Elite 2 chiêu...")]
-    public float[] attackCooldowns = new float[] { 2f }; // Mặc định có 1 đòn, CD 2 giây
+    public float[] attackCooldowns = new float[] { 3f }; // Mặc định có 1 đòn, CD 3 giây
     
-    // Mảng lưu trữ thời điểm (Time.time) mà đòn đánh thứ [i] được phép tung ra lần tiếp theo
-    private float[] nextAttackTimes;
+    // [ĐÃ SỬA]: Chuyển sang mảng đếm lùi thủ công thay vì lưu Time.time
+    protected float[] currentAttackCooldowns;
 
     private SpriteRenderer sr;
     protected Rigidbody2D rb;
@@ -42,8 +42,24 @@ public class EnemyBase : BaseEntity
         sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
 
-        // Khởi tạo độ dài mảng theo dõi CD bằng đúng với số lượng đòn đánh đã cài đặt trên Inspector
-        nextAttackTimes = new float[attackCooldowns.Length];
+        // Khởi tạo độ dài mảng theo dõi CD bằng đúng với số lượng đòn đánh
+        currentAttackCooldowns = new float[attackCooldowns.Length];
+    }
+
+    // [MỚI THÊM]: Hàm cập nhật đếm lùi CD chịu tác động của Time Stop
+    protected virtual void Update()
+    {
+        if (currentAttackCooldowns != null)
+        {
+            for (int i = 0; i < currentAttackCooldowns.Length; i++)
+            {
+                if (currentAttackCooldowns[i] > 0)
+                {
+                    // Nhân với timeMultiplier để đóng băng đếm lùi khi bị Time Stop
+                    currentAttackCooldowns[i] -= Time.deltaTime * timeMultiplier;
+                }
+            }
+        }
     }
 
     protected override void InitializeStats()
@@ -62,8 +78,8 @@ public class EnemyBase : BaseEntity
         // Chống lỗi văng game nếu AI gọi một chiêu không tồn tại
         if (attackIndex < 0 || attackIndex >= attackCooldowns.Length) return false;
 
-        // Nếu thời gian hiện tại đã trôi qua mốc chờ -> Trả về true (Được phép đánh)
-        return Time.time >= nextAttackTimes[attackIndex];
+        // [ĐÃ SỬA]: Được phép đánh khi đồng hồ đếm lùi đã về 0
+        return currentAttackCooldowns[attackIndex] <= 0f;
     }
 
     // Hàm này được gọi NGAY SAU KHI quái vật vung đòn thành công (để bắt đầu đếm ngược CD)
@@ -71,8 +87,8 @@ public class EnemyBase : BaseEntity
     {
         if (attackIndex >= 0 && attackIndex < attackCooldowns.Length)
         {
-            // Mốc đánh tiếp theo = Thời điểm hiện tại + Số giây cần chờ
-            nextAttackTimes[attackIndex] = Time.time + attackCooldowns[attackIndex];
+            // [ĐÃ SỬA]: Bơm lại đúng thời gian hồi chiêu gốc vào bộ đếm lùi
+            currentAttackCooldowns[attackIndex] = attackCooldowns[attackIndex];
         }
     }
 
@@ -94,7 +110,7 @@ public class EnemyBase : BaseEntity
         }
 
         float randomFactor = Random.Range(0.85f, 1.15f);
-        float finalExp = Mathf.Round(baseExp * randomFactor);
+        float finalExp = Mathf.Round(baseExp * randomFactor * 1000f) / 1000f;
 
         if (Random.value < 0.05f)
         {
