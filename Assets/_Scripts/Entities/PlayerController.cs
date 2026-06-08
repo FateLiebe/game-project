@@ -32,6 +32,8 @@ public class PlayerController : BaseEntity
     [SerializeField] private float perfectDodgeWindow = 0.4f; 
     [SerializeField] private float perfectDodgeCooldown = 15f;
     
+    private bool perfectDodgeTriggered;
+
     private float perfectDodgeTimer = 0f;
     private float currentAttackDuration = 0f;
     private bool isAttacking = false;
@@ -216,18 +218,16 @@ public class PlayerController : BaseEntity
         for (int i = 0; i < hitCount; i++)
         {
             Collider2D col = threatColliders[i];
-            
             if (col.transform.root == this.transform || col.CompareTag("Player")) continue;
 
             BaseEntity enemyEntity = col.GetComponentInParent<BaseEntity>();
-
             if (enemyEntity != null)
             {
                 float direction = Mathf.Sign(enemyEntity.transform.position.x - transform.position.x);
-
                 if (direction != facingDir && direction != 0)
                 {
-                    bool isHitbox = col.name.ToLower().Contains("hitbox") && col.enabled;
+                    // [FIX #8]: So sánh Component thay vì String
+                    bool isHitbox = col.GetComponent<UniversalHitbox>() != null && col.enabled;
                     
                     bool isPlayingAttackAnim = false;
                     Animator enemyAnim = enemyEntity.GetComponentInChildren<Animator>();
@@ -245,7 +245,6 @@ public class PlayerController : BaseEntity
                 }
             }
         }
-        
         return false;
     }
 
@@ -308,6 +307,8 @@ public class PlayerController : BaseEntity
         if (isBackdash && previousState == PlayerState.Grounded) anim.SetTrigger("Backdash"); 
         else anim.SetTrigger("Dash"); 
 
+        perfectDodgeTriggered = false; // [FIX #3]: Reset cờ khi bắt đầu lướt mới
+
         TryProactivePerfectDodge();
         StartCoroutine(PerfectDodgeWindowActive());
 
@@ -361,9 +362,12 @@ public class PlayerController : BaseEntity
     public void OnPerfectDodgeSuccess(BaseEntity attacker)
     {
         if (isPhasingThrough) return;
+        if (perfectDodgeTriggered) return; // [FIX #3]: Chặn đúp trigger
 
         if (perfectDodgeTimer <= 0f)
         {
+            perfectDodgeTriggered = true; // [FIX #3]: Đánh dấu đã trigger
+
             Debug.Log("<color=cyan>PERFECT DODGE! NGƯNG ĐỌNG THỜI GIAN!</color>");
             if (TimeAnomalyManager.Instance != null) 
                 TimeAnomalyManager.Instance.TriggerPerfectDodge();
@@ -414,7 +418,6 @@ public class PlayerController : BaseEntity
     private IEnumerator PhaseThroughSpecificEntity(GameObject enemyObj)
     {
         isPhasingThrough = true; 
-        
         Collider2D playerCol = GetComponent<Collider2D>();
         Collider2D[] enemyCols = enemyObj.GetComponentsInChildren<Collider2D>();
 
@@ -433,7 +436,7 @@ public class PlayerController : BaseEntity
         if (playerCol != null && enemyCols.Length > 0)
         {
             foreach (var col in enemyCols) 
-                if (col != null) Physics2D.IgnoreCollision(playerCol, col, false);
+                if (col != null) Physics2D.IgnoreCollision(playerCol, col, false); // [FIX #7]: Check Null trước khi khôi phục
         }
 
         isPhasingThrough = false;

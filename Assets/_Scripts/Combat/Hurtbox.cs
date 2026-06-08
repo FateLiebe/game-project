@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// CHỈ CÓ FILE NÀY mới có ", IDamageable"
 public class Hurtbox : MonoBehaviour, IDamageable
 {
     [SerializeField] private BaseEntity owner;
@@ -8,15 +7,14 @@ public class Hurtbox : MonoBehaviour, IDamageable
 
     public void TakeDamage(DamageInfo info)
     {
-        // TẦNG 2: XÁC NHẬN VA CHẠM THÀNH CÔNG (Confirm Success)
         if (isPerfectDodging)
         {
-            isPerfectDodging = false; // Tắt ngay lập tức để không kích đúp chiêu
+            // [FIX #2]: KHÔNG TẮT isPerfectDodging Ở ĐÂY NỮA
+            // Để Coroutine PerfectDodgeWindowActive() tự động tắt sau 0.4s
 
             PlayerController pc = owner as PlayerController;
             if (pc != null)
             {
-                // FIX LỖI CS1503: Lấy Component BaseEntity từ GameObject
                 BaseEntity attackerEntity = null;
                 if (info.attacker != null)
                 {
@@ -28,7 +26,6 @@ public class Hurtbox : MonoBehaviour, IDamageable
             return; 
         }
 
-        // Nếu không lướt hoặc trượt Perfect Dodge -> Ăn đòn
         if (owner != null) 
         {
             owner.ApplyDamage(info);

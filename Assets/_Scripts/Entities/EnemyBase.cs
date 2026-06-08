@@ -125,6 +125,13 @@ public class EnemyBase : BaseEntity
     {
         base.ApplyDamage(info); 
         
+        // [FIX #5 & #6]: Nếu chết rồi thì không Knockback và hủy Invoke
+        if (isDead || currentHealth <= 0) 
+        {
+            CancelInvoke(nameof(ResetColor));
+            return;
+        }
+
         if (sr != null)
         {
             sr.color = Color.red;

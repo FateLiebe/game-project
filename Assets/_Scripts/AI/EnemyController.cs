@@ -234,12 +234,32 @@ public class EnemyController : EnemyBase
 
     protected override void Die()
     {
-        StopAllCoroutines();
+        // Ép tắt ngay lập tức vũ khí/hitbox nếu đang đánh dở
+        CancelCurrentAttackHitbox();
+
+        // Dừng mọi tiến trình đang chạy (rượt đuổi, tấn công)
+        StopAllCoroutines(); 
+        
+        // Ép trạng thái về Dead để hàm Update() ngừng xử lý AI
         SwitchState(EnemyState.Dead);
         anim.SetBool("isDead", true);
         rb.linearVelocity = Vector2.zero;
+        
+        // 3. Tắt va chạm vật lý để Player không bị vướng vào xác
         GetComponent<Collider2D>().enabled = false;
-        this.enabled = false; 
+
+        // 5. [FIX CHƯA BIẾN MẤT]: Thay vì tắt script (this.enabled = false), 
+        // ta gọi Coroutine để chờ Animation chạy xong rồi mới dọn dẹp xác.
+        StartCoroutine(DeathRoutine());
+    }
+
+    private IEnumerator DeathRoutine()
+    {
+        // Thời gian chờ xác bốc hơi (Bạn có thể tự chỉnh sao cho khớp với độ dài Animation chết)
+        yield return new WaitForSeconds(0.833f);
+        
+        // Hủy hoàn toàn object quái vật này để giải phóng bộ nhớ
+        Destroy(gameObject); 
     }
 
     private void SwitchState(EnemyState newState)

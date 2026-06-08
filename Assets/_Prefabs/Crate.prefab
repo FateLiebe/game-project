@@ -81,15 +81,15 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -1410329597
-  m_SortingLayer: -3
-  m_SortingOrder: 0
+  m_SortingLayer: -7
+  m_SortingOrder: 10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -855298285791758126, guid: 4d6075cb9ac138f4aabb87e170c90851, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ad8b726577b214645a8e6aca7b4ac562, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.125, y: 1.75}
+  m_Size: {x: 1, y: 0.8235294}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -133,7 +133,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 2.125, y: 1.75}
-    newSize: {x: 2.125, y: 1.75}
+    newSize: {x: 1, y: 0.8235294}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -156,6 +156,7 @@ MonoBehaviour:
   damagePopupPrefab: {fileID: 4376294689076033710, guid: 44f05228ddad8ca4c88eeac3e598a23e, type: 3}
   currentHealth: 0
   timeMultiplier: 1
+  isDead: 0
   currentLevel: 1
   currentStatPoints: 0
   currentEXP: 0
@@ -171,7 +172,7 @@ MonoBehaviour:
   addedAttackPoints: 0
   addedDefensePoints: 0
   addedCritPoints: 0
-  brokenSprite: {fileID: 4130640169021434097, guid: 9fda6823362900a4fbbc5e7d07fe4004, type: 3}
+  brokenSprite: {fileID: 21300000, guid: 940f76b393d5bd643bb439fe33b24a1e, type: 3}
   droppedItemPrefab: {fileID: 7990156937817933804, guid: 3821d7e659f63c84abe1837462b4e443, type: 3}
   possibleDrops:
   - {fileID: 11400000, guid: 837baff703fae9b4d9f201b4e95707f2, type: 2}

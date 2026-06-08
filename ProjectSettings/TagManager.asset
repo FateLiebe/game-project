@@ -39,8 +39,14 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: BackgroundFar
+    uniqueID: 808616871
+    locked: 0
   - name: Background
     uniqueID: 3494849709
+    locked: 0
+  - name: BackgroundDecoration
+    uniqueID: 2718062811
     locked: 0
   - name: Midground
     uniqueID: 2676668465
@@ -53,6 +59,18 @@ TagManager:
     locked: 0
   - name: Entity
     uniqueID: 441982573
+    locked: 0
+  - name: Effects
+    uniqueID: 3714016175
+    locked: 0
+  - name: Foreground
+    uniqueID: 1059262455
+    locked: 0
+  - name: ForegroundDecoration
+    uniqueID: 1446328983
+    locked: 0
+  - name: UIWorld
+    uniqueID: 2903588065
     locked: 0
   - name: UI_Floating
     uniqueID: 780179811

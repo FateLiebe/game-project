@@ -1,0 +1,426 @@
+fileFormatVersion: 2
+guid: 18398c7db78d8444baf78c7fca672369
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6170730046749378577
+    second: electro-shock-spritesheets_0
+  - first:
+      213: -2786757894096556722
+    second: electro-shock-spritesheets_1
+  - first:
+      213: -7410107654752300045
+    second: electro-shock-spritesheets_2
+  - first:
+      213: 7523470882109074467
+    second: electro-shock-spritesheets_3
+  - first:
+      213: -1382736007231168859
+    second: electro-shock-spritesheets_4
+  - first:
+      213: -1129512885836011579
+    second: electro-shock-spritesheets_5
+  - first:
+      213: -5291992452872845682
+    second: electro-shock-spritesheets_6
+  - first:
+      213: 8749612409591186305
+    second: electro-shock-spritesheets_7
+  - first:
+      213: 1797252719387507624
+    second: electro-shock-spritesheets_8
+  - first:
+      213: 8833007174628456591
+    second: electro-shock-spritesheets_9
+  - first:
+      213: 8442498520786063594
+    second: electro-shock-spritesheets_10
+  - first:
+      213: -6209989509378349542
+    second: electro-shock-spritesheets_11
+  - first:
+      213: -4438505505226648088
+    second: electro-shock-spritesheets_12
+  - first:
+      213: 6422976902334090716
+    second: electro-shock-spritesheets_13
+  - first:
+      213: 8494842523592901678
+    second: electro-shock-spritesheets_14
+  - first:
+      213: -4378067895223456265
+    second: electro-shock-spritesheets_15
+  - first:
+      213: 3475486604730721233
+    second: electro-shock-spritesheets_16
+  - first:
+      213: -5500940147708624037
+    second: electro-shock-spritesheets_17
+  - first:
+      213: 7786020667139130706
+    second: electro-shock-spritesheets_18
+  - first:
+      213: -5928330327694336549
+    second: electro-shock-spritesheets_19
+  - first:
+      213: 3790731335423363315
+    second: electro-shock-spritesheets_20
+  - first:
+      213: 5153760985809247969
+    second: electro-shock-spritesheets_21
+  - first:
+      213: -1696919121112957372
+    second: electro-shock-spritesheets_22
+  - first:
+      213: -7529762687207793031
+    second: electro-shock-spritesheets_23
+  - first:
+      213: -3737190859951312682
+    second: electro-shock-spritesheets_24
+  - first:
+      213: 6387987414564097264
+    second: electro-shock-spritesheets_25
+  - first:
+      213: 663321621478003515
+    second: electro-shock-spritesheets_26
+  - first:
+      213: -689937058264081929
+    second: electro-shock-spritesheets_27
+  - first:
+      213: 1781686144978005740
+    second: electro-shock-spritesheets_28
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: electro-shock-spritesheets_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 128
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11883599846d2a550800000000000000
+      internalID: 6170730046749378577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: electro-shock-spritesheets_1
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 128
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4deb5fc5727359d0800000000000000
+      internalID: -2786757894096556722
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: electro-shock-spritesheets_2
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 128
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f3161339520a2990800000000000000
+      internalID: -7410107654752300045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: electro-shock-spritesheets_3
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 128
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32c2b1ef7ecb86860800000000000000
+      internalID: 7523470882109074467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: electro-shock-spritesheets_4
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 0
+        width: 128
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ae18de6de88fcce0800000000000000
+      internalID: -1382736007231168859
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: electro-shock-spritesheets_5
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 0
+        width: 128
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c7a486c30a2350f0800000000000000
+      internalID: -1129512885836011579
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: electro-shock-spritesheets_6
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 0
+        width: 128
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e86477cf6e01f86b0800000000000000
+      internalID: -5291992452872845682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: electro-shock-spritesheets_7
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 0
+        width: 128
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 183480c012edc6970800000000000000
+      internalID: 8749612409591186305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: electro-shock-spritesheets_8
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 0
+        width: 128
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ab72b673df11f810800000000000000
+      internalID: 1797252719387507624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 42a8409255276434ab248c9707a5835a
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":128.0,"y":96.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      electro-shock-spritesheets_0: 6170730046749378577
+      electro-shock-spritesheets_1: -2786757894096556722
+      electro-shock-spritesheets_2: -7410107654752300045
+      electro-shock-spritesheets_3: 7523470882109074467
+      electro-shock-spritesheets_4: -1382736007231168859
+      electro-shock-spritesheets_5: -1129512885836011579
+      electro-shock-spritesheets_6: -5291992452872845682
+      electro-shock-spritesheets_7: 8749612409591186305
+      electro-shock-spritesheets_8: 1797252719387507624
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

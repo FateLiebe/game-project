@@ -13,6 +13,7 @@ public class BaseEntity : MonoBehaviour
     public float currentHealth;
 
     [HideInInspector] public float timeMultiplier = 1f;
+    [HideInInspector] public bool isDead = false; // [FIX #4]: Cờ trạng thái sống chết
 
     public event Action<float, float> OnHealthChanged;
     public event Action<int> OnLevelChanged;
@@ -44,7 +45,6 @@ public class BaseEntity : MonoBehaviour
     public int addedDefensePoints = 0;
     public int addedCritPoints = 0;
 
-    // Các chỉ số linh động, đã thay đổi hệ số nhân (HP +5, ATK +1, DEF +1)
     public virtual float MaxHealth => baseData.baseMaxHealth + ((currentLevel - 1) * baseData.healthGrowth) + (addedHealthPoints * 5f) + equipHealthBonus;
     public virtual float Attack => baseData.baseAttack + ((currentLevel - 1) * baseData.attackGrowth) + (addedAttackPoints * 1f) + equipAttackBonus;
     public virtual float Defense => baseData.baseDefense + ((currentLevel - 1) * baseData.defenseGrowth) + (addedDefensePoints * 1f) + equipDefenseBonus;
@@ -59,8 +59,8 @@ public class BaseEntity : MonoBehaviour
 
     public virtual void ApplyDamage(DamageInfo info)
     {
-
-        if (currentHealth <= 0) return;
+        // [FIX #4]: Chặn đứng mọi sát thương/EXP cộng dồn nếu đã chết
+        if (isDead || currentHealth <= 0) return; 
 
         lastCombatTime = Time.time; 
         
@@ -88,11 +88,10 @@ public class BaseEntity : MonoBehaviour
             }
         }
 
-        // ==========================================
-        // [ĐÃ SỬA] LOGIC NHẬN EXP TỪ QUÁI (GỌI HÀM)
-        // ==========================================
         if (currentHealth <= 0)
         {
+            isDead = true; // Đánh dấu chết ngay lập tức
+
             if (info.attacker != null)
             {
                 BaseEntity attackerEntity = info.attacker.GetComponent<BaseEntity>();
@@ -100,11 +99,7 @@ public class BaseEntity : MonoBehaviour
                 if (attackerEntity != null && info.attacker.CompareTag("Player"))
                 {
                     EnemyBase enemy = this as EnemyBase;
-
-                    if (enemy != null)
-                    {
-                        attackerEntity.GainEXP(enemy.GetExpReward());
-                    }
+                    if (enemy != null) attackerEntity.GainEXP(enemy.GetExpReward());
                 }
             }
             Die();
@@ -113,7 +108,8 @@ public class BaseEntity : MonoBehaviour
 
     protected virtual void Die()
     {
-        Debug.Log(gameObject.name + " đã ngỏm!");
+        // [FIX #1 & #11]: Xóa gameObject.SetActive(false);
+        // Để các class con (Player/Enemy) tự quyền quyết định cách chết
     }
 
     protected virtual void InitializeStats()
@@ -134,7 +130,6 @@ public class BaseEntity : MonoBehaviour
         currentEXP += amount;
         
         OnExpChanged?.Invoke(currentEXP, expToNextLevel);
-        Debug.Log($"<color=cyan>Hấp thụ {amount} EXP!</color> (Tiến trình: {currentEXP}/{expToNextLevel})");
 
         if (damagePopupPrefab != null)
         {
@@ -179,26 +174,15 @@ public class BaseEntity : MonoBehaviour
     public void AllocateStatPoint(string statType)
     {
         if (currentStatPoints <= 0) return; 
-        
         currentStatPoints--; 
         
         switch (statType)
         {
-            case "HP":
-                addedHealthPoints++;
-                currentHealth += 5f; // [ĐÃ SỬA]: Chỉ hồi 5 máu khi cộng điểm
-                break;
-            case "ATK":
-                addedAttackPoints++;
-                break;
-            case "DEF":
-                addedDefensePoints++;
-                break;
-            case "CRIT":
-                addedCritPoints++;
-                break;
+            case "HP": addedHealthPoints++; currentHealth += 5f; break;
+            case "ATK": addedAttackPoints++; break;
+            case "DEF": addedDefensePoints++; break;
+            case "CRIT": addedCritPoints++; break;
         }
-        
         OnHealthChanged?.Invoke(currentHealth, MaxHealth);
     }
 
@@ -206,9 +190,7 @@ public class BaseEntity : MonoBehaviour
     {
         currentHealth += amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, MaxHealth); 
-        
         OnHealthChanged?.Invoke(currentHealth, MaxHealth); 
-        Debug.Log($"<color=green>Hồi phục {amount} máu! ({currentHealth}/{MaxHealth})</color>");
     }
 
     public void UpdateEquipmentStats(float hp, float atk, float def, float crit, float critDmg = 0f, float speedBonus = 0f)
@@ -221,7 +203,6 @@ public class BaseEntity : MonoBehaviour
         equipSpeedBonus = speedBonus;     
 
         currentHealth = Mathf.Clamp(currentHealth, 0, MaxHealth);
-        
         OnHealthChanged?.Invoke(currentHealth, MaxHealth);
     }
 }

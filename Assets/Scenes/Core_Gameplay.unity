@@ -12151,6 +12151,7 @@ MonoBehaviour:
   damagePopupPrefab: {fileID: 4376294689076033710, guid: 44f05228ddad8ca4c88eeac3e598a23e, type: 3}
   currentHealth: 0
   timeMultiplier: 1
+  isDead: 0
   currentLevel: 1
   currentStatPoints: 0
   currentEXP: 0
@@ -12230,7 +12231,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 441982573
-  m_SortingLayer: -2
+  m_SortingLayer: -6
   m_SortingOrder: 5
   m_MaskInteraction: 0
   m_Sprite: {fileID: 3447589828770737623, guid: 029bb1545d2be2c4f9901c412aa2b433, type: 3}
