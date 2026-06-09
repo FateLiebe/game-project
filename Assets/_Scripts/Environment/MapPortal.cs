@@ -4,47 +4,80 @@ using System.Collections;
 
 public class MapPortal : MonoBehaviour
 {
-    [Header("--- CÀI ĐẶT CỔNG CHUYỂN MAP ---")]
+    [Header("--- THÔNG TIN CỔNG ---")]
+    [Tooltip("Số thứ tự của cổng này")]
+    public int portalID = 1;
+
+    [Header("--- ĐÍCH ĐẾN ---")]
     public string nextMapName;
+    [Tooltip("Số thứ tự của cổng bên Map kia mà Player sẽ chui ra")]
+    public int destinationPortalID = 1;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            // Khóa cổng để tránh chạm nhiều lần
-            GetComponent<Collider2D>().enabled = false;
+            GetComponent<Collider2D>().enabled = false; 
             
-            // Truyền luôn cục Player vào để xử lý
-            StartCoroutine(TransitionMap(other.gameObject));
+            PlayerController playerCtrl = other.GetComponent<PlayerController>();
+            if (playerCtrl != null)
+            {
+                playerCtrl.StartCoroutine(TransitionMapRoutine(other.gameObject, gameObject.scene));
+            }
         }
     }
 
-    private IEnumerator TransitionMap(GameObject playerObj)
+    private IEnumerator TransitionMapRoutine(GameObject playerObj, Scene currentMap)
     {
-        Debug.Log($"<color=yellow>Đang tải bản đồ: {nextMapName}</color>");
+        Debug.Log($"<color=yellow>Đang tải không gian: {nextMapName}...</color>");
         
-        // --- 1. ĐÓNG BĂNG PLAYER ---
         Rigidbody2D rb = playerObj.GetComponent<Rigidbody2D>();
         PlayerController playerCtrl = playerObj.GetComponent<PlayerController>();
-        
-        // Tắt mô phỏng vật lý (chống rơi) và tắt điều khiển (chống bấm nút bậy)
-        if (rb != null) rb.simulated = false; 
-        if (playerCtrl != null) playerCtrl.enabled = false; 
 
-        // --- 2. CHỜ TẢI MAP MỚI VÀ XÓA MAP CŨ ---
+        Vector2 enterDirection = Vector2.right;
+
+        if (rb != null && rb.linearVelocity.sqrMagnitude > 0.01f)
+        {
+            enterDirection = rb.linearVelocity.normalized;
+        }
+        
+        // 1. ĐÓNG BĂNG
+        if (rb != null) { rb.linearVelocity = Vector2.zero; rb.simulated = false; }
+        if (playerCtrl != null) { playerCtrl.DisableHitbox(); playerCtrl.enabled = false; }
+
+        // 2. TẢI MAP MỚI
         AsyncOperation loadOp = SceneManager.LoadSceneAsync(nextMapName, LoadSceneMode.Additive);
-        yield return loadOp; // Đợi load xong 100%
+        yield return loadOp; 
 
-        Scene currentMap = gameObject.scene; 
+        // 3. ĐỊNH VỊ CỔNG ĐÍCH & DI CHUYỂN PLAYER
+        MapPortal[] allPortals = FindObjectsByType<MapPortal>(FindObjectsSortMode.None);
+        foreach (var portal in allPortals)
+        {
+            if (portal.gameObject.scene != currentMap &&
+                portal.portalID == this.destinationPortalID)
+            {
+                // Dịch chuyển player lệch khỏi tâm portal một chút
+                playerObj.transform.position = portal.transform.position + (Vector3)(enterDirection * 1.5f);
+                break;
+            }
+        }
+
+        // 4. TIÊU HỦY MAP CŨ
         AsyncOperation unloadOp = SceneManager.UnloadSceneAsync(currentMap);
-        yield return unloadOp; // Đợi xóa map cũ xong 100%
+        yield return unloadOp;
 
-        // --- 3. RÃ ĐÔNG PLAYER ---
-        // Đặt lại vận tốc về 0 để lỡ trước khi qua cổng đang phi nhanh cũng không bị kẹt tường
-        if (rb != null) rb.linearVelocity = Vector2.zero; 
-        
-        // Bật lại vật lý và điều khiển
+        // 5. RÃ ĐÔNG
         if (rb != null) rb.simulated = true;
         if (playerCtrl != null) playerCtrl.enabled = true;
+        
+        Debug.Log("<color=green>Chuyển không gian thành công!</color>");
+    }
+
+    private IEnumerator ReEnablePortal(Collider2D portalCollider)
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        if (portalCollider != null)
+            portalCollider.enabled = true;
     }
 }

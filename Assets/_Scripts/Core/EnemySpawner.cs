@@ -6,18 +6,17 @@ public class EnemySpawner : MonoBehaviour
 {
     [Header("--- CÀI ĐẶT QUÁI VẬT ---")]
     public GameObject[] enemyPrefabs; 
-    public int maxEnemies = 20;
     
     [Tooltip("Thời gian chờ giữa mỗi lần hệ thống kiểm tra và đẻ quái (Giây)")]
-    public float spawnDelay = 2f; 
+    public float spawnDelay = 10f; 
 
     [Header("--- ĐIỂM SINH SẢN CỐ ĐỊNH ---")]
     [Tooltip("Danh sách các điểm đẻ quái (Tự động nạp)")]
     public Transform[] spawnNodes; 
 
     [Header("--- TỐI ƯU KHOẢNG CÁCH ---")]
-    public float maxDistanceFromPlayer = 25f;
-    public float minDistanceFromPlayer = 10f;
+    public float maxDistanceFromPlayer = 30f;
+    public float minDistanceFromPlayer = 5f;
 
     [Header("--- KẾT NỐI PLAYER ---")]
     [Tooltip("Hệ thống sẽ tự động tìm Player xuyên Scene")]
@@ -42,7 +41,6 @@ public class EnemySpawner : MonoBehaviour
 
     private void Start()
     {
-        // [ĐÃ SỬA]: Tự động tìm Player xuyên Scene bằng Tag
         if (player == null)
         {
             GameObject p = GameObject.FindGameObjectWithTag("Player");
@@ -61,75 +59,101 @@ public class EnemySpawner : MonoBehaviour
             Debug.LogError("<color=red>EnemySpawner KHÔNG TÌM THẤY PLAYER! Hãy đảm bảo Object Player của bạn được gắn Tag là 'Player'.</color>");
         }
 
-        StartCoroutine(SpawnRoutine());
+        // 1. Vừa vào Map là đẻ quái luôn
+        InitialSpawnAll();
+
+        // 2. Chạy vòng lặp kiểm tra hồi sinh quái chết
+        StartCoroutine(RespawnRoutine());
+    }
+
+    private void InitialSpawnAll()
+    {
+        if (spawnNodes == null || spawnNodes.Length == 0 || enemyPrefabs == null || enemyPrefabs.Length == 0) return;
+
+        // Nếu mới vào game (Player lv 1) thì quái lv 1. Nếu Player đã sang map khác và cấp cao thì lấy Lv + 3
+        int startLevel = (player != null && player.currentLevel > 1) ? player.currentLevel + 3 : 1;
+
+        for (int i = 0; i < spawnNodes.Length; i++)
+        {
+            SpawnEnemyAtNode(i, startLevel);
+        }
+    }
+
+    private IEnumerator RespawnRoutine()
+    {
+        while (true)
+        {
+
+            yield return new WaitForSeconds(spawnDelay);
+
+            if (player == null) continue;
+
+            Vector2 playerPos = player.transform.position;
+
+            for (int i = 0; i < enemiesAtNodes.Length; i++)
+            {
+                // Nếu quái ở Node này đã chết
+                if (enemiesAtNodes[i] == null)
+                {
+
+                    yield return new WaitForSeconds(spawnDelay);
+
+                    float distanceToPlayer = Vector2.Distance(playerPos, (Vector2)spawnNodes[i].position);
+
+                    // Chỉ hồi sinh quái nếu Player nằm trong phạm vi Spawn
+                    if (distanceToPlayer >= minDistanceFromPlayer && distanceToPlayer <= maxDistanceFromPlayer)
+                    {
+                        int spawnLevel = (player.currentLevel == 1) ? 1 : player.currentLevel + 3;
+                        SpawnEnemyAtNode(i, spawnLevel);
+                    }
+                }
+            }
+        }
+    }
+
+    private void SpawnEnemyAtNode(int nodeIndex, int level)
+    {
+        Transform selectedNode = spawnNodes[nodeIndex];
+        
+        GameObject randomPrefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+        if (randomPrefab == null) return;
+
+        GameObject newEnemy = Instantiate(randomPrefab, selectedNode.position, Quaternion.identity, transform);
+        
+        BaseEntity enemyStats = newEnemy.GetComponent<BaseEntity>();
+        if (enemyStats != null)
+        {
+            enemyStats.currentLevel = level;
+            // Bơm đầy máu theo level
+            enemyStats.currentHealth = enemyStats.MaxHealth; 
+        }
+
+        enemiesAtNodes[nodeIndex] = newEnemy;
     }
 
     private void HandlePlayerLevelUp(int newLevel)
     {
-        TrySpawnEnemy();
-    }
+        if (player == null || enemiesAtNodes == null) return;
 
-    private IEnumerator SpawnRoutine()
-    {
-        while (true)
-        {
-            int currentActiveCount = 0;
-            for (int i = 0; i < enemiesAtNodes.Length; i++)
-            {
-                if (enemiesAtNodes[i] != null) 
-                {
-                    currentActiveCount++;
-                }
-            }
-
-            if (currentActiveCount < maxEnemies)
-            {
-                TrySpawnEnemy();
-            }
-            
-            yield return new WaitForSeconds(spawnDelay);
-        }
-    }
-
-    private void TrySpawnEnemy()
-    {
-        // Thêm kiểm tra enemyPrefabs để tránh lỗi Null
-        if (spawnNodes == null || spawnNodes.Length == 0 || enemyPrefabs == null || enemyPrefabs.Length == 0 || player == null) return;
-
-        List<int> availableNodeIndices = new List<int>();
         Vector2 playerPos = player.transform.position;
 
-        for (int i = 0; i < spawnNodes.Length; i++)
+        for (int i = 0; i < enemiesAtNodes.Length; i++)
         {
-            if (enemiesAtNodes[i] == null)
+            if (enemiesAtNodes[i] != null)
             {
-                float distanceToPlayer = Vector2.Distance(playerPos, (Vector2)spawnNodes[i].position);
-
-                if (distanceToPlayer >= minDistanceFromPlayer && distanceToPlayer <= maxDistanceFromPlayer)
+                float distanceToPlayer = Vector2.Distance(playerPos, enemiesAtNodes[i].transform.position);
+                
+                // Nếu quái nằm NGOÀI phạm vi spawn (quá gần < min HOẶC quá xa > max) thì cập nhật cấp
+                if (distanceToPlayer > maxDistanceFromPlayer)
                 {
-                    availableNodeIndices.Add(i);
+                    BaseEntity enemyStats = enemiesAtNodes[i].GetComponent<BaseEntity>();
+                    if (enemyStats != null)
+                    {
+                        enemyStats.currentLevel = newLevel + 3;
+                        enemyStats.Heal(99999f); // Bơm máu để UI cập nhật
+                    }
                 }
             }
-        }
-
-        if (availableNodeIndices.Count > 0)
-        {
-            int randomIndex = availableNodeIndices[Random.Range(0, availableNodeIndices.Count)];
-            Transform selectedNode = spawnNodes[randomIndex];
-            
-            GameObject randomPrefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
-            if (randomPrefab == null) return;
-
-            GameObject newEnemy = Instantiate(randomPrefab, selectedNode.position, Quaternion.identity);
-            
-            BaseEntity enemyStats = newEnemy.GetComponent<BaseEntity>();
-            if (enemyStats != null)
-            {
-                if (player.currentLevel == 1) enemyStats.currentLevel = 1;
-                else enemyStats.currentLevel = player.currentLevel + 3;
-            }
-
-            enemiesAtNodes[randomIndex] = newEnemy;
         }
     }
     
