@@ -205,4 +205,15 @@ public class BaseEntity : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth, 0, MaxHealth);
         OnHealthChanged?.Invoke(currentHealth, MaxHealth);
     }
+
+    // Hàm này dùng để Set cấp độ trực tiếp cho Quái từ Spawner và kích hoạt UI
+    public void SetLevel(int newLevel)
+    {
+        currentLevel = newLevel;
+        currentHealth = MaxHealth; // Tự động scale máu tối đa theo level mới và bơm đầy
+        
+        // Kích hoạt Event để báo cho UI Canvas trên đầu quái cập nhật lại con số
+        OnLevelChanged?.Invoke(currentLevel); 
+        OnHealthChanged?.Invoke(currentHealth, MaxHealth); 
+    }
 }
