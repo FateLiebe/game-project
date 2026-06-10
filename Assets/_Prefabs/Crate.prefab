@@ -173,7 +173,7 @@ MonoBehaviour:
   addedDefensePoints: 0
   addedCritPoints: 0
   brokenSprite: {fileID: 21300000, guid: 940f76b393d5bd643bb439fe33b24a1e, type: 3}
-  droppedItemPrefab: {fileID: 7990156937817933804, guid: 3821d7e659f63c84abe1837462b4e443, type: 3}
+  droppedItemPrefab: {fileID: 8139086573112604224, guid: c19674eac6f5cc7418d061be07e1de6b, type: 3}
   possibleDrops:
   - {fileID: 11400000, guid: 837baff703fae9b4d9f201b4e95707f2, type: 2}
   - {fileID: 11400000, guid: 70e7bd37d36cfe247b3ea9b8a1d1ab9a, type: 2}

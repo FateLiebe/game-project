@@ -57,7 +57,7 @@ public class MapPortal : MonoBehaviour
                 portal.portalID == this.destinationPortalID)
             {
                 // Dịch chuyển player lệch khỏi tâm portal một chút
-                playerObj.transform.position = portal.transform.position + (Vector3)(enterDirection * 1.5f);
+                playerObj.transform.position = portal.transform.position + (Vector3)(enterDirection * 3f);
                 break;
             }
         }
@@ -68,7 +68,11 @@ public class MapPortal : MonoBehaviour
 
         // 5. RÃ ĐÔNG
         if (rb != null) rb.simulated = true;
-        if (playerCtrl != null) playerCtrl.enabled = true;
+        if (playerCtrl != null)
+        {
+            playerCtrl.enabled = true;
+            playerCtrl.ForceGroundedState();
+        }
         
         Debug.Log("<color=green>Chuyển không gian thành công!</color>");
     }

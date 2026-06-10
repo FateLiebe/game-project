@@ -94,9 +94,9 @@ public class PlayerController : BaseEntity
 
         HandleInput();
         HandleComboReset();
+        CheckGrounded();
         Flip();
         UpdateAnimations();
-        CheckGrounded();
     }
 
     private void FixedUpdate()
@@ -668,27 +668,36 @@ public class PlayerController : BaseEntity
         float visualSpeed = isAttacking ? 0 : Mathf.Abs(horizontalInput);
         anim.SetFloat("speed", visualSpeed);
 
-        bool jumping = currentState == PlayerState.Airborne && rb.linearVelocity.y > 0.1f;
-        bool falling = currentState == PlayerState.Airborne && rb.linearVelocity.y <= 0.1f;
-        bool grounded = currentState == PlayerState.Grounded; 
+        bool grounded = currentState == PlayerState.Grounded;
+        
+        // isJumping chỉ true khi player CHỦ ĐỘNG nhảy
+        // dùng lastJumpTime thay vì velocity để tránh false positive
+        bool jumping = !grounded 
+                    && currentState == PlayerState.Airborne 
+                    && (Time.time - lastJumpTime) < 0.5f  // ← chỉ true trong 0.5s sau khi nhảy
+                    && rb.linearVelocity.y > 0.1f;
+                    
+        bool falling = !grounded 
+                    && currentState == PlayerState.Airborne 
+                    && rb.linearVelocity.y < -0.1f;
 
-        anim.SetBool("isJumping", jumping);
-        anim.SetBool("isFalling", falling);
-        anim.SetBool("isGrounded", grounded); 
+        anim.SetBool("isGrounded", grounded);
+        anim.SetBool("isJumping",  jumping);
+        anim.SetBool("isFalling",  falling);
     }
 
-    private void CheckGrounded()
+   private void CheckGrounded()
     {
         if (currentState == PlayerState.Dashing || currentState == PlayerState.DashStalling) return;
-
-        if (Time.time - lastJumpTime <= 0.1f) return;
+        if (Time.time - lastJumpTime <= 0.15f) return;
 
         Collider2D col = GetComponent<Collider2D>();
-        
-        Vector2 feetPos = new Vector2(col.bounds.center.x, col.bounds.min.y + 0.1f);
-        Vector2 boxSize = new Vector2(col.bounds.size.x * 0.7f, 0.25f);
 
-        bool isGroundedNow = Physics2D.OverlapBox(feetPos, boxSize, 0f, groundLayer) != null; 
+        // Đặt box BÊN DƯỚI chân, không phải bên trong collider
+        Vector2 feetPos = new Vector2(col.bounds.center.x, col.bounds.min.y - 0.05f);
+        Vector2 boxSize = new Vector2(col.bounds.size.x * 0.7f, 0.15f);
+
+        bool isGroundedNow = Physics2D.OverlapBox(feetPos, boxSize, 0f, groundLayer) != null;
 
         if (isGroundedNow)
         {
@@ -697,10 +706,7 @@ public class PlayerController : BaseEntity
         else
         {
             if (currentState == PlayerState.Grounded)
-            {
                 currentState = PlayerState.Airborne;
-                jumpsLeft = Mathf.Max(0, jumpsLeft - 1);
-            }
         }
     }
 
@@ -726,5 +732,15 @@ public class PlayerController : BaseEntity
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, 3.5f);
+    }
+
+    public void ForceGroundedState()
+    {
+        currentState = PlayerState.Grounded;
+        jumpsLeft = baseData.maxJumps;
+        canAirAttack = true;
+        dashesUsedInAir = 0;
+        dashResetByJump = false;
+        rb.gravityScale = originalGravity;
     }
 }

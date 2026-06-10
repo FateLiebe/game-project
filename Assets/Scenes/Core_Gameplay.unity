@@ -2324,7 +2324,7 @@ MonoBehaviour:
   - {fileID: 274788462}
   btnUse: {fileID: 1262677446}
   btnDrop: {fileID: 1491741063}
-  droppedItemPrefab: {fileID: 7990156937817933804, guid: 3821d7e659f63c84abe1837462b4e443, type: 3}
+  droppedItemPrefab: {fileID: 8139086573112604224, guid: c19674eac6f5cc7418d061be07e1de6b, type: 3}
   player: {fileID: 1056620095}
 --- !u!4 &184379604
 Transform:
@@ -12277,7 +12277,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 2.5
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: a3f60191f8d4aa84d98db30d3afc50d2, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

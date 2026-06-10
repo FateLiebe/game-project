@@ -71,6 +71,6 @@ public class BreakableCrate : BaseEntity // Kế thừa BaseEntity để nhận 
 
         // Gắn dữ liệu bốc thăm được vào cục đồ
         ItemPickup pickup = loot.GetComponent<ItemPickup>();
-        if (pickup != null) pickup.itemData = droppedData;
+        if (pickup != null) pickup.Setup(droppedData); // ← dùng Setup() thay vì gán trực tiếp
     }
 }

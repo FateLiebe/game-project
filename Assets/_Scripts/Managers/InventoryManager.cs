@@ -149,17 +149,28 @@ public class InventoryManager : MonoBehaviour
     // ===============================================
     public void DropItem()
     {
-        if (selectedItem == null) return;
+        if (selectedItem == null) { Debug.Log("selectedItem NULL"); return; }
+        if (droppedItemPrefab == null) { Debug.Log("droppedItemPrefab NULL - chưa gán prefab!"); return; }
+        if (player == null) { Debug.Log("player NULL - chưa gán player!"); return; }
 
-        if (droppedItemPrefab != null && player != null)
-        {
-            GameObject loot = Instantiate(droppedItemPrefab, player.transform.position + new Vector3(0, 0.5f, 0), Quaternion.identity);
-            ItemPickup pickup = loot.GetComponent<ItemPickup>();
-            if (pickup != null) pickup.Setup(selectedItem); 
-            
-            Rigidbody2D rb = loot.GetComponent<Rigidbody2D>();
-            if (rb != null) rb.AddForce(new Vector2(Random.Range(-2f, 2f), 3f), ForceMode2D.Impulse);
-        }
+        Vector3 dropOffset = new Vector3(
+            player.transform.localScale.x > 0 ? 1f : -1f, 
+            0.5f, 0);
+
+        GameObject loot = Instantiate(droppedItemPrefab, 
+            player.transform.position + dropOffset, 
+            Quaternion.identity);
+        
+        Debug.Log($"Spawned: {loot.name} tại {loot.transform.position}");
+        
+        ItemPickup pickup = loot.GetComponent<ItemPickup>();
+        if (pickup == null) { Debug.Log("Prefab thiếu ItemPickup component!"); return; }
+        
+        pickup.Setup(selectedItem);
+        
+        Rigidbody2D rb = loot.GetComponent<Rigidbody2D>();
+        if (rb == null) Debug.Log("Prefab thiếu Rigidbody2D!");
+        else rb.AddForce(new Vector2(Random.Range(-2f, 2f), 3f), ForceMode2D.Impulse);
 
         RemoveSelectedItem();
     }

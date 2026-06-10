@@ -7,9 +7,13 @@ public class ItemPickup : MonoBehaviour
     private SpriteRenderer sr;
     private bool canPickUp = true; // Mặc định cho phép nhặt (dành cho đồ rớt từ thùng)
 
+    private void Awake()
+    {
+        sr = GetComponent<SpriteRenderer>();
+    }
+
     private void Start()
     {
-        if (sr == null) sr = GetComponent<SpriteRenderer>();
         if (itemData != null && sr != null) sr.sprite = itemData.icon;
     }
 
@@ -34,17 +38,20 @@ public class ItemPickup : MonoBehaviour
         canPickUp = true; // Bật lại cảm biến nhặt
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerStay2D(Collider2D other)
     {
-        // Nếu đang trong thời gian bị khóa (vừa vứt ra), bỏ qua không xử lý va chạm
-        if (!canPickUp) return; 
-
-        if (collision.gameObject.CompareTag("Player"))
+        if (!canPickUp) return;
+        if (!other.CompareTag("Player")) return;
+        if (itemData == null) return;
+        
+        // Guard null
+        if (InventoryManager.Instance == null)
         {
-            if (InventoryManager.Instance != null && InventoryManager.Instance.AddItem(itemData))
-            {
-                Destroy(gameObject); // Xóa đồ dưới đất
-            }
+            Debug.LogWarning("InventoryManager.Instance NULL khi nhặt đồ!");
+            return;
         }
+        
+        if (InventoryManager.Instance.AddItem(itemData))
+            Destroy(gameObject);
     }
 }

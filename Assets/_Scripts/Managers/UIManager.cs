@@ -58,10 +58,10 @@ public class UIManager : MonoBehaviour
     // --- CÁC HÀM GẮN VÀO NÚT BẤM (BUTTONS) ---
     public void ResumeGame() { TogglePause(); }
 
-    public void RestartGame() 
-    { 
-        Time.timeScale = 1f; 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); 
+    public void RestartGame()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Core_Gameplay"); // Load lại scene gốc, GameLoader sẽ tự load Map_1
     }
 
     public void QuitGame() 

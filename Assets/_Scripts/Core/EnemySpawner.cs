@@ -15,7 +15,7 @@ public class EnemySpawner : MonoBehaviour
     public Transform[] spawnNodes; 
 
     [Header("--- TỐI ƯU KHOẢNG CÁCH ---")]
-    public float maxDistanceFromPlayer = 30f;
+    public float maxDistanceFromPlayer = 80f;
     public float minDistanceFromPlayer = 5f;
 
     [Header("--- KẾT NỐI PLAYER ---")]
@@ -95,9 +95,6 @@ public class EnemySpawner : MonoBehaviour
                 // Nếu quái ở Node này đã chết
                 if (enemiesAtNodes[i] == null)
                 {
-
-                    yield return new WaitForSeconds(spawnDelay);
-
                     float distanceToPlayer = Vector2.Distance(playerPos, (Vector2)spawnNodes[i].position);
 
                     // Chỉ hồi sinh quái nếu Player nằm trong phạm vi Spawn
