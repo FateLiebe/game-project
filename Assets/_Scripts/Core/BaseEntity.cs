@@ -45,9 +45,14 @@ public class BaseEntity : MonoBehaviour
     public int addedDefensePoints = 0;
     public int addedCritPoints = 0;
 
+    [Header("--- TEMPORARY BUFFS & SHIELD ---")]
+    public float currentShield = 0f;
+    public float buffAttack = 0f;
+    public float buffDefense = 0f;
+
     public virtual float MaxHealth => baseData.baseMaxHealth + ((currentLevel - 1) * baseData.healthGrowth) + (addedHealthPoints * 5f) + equipHealthBonus;
-    public virtual float Attack => baseData.baseAttack + ((currentLevel - 1) * baseData.attackGrowth) + (addedAttackPoints * 1f) + equipAttackBonus;
-    public virtual float Defense => baseData.baseDefense + ((currentLevel - 1) * baseData.defenseGrowth) + (addedDefensePoints * 1f) + equipDefenseBonus;
+    public virtual float Attack => baseData.baseAttack + ((currentLevel - 1) * baseData.attackGrowth) + (addedAttackPoints * 1f) + equipAttackBonus + buffAttack;
+    public virtual float Defense => baseData.baseDefense + ((currentLevel - 1) * baseData.defenseGrowth) + (addedDefensePoints * 1f) + equipDefenseBonus + buffDefense;
     public float CritRate => baseData.baseCritRate + ((currentLevel - 1) * baseData.critRateGrowth) + (addedCritPoints * 0.2f) + equipCritRateBonus;
     public float CritDamage => (baseData.critDamageMultiplier * 100f) + equipCritDamageBonus;    
     public float Speed => baseData.moveSpeed + equipSpeedBonus;
@@ -71,6 +76,21 @@ public class BaseEntity : MonoBehaviour
         }
 
         float finalDamage = Mathf.Max(1f, info.damage - Defense);
+
+        // --- ĐOẠN CODE THÊM MỚI: CHẶN SÁT THƯƠNG BẰNG KHIÊN ---
+        if (currentShield > 0)
+        {
+            if (currentShield >= finalDamage)
+            {
+                currentShield -= finalDamage;
+                finalDamage = 0; // Khiên gánh hết sát thương
+            }
+            else
+            {
+                finalDamage -= currentShield; // Khiên vỡ, phần dư trừ vào máu
+                currentShield = 0;
+            }
+        }
 
         currentHealth -= finalDamage;
         currentHealth = Mathf.Clamp(currentHealth, 0, MaxHealth); 

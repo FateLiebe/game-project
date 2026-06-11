@@ -41,6 +41,11 @@ public class PlayerController : BaseEntity
 
     [Header("Physics & Detection")]
     [SerializeField] private LayerMask groundLayer;
+
+    [Header("Boss Detection")]
+    public float bossDetectionRadius = 15f; 
+    public LayerMask bossLayer; 
+    private BaseEntity activeBoss;
     
     private Animator anim;
     private Rigidbody2D rb;
@@ -91,6 +96,8 @@ public class PlayerController : BaseEntity
             UpdateAnimations(); 
             return; 
         }
+
+        HandleBossDetection();
 
         HandleInput();
         HandleComboReset();
@@ -686,7 +693,7 @@ public class PlayerController : BaseEntity
         anim.SetBool("isFalling",  falling);
     }
 
-   private void CheckGrounded()
+    private void CheckGrounded()
     {
         if (currentState == PlayerState.Dashing || currentState == PlayerState.DashStalling) return;
         if (Time.time - lastJumpTime <= 0.15f) return;
@@ -742,5 +749,30 @@ public class PlayerController : BaseEntity
         dashesUsedInAir = 0;
         dashResetByJump = false;
         rb.gravityScale = originalGravity;
+    }
+
+    private void HandleBossDetection()
+    {
+        // Quét 1 vòng tròn quanh Player để tìm Layer của Boss
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, bossDetectionRadius, bossLayer);
+        
+        if (hit != null)
+        {
+            // Nếu trúng, lấy thông tin Boss
+            BaseEntity bossEntity = hit.GetComponentInParent<BaseEntity>();
+            
+            // Nếu là Boss mới (khác con cũ đang lưu) và nó còn sống -> Hiện UI
+            if (bossEntity != null && activeBoss != bossEntity && bossEntity.currentHealth > 0)
+            {
+                activeBoss = bossEntity;
+                if (BossUIManager.Instance != null) BossUIManager.Instance.SetupBoss(activeBoss);
+            }
+        }
+        else if (activeBoss != null)
+        {
+            // Nếu quét không thấy ai mà trước đó đang có Boss -> Đã đi ra xa -> Ẩn UI
+            activeBoss = null;
+            if (BossUIManager.Instance != null) BossUIManager.Instance.HideBossUI();
+        }
     }
 }

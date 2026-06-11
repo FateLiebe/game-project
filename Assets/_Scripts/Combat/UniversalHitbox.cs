@@ -48,8 +48,18 @@ public class UniversalHitbox : MonoBehaviour
                     BaseEntity enemy = owner.GetComponent<BaseEntity>();
                     if (enemy != null)
                     {
-                        // Nếu chủ nhân là Quái -> Lấy thẳng chỉ số Attack (không Crit, không Combo)
-                        finalDamage = enemy.Attack;
+                        // Kiểm tra xem hitbox này có BossHitboxData không (VFX của Boss)
+                        BossHitboxData bossData = GetComponent<BossHitboxData>();
+                        if (bossData != null)
+                        {
+                            // Boss skill: tính dame theo công thức riêng từng skill
+                            finalDamage = bossData.CalculateDamage(enemy.Attack, transform.position);
+                        }
+                        else
+                        {
+                            // Quái thường: lấy thẳng chỉ số Attack
+                            finalDamage = enemy.Attack;
+                        }
                     }
                 }
             }

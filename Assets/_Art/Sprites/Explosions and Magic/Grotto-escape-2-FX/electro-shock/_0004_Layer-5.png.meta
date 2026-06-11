@@ -125,12 +125,12 @@ TextureImporter:
       name: _0004_Layer-5_0
       rect:
         serializedVersion: 2
-        x: 31
-        y: 42
-        width: 10
-        height: 17
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 0
+        width: 128
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5, y: 0.114583336}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -143,77 +143,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: _0004_Layer-5_1
-      rect:
-        serializedVersion: 2
-        x: 36
-        y: 8
-        width: 57
-        height: 74
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 694471b0b57213580800000000000000
-      internalID: -8849248520824732522
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: _0004_Layer-5_2
-      rect:
-        serializedVersion: 2
-        x: 32
-        y: 18
-        width: 6
-        height: 10
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 18d930112f80c0fa0800000000000000
-      internalID: -5833277581591077503
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: _0004_Layer-5_3
-      rect:
-        serializedVersion: 2
-        x: 33
-        y: 12
-        width: 6
-        height: 6
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 892536e74ff745fd0800000000000000
-      internalID: -2354116017138740584
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: af4556b6104eaec49832d26c89e63293
     internalID: 0
     vertices: []
     indices: 
@@ -221,12 +155,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":128.0,"y":96.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       _0004_Layer-5_0: 7545991188992280900
-      _0004_Layer-5_1: -8849248520824732522
-      _0004_Layer-5_2: -5833277581591077503
-      _0004_Layer-5_3: -2354116017138740584
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

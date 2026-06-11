@@ -15,6 +15,9 @@ public class EnemyController : EnemyBase
     [SerializeField] private float attackRange = 1.8f;     
     [SerializeField] private float idleDuration = 1.5f;    
     
+    // [MỚI THÊM]: Cờ xác định quái vật có bay hay không
+    [SerializeField] public bool isFlying = false;
+
     [Header("Detection (Kẻ tia)")]
     [SerializeField] private Transform wallCheck;          
     [SerializeField] private Transform ledgeCheck;         
@@ -33,18 +36,27 @@ public class EnemyController : EnemyBase
         base.Start(); 
         anim = GetComponent<Animator>();
 
-        RaycastHit2D hit = Physics2D.Raycast(
-        transform.position,
-        Vector2.down,
-        10f,
-        LayerMask.GetMask("Ground")
-        );
-
-        if (hit.collider != null)
+        // [ĐÃ SỬA]: Chỉ ép vị trí xuống đất nếu KHÔNG PHẢI quái bay
+        if (!isFlying)
         {
-            Vector3 pos = transform.position;
-            pos.y = hit.point.y;
-            transform.position = pos;
+            RaycastHit2D hit = Physics2D.Raycast(
+                transform.position,
+                Vector2.down,
+                10f,
+                LayerMask.GetMask("Ground")
+            );
+
+            if (hit.collider != null)
+            {
+                Vector3 pos = transform.position;
+                pos.y = hit.point.y;
+                transform.position = pos;
+            }
+        }
+        else
+        {
+            // Nếu là quái bay, tắt trọng lực để nó lơ lửng
+            if (rb != null) rb.gravityScale = 0f;
         }
         
         SwitchState(EnemyState.Patrol);
@@ -52,7 +64,7 @@ public class EnemyController : EnemyBase
 
     protected override void Update()
     {
-        base.Update(); // Kích hoạt hệ thống đếm lùi thời gian hồi chiêu từ EnemyBase
+        base.Update(); 
 
         if (currentState == EnemyState.Dead || !canAction) return;
 
@@ -78,7 +90,6 @@ public class EnemyController : EnemyBase
     {
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         
-        // Nhờ DetectPlayer nâng cấp, nếu trả về true nghĩa là Player chắc chắn CÒN SỐNG
         if (DetectPlayer()) 
         {
             float dist = Vector2.Distance(transform.position, playerTarget.position);
@@ -126,12 +137,11 @@ public class EnemyController : EnemyBase
             return;
         }
 
-        // KIỂM TRA SINH TỬ: Kẻ địch đang rượt có lỡ đột tử không?
         BaseEntity targetEntity = playerTarget.GetComponentInParent<BaseEntity>();
         if (targetEntity == null || targetEntity.currentHealth <= 0)
         {
             playerTarget = null;
-            SwitchState(EnemyState.Idle); // Lập tức quay xe đi tuần tra
+            SwitchState(EnemyState.Idle); 
             return;
         }
 
@@ -145,6 +155,7 @@ public class EnemyController : EnemyBase
 
         if (distToPlayer <= attackRange)
         {
+            // Tạm thời vẫn dùng CanAttack(0) để test logic rượt đuổi, sẽ sửa lại khi làm hệ thống đa kỹ năng cho Boss
             if (CanAttack(0))
             {
                 SwitchState(EnemyState.Attack);
@@ -234,31 +245,24 @@ public class EnemyController : EnemyBase
 
     protected override void Die()
     {
-        // Ép tắt ngay lập tức vũ khí/hitbox nếu đang đánh dở
         CancelCurrentAttackHitbox();
-
-        // Dừng mọi tiến trình đang chạy (rượt đuổi, tấn công)
         StopAllCoroutines(); 
         
-        // Ép trạng thái về Dead để hàm Update() ngừng xử lý AI
         SwitchState(EnemyState.Dead);
         anim.SetBool("isDead", true);
         rb.linearVelocity = Vector2.zero;
         
-        // 3. Tắt va chạm vật lý để Player không bị vướng vào xác
         GetComponent<Collider2D>().enabled = false;
+        
+        // Nếu là quái bay thì cho nó rơi từ từ xuống đất khi chết cho chân thực
+        if (isFlying && rb != null) rb.gravityScale = 2f; 
 
-        // 5. [FIX CHƯA BIẾN MẤT]: Thay vì tắt script (this.enabled = false), 
-        // ta gọi Coroutine để chờ Animation chạy xong rồi mới dọn dẹp xác.
         StartCoroutine(DeathRoutine());
     }
 
     private IEnumerator DeathRoutine()
     {
-        // Thời gian chờ xác bốc hơi (Bạn có thể tự chỉnh sao cho khớp với độ dài Animation chết)
         yield return new WaitForSeconds(0.833f);
-        
-        // Hủy hoàn toàn object quái vật này để giải phóng bộ nhớ
         Destroy(gameObject); 
     }
 
@@ -277,14 +281,15 @@ public class EnemyController : EnemyBase
 
     private bool CheckLedge()
     {
+        // [ĐÃ SỬA]: Nếu là quái bay thì không bao giờ sợ vực sâu
+        if (isFlying) return true; 
+
         if (ledgeCheck == null) return true;
         return Physics2D.Raycast(ledgeCheck.position, Vector2.down, 0.5f, groundLayer);
     }
 
     private bool DetectPlayer()
     {
-        // [NÂNG CẤP]: Cả 2 hệ thống quét giờ đây đều phải kiểm tra Máu của nạn nhân
-        
         if (wallCheck != null)
         {
             RaycastHit2D hit = Physics2D.Raycast(wallCheck.position, Vector2.right * facingDir, lineOfSight, playerLayer);
@@ -330,7 +335,8 @@ public class EnemyController : EnemyBase
 
     private void UpdateAnimations()
     {
-        anim.SetFloat("speed", Mathf.Abs(rb.linearVelocity.x));
+        // Nếu là quái bay, có thể dùng 1 anim bay lơ lửng suốt nên không cần set speed
+        if (!isFlying) anim.SetFloat("speed", Mathf.Abs(rb.linearVelocity.x));
     }
 
     private void OnDrawGizmos()

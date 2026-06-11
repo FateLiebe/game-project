@@ -1,18 +1,40 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class GameLoader : MonoBehaviour
 {
-    [Header("Bản đồ mặc định khi vào game")]
+    [Header("Map dau tien")]
     public string firstMapName = "Map_1";
 
-    // ĐỔI TỪ Start() SANG Awake()
-    void Awake() 
+    private IEnumerator Start()
     {
-        // Ép tải Map ngay lập tức trước khi bất kỳ Object nào khác được phép hoạt động
-        if (!SceneManager.GetSceneByName(firstMapName).isLoaded)
+        AsyncOperation loadOp =
+            SceneManager.LoadSceneAsync(
+                firstMapName,
+                LoadSceneMode.Additive
+            );
+
+        yield return loadOp;
+
+        yield return null;
+
+        MapSpawnPoint spawnPoint =
+            FindFirstObjectByType<MapSpawnPoint>();
+
+        GameObject player =
+            GameObject.FindGameObjectWithTag("Player");
+
+        if (spawnPoint != null && player != null)
         {
-            SceneManager.LoadScene(firstMapName, LoadSceneMode.Additive);
+            player.transform.position =
+                spawnPoint.transform.position;
+
+            Debug.Log("Da dua Player toi SpawnPoint");
+        }
+        else
+        {
+            Debug.LogError("Khong tim thay SpawnPoint hoac Player");
         }
     }
 }

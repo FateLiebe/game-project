@@ -125,12 +125,12 @@ TextureImporter:
       name: _0005_Layer-6_0
       rect:
         serializedVersion: 2
-        x: 36
-        y: 12
-        width: 22
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 0
+        width: 128
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5, y: 0.114583336}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -143,77 +143,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: _0005_Layer-6_1
-      rect:
-        serializedVersion: 2
-        x: 53
-        y: 10
-        width: 27
-        height: 71
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d1407df5eb3426b40800000000000000
-      internalID: 5431978585493013533
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: _0005_Layer-6_2
-      rect:
-        serializedVersion: 2
-        x: 79
-        y: 43
-        width: 8
-        height: 7
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 76d8d2a9c32439e00800000000000000
-      internalID: 1050255966159605095
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: _0005_Layer-6_3
-      rect:
-        serializedVersion: 2
-        x: 81
-        y: 10
-        width: 12
-        height: 61
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 850e230e1ce33fa60800000000000000
-      internalID: 7706572389772091480
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: e79003fcfdda62647a8fbd030f3b41b7
     internalID: 0
     vertices: []
     indices: 
@@ -221,12 +155,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":128.0,"y":96.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       _0005_Layer-6_0: -8093052077834513261
-      _0005_Layer-6_1: 5431978585493013533
-      _0005_Layer-6_2: 1050255966159605095
-      _0005_Layer-6_3: 7706572389772091480
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
