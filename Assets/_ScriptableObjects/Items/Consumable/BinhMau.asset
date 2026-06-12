@@ -17,10 +17,14 @@ MonoBehaviour:
   icon: {fileID: 189804300, guid: 3a6cac4ef058b5243a458056c66b05b7, type: 3}
   itemType: 0
   rarity: 0
-  healthBonus: 50
+  healthBonus: 0
   attackBonus: 0
   defenseBonus: 0
   critRateBonus: 0
   critDamageBonus: 0
   speedBonus: 0
-  healAmount: 1
+  healAmount: 50
+  skillPrefab: {fileID: 0}
+  damageMultiplier: 1.5
+  skillCooldown: 5
+  maxUses: 3

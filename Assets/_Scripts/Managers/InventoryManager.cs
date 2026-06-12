@@ -13,7 +13,7 @@ public class InventoryManager : MonoBehaviour
     [Header("Kết nối UI")]
     public Transform slotsParent; 
     public ItemTooltipUI tooltipUI; 
-    public EquipmentSlotUI[] equipSlots; // 7 Ô trang bị
+    public EquipmentSlotUI[] equipSlots; 
     
     [Header("Tương tác Item")]
     public Button btnUse; 
@@ -38,9 +38,71 @@ public class InventoryManager : MonoBehaviour
         if (btnDrop != null) btnDrop.onClick.AddListener(DropItem);
     }
 
+    private void Update()
+    {
+        // Lắng nghe phím Q để uống bình máu
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            QuickUseConsumable();
+        }
+    }
+
+    // ===============================================
+    // --- TÍNH TOÁN SỐ Ô THỰC TẾ ĐANG BỊ CHIẾM ---
+    // ===============================================
+    private int GetOccupiedSlots()
+    {
+        int occupied = 0;
+        HashSet<string> consumableNames = new HashSet<string>();
+
+        foreach (ItemSO item in inventoryList)
+        {
+            if (item.itemType == ItemType.Consumable)
+            {
+                if (!consumableNames.Contains(item.itemName))
+                {
+                    consumableNames.Add(item.itemName);
+                    occupied++;
+                }
+            }
+            else 
+            {
+                occupied++; 
+            }
+        }
+        return occupied;
+    }
+
     public bool AddItem(ItemSO itemToAdd)
     {
-        if (inventoryList.Count >= maxSlots) return false;
+        int occupied = GetOccupiedSlots();
+        bool isNewConsumable = false;
+
+        // Nếu là đồ tiêu hao, check xem trong túi đã có bình nào trùng tên chưa
+        if (itemToAdd.itemType == ItemType.Consumable)
+        {
+            bool hasAlready = false;
+            foreach (var item in inventoryList)
+            {
+                if (item.itemType == ItemType.Consumable && item.itemName == itemToAdd.itemName)
+                {
+                    hasAlready = true;
+                    break;
+                }
+            }
+            isNewConsumable = !hasAlready;
+        }
+
+        // Kiểm tra xem túi đã đầy chưa
+        if (itemToAdd.itemType != ItemType.Consumable || isNewConsumable)
+        {
+            if (occupied >= maxSlots) 
+            {
+                Debug.Log("<color=red>Túi đồ đã đầy!</color>");
+                return false; 
+            }
+        }
+
         inventoryList.Add(itemToAdd);
         UpdateUI(); 
         return true; 
@@ -49,10 +111,95 @@ public class InventoryManager : MonoBehaviour
     private void UpdateUI()
     {
         if (slots == null) return;
+
+        List<ItemSO> displayList = new List<ItemSO>();
+        Dictionary<string, int> consumableCounts = new Dictionary<string, int>();
+
+        // Phân loại và gom nhóm
+        foreach (ItemSO item in inventoryList)
+        {
+            if (item.itemType == ItemType.Consumable)
+            {
+                if (consumableCounts.ContainsKey(item.itemName))
+                {
+                    consumableCounts[item.itemName]++;
+                }
+                else
+                {
+                    consumableCounts[item.itemName] = 1;
+                    displayList.Add(item); 
+                }
+            }
+            else
+            {
+                displayList.Add(item);
+            }
+        }
+
+        // Đổ dữ liệu ra các ô
         for (int i = 0; i < slots.Length; i++)
         {
-            if (i < inventoryList.Count) slots[i].UpdateSlot(inventoryList[i]);
-            else slots[i].UpdateSlot(null);
+            if (i < displayList.Count)
+            {
+                int quantity = 1;
+                if (displayList[i].itemType == ItemType.Consumable)
+                {
+                    quantity = consumableCounts[displayList[i].itemName];
+                }
+                
+                slots[i].UpdateSlot(displayList[i], quantity);
+            }
+            else 
+            {
+                slots[i].UpdateSlot(null, 0);
+            }
+        }
+
+        UpdateConsumableQuickSlot();
+    }
+
+    private void UpdateConsumableQuickSlot()
+    {
+        ItemSO firstConsumable = null;
+        int count = 0;
+
+        foreach (ItemSO item in inventoryList)
+        {
+            if (item.itemType == ItemType.Consumable)
+            {
+                if (firstConsumable == null) firstConsumable = item;
+                if (item.itemName == firstConsumable.itemName) count++;
+            }
+        }
+
+        if (ConsumableUI.Instance != null) ConsumableUI.Instance.UpdateUI(firstConsumable, count);
+    }
+
+    // ===============================================
+    // --- LOGIC PHÍM Q DÙNG NHANH BÌNH MÁU ---
+    // ===============================================
+    public void QuickUseConsumable()
+    {
+        ItemSO itemToUse = null;
+
+        foreach (ItemSO item in inventoryList)
+        {
+            if (item.itemType == ItemType.Consumable)
+            {
+                itemToUse = item;
+                break;
+            }
+        }
+
+        if (itemToUse != null)
+        {
+            if (player != null) 
+            {
+                player.Heal(itemToUse.healAmount);
+                Debug.Log($"<color=green>Đã dùng {itemToUse.itemName}, hồi {itemToUse.healAmount} HP.</color>");
+            }
+            inventoryList.Remove(itemToUse);
+            UpdateUI(); 
         }
     }
 
@@ -62,9 +209,6 @@ public class InventoryManager : MonoBehaviour
         if (tooltipUI != null) tooltipUI.ShowTooltip(item);
     }
 
-    // ===============================================
-    // --- LOGIC SỬ DỤNG / MẶC ĐỒ ---
-    // ===============================================
     public void UseItem()
     {
         if (selectedItem == null) return;
@@ -74,7 +218,7 @@ public class InventoryManager : MonoBehaviour
             if (player != null) player.Heal(selectedItem.healAmount);
             RemoveSelectedItem();
         }
-        else // Nếu là Trang bị (Vũ khí, Áo, Mũ...)
+        else 
         {
             EquipItem(selectedItem);
         }
@@ -82,49 +226,40 @@ public class InventoryManager : MonoBehaviour
 
     private void EquipItem(ItemSO itemToEquip)
     {
-        // Quét 7 ô trang bị xem ô nào đúng loại đồ này
         foreach (EquipmentSlotUI slot in equipSlots)
         {
             if (slot.allowedItemType == itemToEquip.itemType)
             {
-                // Nhớ lại xem ô này đang mặc cái gì cũ không
                 ItemSO previousItem = slot.equippedItem;
 
-                // Mặc đồ mới lên
                 slot.UpdateSlot(itemToEquip);
-                
-                // Xóa đồ mới khỏi túi
                 inventoryList.Remove(itemToEquip);
 
-                // TRÁO ĐỒ: Nếu có đồ cũ, ném nó ngược lại vào túi
-                if (previousItem != null)
-                {
-                    inventoryList.Add(previousItem);
-                }
+                if (previousItem != null) inventoryList.Add(previousItem);
 
-                // Cập nhật giao diện và Chỉ số
                 selectedItem = null;
                 if (tooltipUI != null) tooltipUI.HideTooltip();
                 UpdateUI();
                 RecalculatePlayerStats();
 
+                if (itemToEquip.itemType == ItemType.SupportSkill && player is PlayerController pc)
+                {
+                    pc.EquipSupportSkill(itemToEquip);
+                }
+
                 Debug.Log($"<color=cyan>Đã mặc: {itemToEquip.itemName}</color>");
-                return; // Xong việc thì thoát vòng lặp
+                return; 
             }
         }
     }
 
-    // ===============================================
-    // --- LOGIC TÍNH TOÁN SỨC MẠNH TỔNG ---
-    // ===============================================
     private void RecalculatePlayerStats()
     {
         if (player == null) return;
 
         float bonusHP = 0, bonusATK = 0, bonusDEF = 0, bonusCRIT = 0;
-        float bonusCritDmg = 0, bonusSpeed = 0; // [MỚI THÊM]: Sát thương bạo kích và Tốc độ
+        float bonusCritDmg = 0, bonusSpeed = 0; 
 
-        // Cộng dồn sức mạnh của cả 7 món trên người
         foreach (EquipmentSlotUI slot in equipSlots)
         {
             if (slot.equippedItem != null)
@@ -133,44 +268,27 @@ public class InventoryManager : MonoBehaviour
                 bonusATK += slot.equippedItem.attackBonus;
                 bonusDEF += slot.equippedItem.defenseBonus;
                 bonusCRIT += slot.equippedItem.critRateBonus;
-
-                // [MỚI THÊM]: Lấy chỉ số mới
                 bonusCritDmg += slot.equippedItem.critDamageBonus;
                 bonusSpeed += slot.equippedItem.speedBonus;
             }
         }
 
-        // [ĐÃ SỬA]: Truyền cả 6 chỉ số sang BaseEntity
         player.UpdateEquipmentStats(bonusHP, bonusATK, bonusDEF, bonusCRIT, bonusCritDmg, bonusSpeed);
     }
 
-    // ===============================================
-    // --- LOGIC VỨT ĐỒ ---
-    // ===============================================
     public void DropItem()
     {
-        if (selectedItem == null) { Debug.Log("selectedItem NULL"); return; }
-        if (droppedItemPrefab == null) { Debug.Log("droppedItemPrefab NULL - chưa gán prefab!"); return; }
-        if (player == null) { Debug.Log("player NULL - chưa gán player!"); return; }
+        if (selectedItem == null) return;
+        if (droppedItemPrefab == null || player == null) return;
 
-        Vector3 dropOffset = new Vector3(
-            player.transform.localScale.x > 0 ? 1f : -1f, 
-            0.5f, 0);
-
-        GameObject loot = Instantiate(droppedItemPrefab, 
-            player.transform.position + dropOffset, 
-            Quaternion.identity);
-        
-        Debug.Log($"Spawned: {loot.name} tại {loot.transform.position}");
+        Vector3 dropOffset = new Vector3(player.transform.localScale.x > 0 ? 1f : -1f, 0.5f, 0);
+        GameObject loot = Instantiate(droppedItemPrefab, player.transform.position + dropOffset, Quaternion.identity);
         
         ItemPickup pickup = loot.GetComponent<ItemPickup>();
-        if (pickup == null) { Debug.Log("Prefab thiếu ItemPickup component!"); return; }
-        
-        pickup.Setup(selectedItem);
+        if (pickup != null) pickup.Setup(selectedItem);
         
         Rigidbody2D rb = loot.GetComponent<Rigidbody2D>();
-        if (rb == null) Debug.Log("Prefab thiếu Rigidbody2D!");
-        else rb.AddForce(new Vector2(Random.Range(-2f, 2f), 3f), ForceMode2D.Impulse);
+        if (rb != null) rb.AddForce(new Vector2(Random.Range(-2f, 2f), 3f), ForceMode2D.Impulse);
 
         RemoveSelectedItem();
     }
@@ -183,31 +301,41 @@ public class InventoryManager : MonoBehaviour
         UpdateUI(); 
     }
 
-    // ===============================================
-    // --- LOGIC THÁO ĐỒ TỪ NGƯỜI XUỐNG TÚI ---
-    // ===============================================
     public void UnequipItem(EquipmentSlotUI slot)
     {
         if (slot.equippedItem == null) return;
 
-        // 1. Kiểm tra xem túi có bị đầy không
-        if (inventoryList.Count >= maxSlots)
+        if (GetOccupiedSlots() >= maxSlots)
         {
             Debug.Log("<color=red>Túi đồ đã đầy, không thể tháo trang bị!</color>");
             return;
         }
 
-        // 2. Ném đồ từ người trở lại vào list túi đồ
         inventoryList.Add(slot.equippedItem);
+        
+        if (slot.allowedItemType == ItemType.SupportSkill && player is PlayerController pc)
+        {
+            pc.EquipSupportSkill(null);
+            if (SupportSkillUI.Instance != null) SupportSkillUI.Instance.UpdateUI(null, 0, 0);
+        }
 
-        // 3. Xóa ảnh món đồ trên ô trang bị (trả về ảnh trống)
         slot.UpdateSlot(null);
-
-        // 4. Cập nhật lại giao diện túi và TRỪ CHỈ SỐ trên người
         UpdateUI();
         RecalculatePlayerStats();
-        
         if (tooltipUI != null) tooltipUI.HideTooltip();
         Debug.Log("<color=yellow>Đã tháo trang bị xuống túi.</color>");
+    }
+
+    public void RemoveBrokenEquipment(ItemType type)
+    {
+        foreach (EquipmentSlotUI slot in equipSlots)
+        {
+            if (slot.allowedItemType == type && slot.equippedItem != null)
+            {
+                slot.UpdateSlot(null); 
+                RecalculatePlayerStats();
+                break;
+            }
+        }
     }
 }

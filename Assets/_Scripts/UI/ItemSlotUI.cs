@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro; // Đã thêm thư viện TextMeshPro
 
 public class ItemSlotUI : MonoBehaviour
 {
@@ -11,6 +12,9 @@ public class ItemSlotUI : MonoBehaviour
 
     private float lastClickTime = 0f;
     private float doubleClickThreshold = 0.25f; 
+
+    [Header("UI Cài đặt thêm")]
+    public TextMeshProUGUI quantityText; // Kéo TextMeshPro hiển thị số lượng vào đây
 
     private void Awake()
     {
@@ -25,17 +29,33 @@ public class ItemSlotUI : MonoBehaviour
         }
     }
 
-    public void UpdateSlot(ItemSO item)
+    // Đã nâng cấp hàm UpdateSlot để nhận thêm tham số quantity
+    public void UpdateSlot(ItemSO item, int quantity = 1)
     {
         currentItem = item;
         
         if (item != null)
         {
             slotImage.sprite = item.icon; 
+
+            // Hiện số lượng nếu có nhiều hơn 1
+            if (quantity > 1)
+            {
+                if (quantityText != null) 
+                {
+                    quantityText.text = quantity.ToString();
+                    quantityText.gameObject.SetActive(true);
+                }
+            }
+            else
+            {
+                if (quantityText != null) quantityText.gameObject.SetActive(false);
+            }
         }
         else
         {
             slotImage.sprite = defaultSprite; 
+            if (quantityText != null) quantityText.gameObject.SetActive(false);
         }
     }
 
@@ -48,15 +68,10 @@ public class ItemSlotUI : MonoBehaviour
 
         if (timeSinceLastClick <= doubleClickThreshold)
         {
-            // =====================================
             // TRƯỜNG HỢP: DOUBLE CLICK (Mặc đồ / Bơm máu)
-            // =====================================
             if (InventoryManager.Instance != null)
             {
-                // 1. Phải mượn hàm ShowTooltip để InventoryManager tự động ghi nhớ "selectedItem"
                 InventoryManager.Instance.ShowTooltip(currentItem);
-                
-                // 2. Sau khi đã nhớ, gọi hàm UseItem (hàm này sẽ tự đọc từ selectedItem để dùng)
                 InventoryManager.Instance.UseItem(); 
             }
             
@@ -64,10 +79,7 @@ public class ItemSlotUI : MonoBehaviour
         }
         else
         {
-            // =====================================
             // TRƯỜNG HỢP: SINGLE CLICK (Xem thông tin)
-            // =====================================
-            // Trả lại logic cũ: Bắt buộc gọi qua InventoryManager để hệ thống ghi nhớ selectedItem
             if (InventoryManager.Instance != null) 
             {
                 InventoryManager.Instance.ShowTooltip(currentItem);

@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3124a28971ba53044a7e1af36f0e447a, type: 3}
-  m_Name: Bua skill 1
+  m_Name: Bua skill 2
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
-  itemName: "\xDD Ch\u1EC9 Th\u1EA7n S\u1EA5m"
-  description: "G\u1ECDi s\u1EA5m s\xE9t h\u1ED7 tr\u1EE3 g\xE2y s\xE1t th\u01B0\u01A1ng"
+  itemName: Fire Ball
+  description: "B\u1EAFn ra c\u1EA7u l\u1EEDa v\xE0o k\u1EBB \u0111\u1ECBch"
   icon: {fileID: 1210084849, guid: b435831bd28698245b39e1b4daee86e9, type: 3}
   itemType: 7
   rarity: 2
@@ -24,7 +24,7 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
-  skillPrefab: {fileID: 7175377170976055196, guid: 439b86dab256e134cbc80589d1d95452, type: 3}
-  damageMultiplier: 1.5
-  skillCooldown: 5
-  maxUses: 3
+  skillPrefab: {fileID: 1874829119412524165, guid: 29c56742a3028b149bde56552ab5ef87, type: 3}
+  damageMultiplier: 1.3
+  skillCooldown: 4
+  maxUses: 5

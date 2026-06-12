@@ -5,8 +5,10 @@ public class UniversalHitbox : MonoBehaviour
     [Header("Damage Settings")]
     public Vector2 baseKnockback = new Vector2(5f, 2f);
     
+    public float damageOverride = 0f; 
+    public bool isCriticalOverride = false; // [MỚI THÊM]: Cờ lưu trạng thái bạo kích của đạn
+
     [Header("Hitbox Owner")]
-    [Tooltip("Kéo cha của Hitbox (Player hoặc Enemy) vào đây")]
     public GameObject owner;
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -15,32 +17,33 @@ public class UniversalHitbox : MonoBehaviour
         
         if (targetHurtbox != null)
         {
-            // ==========================================
-            // --- BỘ LỌC MỤC TIÊU (CHẶN QUÁI ĐÁNH LUNG TUNG) ---
-            // ==========================================
-            if (owner != null && owner.CompareTag("Enemy"))
+            // BỘ LỌC CHỐNG TỰ SÁT THƯƠNG (FRIENDLY FIRE)
+            if (owner != null)
             {
-                // Kiểm tra xem nạn nhân có mang tag "Player" không (quét bản thân nó và đối tượng cha)
-                bool isHittingPlayer = collision.gameObject.CompareTag("Player") || collision.transform.root.CompareTag("Player");
-                
-                // Nếu nạn nhân KHÔNG PHẢI Player (mà là Thùng, Cây, v.v...) -> Hủy đòn đánh!
-                if (!isHittingPlayer) return; 
-            }
-            // ==========================================
+                bool ownerIsPlayer = owner.CompareTag("Player") || owner.transform.root.CompareTag("Player");
+                bool targetIsPlayer = collision.gameObject.CompareTag("Player") || collision.transform.root.CompareTag("Player");
 
-            int pushDirection = targetHurtbox.transform.position.x < owner.transform.position.x ? -1 : 1;
+                if (ownerIsPlayer && targetIsPlayer) return;
+                if (!ownerIsPlayer && !targetIsPlayer) return;
+            }
+
+            Vector2 originPos = owner != null ? (Vector2)owner.transform.position : (Vector2)transform.position;
+            int pushDirection = targetHurtbox.transform.position.x < originPos.x ? -1 : 1;
             Vector2 finalKnockback = new Vector2(baseKnockback.x * pushDirection, baseKnockback.y);
 
-            // --- TÍNH TOÁN SÁT THƯƠNG ĐỘNG TỪ CHỈ SỐ ---
             float finalDamage = 0f;
             bool isCriticalHit = false;
 
-            if (owner != null)
+            if (damageOverride > 0f)
+            {
+                finalDamage = damageOverride;
+                isCriticalHit = isCriticalOverride; // [ĐÃ SỬA]: Ép cờ bạo kích từ Player vào
+            }
+            else if (owner != null)
             {
                 PlayerController player = owner.GetComponent<PlayerController>();
                 if (player != null)
                 {
-                    // Nếu chủ nhân là Player -> Lấy Sát thương có tính Combo và Crit
                     finalDamage = player.GetCurrentMeleeDamage(out isCriticalHit);
                 }
                 else
@@ -48,24 +51,14 @@ public class UniversalHitbox : MonoBehaviour
                     BaseEntity enemy = owner.GetComponent<BaseEntity>();
                     if (enemy != null)
                     {
-                        // Kiểm tra xem hitbox này có BossHitboxData không (VFX của Boss)
                         BossHitboxData bossData = GetComponent<BossHitboxData>();
-                        if (bossData != null)
-                        {
-                            // Boss skill: tính dame theo công thức riêng từng skill
-                            finalDamage = bossData.CalculateDamage(enemy.Attack, transform.position);
-                        }
-                        else
-                        {
-                            // Quái thường: lấy thẳng chỉ số Attack
-                            finalDamage = enemy.Attack;
-                        }
+                        if (bossData != null) finalDamage = bossData.CalculateDamage(enemy.Attack, transform.position);
+                        else finalDamage = enemy.Attack;
                     }
                 }
             }
             else 
             {
-                // Fallback (phòng hờ bạn tạo bẫy chông môi trường không có chủ)
                 finalDamage = 10f; 
             }
 
@@ -74,7 +67,7 @@ public class UniversalHitbox : MonoBehaviour
                 damage = finalDamage,
                 knockbackForce = finalKnockback,
                 attacker = this.owner,
-                isCritical = isCriticalHit // Gắn cờ Crit vào Info
+                isCritical = isCriticalHit 
             };
 
             targetHurtbox.TakeDamage(info);

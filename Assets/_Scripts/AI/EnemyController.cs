@@ -214,9 +214,18 @@ public class EnemyController : EnemyBase
 
         if (currentHealth > 0)
         {
+            // 1. Tắt ngay lập tức Hitbox đòn đánh đang dở dang
+            CancelCurrentAttackHitbox(); 
+
             StopAllCoroutines();
             SwitchState(EnemyState.Hurt);
-            anim.SetTrigger("Hurt");
+            
+            // 2. Dọn sạch lệnh "Attack" tồn đọng trong bộ nhớ Animator để chống kẹt
+            if (anim != null) 
+            {
+                anim.ResetTrigger("Attack");
+                anim.SetTrigger("Hurt");
+            }
             
             if (info.attacker != null)
             {

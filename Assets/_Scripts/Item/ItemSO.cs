@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// Các loại trang bị khớp với Ảnh 1 của bạn
 public enum ItemType 
 { 
     Consumable,     // Đồ tiêu hao (Bình máu, v.v.)
@@ -41,4 +40,17 @@ public class ItemSO : ScriptableObject
 
     [Header("Giá trị sử dụng (Dành cho đồ tiêu hao)")]
     public int healAmount;
+
+    [Header("--- SUPPORT SKILL SETTINGS (Dành cho Bùa) ---")]
+    [Tooltip("Prefab VFX/Đạn bắn ra (Bắt buộc phải gắn UniversalHitbox)")]
+    public GameObject skillPrefab;
+        
+    [Tooltip("Hệ số sát thương (VD: 1.5 = 150% ATK của Player)")]
+    public float damageMultiplier = 1.5f;
+        
+    [Tooltip("Thời gian hồi chiêu (Giây)")]
+    public float skillCooldown = 5f;
+        
+    [Tooltip("Số lần sử dụng tối đa")]
+    public int maxUses = 3;
 }

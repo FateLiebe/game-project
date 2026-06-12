@@ -11,6 +11,10 @@ GameObject:
   - component: {fileID: 10924879742952688}
   - component: {fileID: 1017692511278829511}
   - component: {fileID: 5136645450005943983}
+  - component: {fileID: 785484266920143742}
+  - component: {fileID: 458152704705413007}
+  - component: {fileID: -7502594587224700444}
+  - component: {fileID: 1291478937101475496}
   m_Layer: 0
   m_Name: VFX_SlashHorizontal_Boss
   m_TagString: Untagged
@@ -78,8 +82,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -580951121
+  m_SortingLayer: -5
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -564469572680208601, guid: f9855f6bfc08a074fa9ad3137f931c1c, type: 3}
@@ -114,3 +118,92 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!61 &785484266920143742
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2624578184461395664}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: -0.6454811, y: -1.1925011}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.7}
+    oldSize: {x: 10.833333, y: 6.6666665}
+    newSize: {x: 4.0625, y: 2.5}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 9.025986, y: 4.1316843}
+  m_EdgeRadius: 0
+--- !u!114 &458152704705413007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2624578184461395664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e4c120167cbb3c42a3aef730ba2c5c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UniversalHitbox
+  baseKnockback: {x: 5, y: 2}
+  damageOverride: 0
+  isCriticalOverride: 0
+  owner: {fileID: 0}
+--- !u!114 &-7502594587224700444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2624578184461395664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa2e24f87517d4540a8daf30135f1882, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX_AutoDestroy
+--- !u!114 &1291478937101475496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2624578184461395664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e4c87131860c1b418c133ed0e789b31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossHitboxData
+  skillType: 2
+  fireBallMaxRange: 15
+  spawnPosition: {x: 0, y: 0, z: 0}

@@ -172,31 +172,63 @@ MonoBehaviour:
   addedAttackPoints: 0
   addedDefensePoints: 0
   addedCritPoints: 0
+  currentShield: 0
+  buffAttack: 0
+  buffDefense: 0
   brokenSprite: {fileID: 21300000, guid: 940f76b393d5bd643bb439fe33b24a1e, type: 3}
   droppedItemPrefab: {fileID: 8139086573112604224, guid: c19674eac6f5cc7418d061be07e1de6b, type: 3}
-  possibleDrops:
-  - {fileID: 11400000, guid: 837baff703fae9b4d9f201b4e95707f2, type: 2}
-  - {fileID: 11400000, guid: 70e7bd37d36cfe247b3ea9b8a1d1ab9a, type: 2}
-  - {fileID: 11400000, guid: c60eb20811bc13b4c97c2235be40d15a, type: 2}
-  - {fileID: 11400000, guid: 47f0b573a3f782c468272712d85d0e3a, type: 2}
-  - {fileID: 11400000, guid: 9a61a90cdbf4f174c99f30eccb3f41fc, type: 2}
-  - {fileID: 11400000, guid: 307b13f907bd9804db938802f45a9a8d, type: 2}
-  - {fileID: 11400000, guid: 6b4d079ae95b61749ac4a293f914fbd8, type: 2}
-  - {fileID: 11400000, guid: d88b103961f1412449a848e586ec3f2f, type: 2}
-  - {fileID: 11400000, guid: 5531e72e67d4f404b9d46b28aa6ec9b1, type: 2}
-  - {fileID: 11400000, guid: 666b5594a0f4fcd41973851fa3e273b5, type: 2}
-  - {fileID: 11400000, guid: 21c2d61e0250880428118f7d660276a3, type: 2}
-  - {fileID: 11400000, guid: 0acf5de692376b443b376ee0653f0f04, type: 2}
-  - {fileID: 11400000, guid: 942f0a3fb18f5c644a00f73a542d322d, type: 2}
-  - {fileID: 11400000, guid: 94986d0c65523cf458cf8b67edf43f45, type: 2}
-  - {fileID: 11400000, guid: 0ff095ea96737ed43a77a05553eaf974, type: 2}
-  - {fileID: 11400000, guid: 8cbf7de9063c35f42b786328c566a169, type: 2}
-  - {fileID: 11400000, guid: a4ece5f45f32fca4c90a95d418ea7ada, type: 2}
-  - {fileID: 11400000, guid: 3cae196d30284324894582f970c63aef, type: 2}
+  itemPool:
   - {fileID: 11400000, guid: f3e6c4d03370ae948af56cf88a565879, type: 2}
   - {fileID: 11400000, guid: 71c7f407668a70240990e331c85d2704, type: 2}
   - {fileID: 11400000, guid: aceadbde31c3ba348bcd50b76e1048f2, type: 2}
+  - {fileID: 11400000, guid: 666b5594a0f4fcd41973851fa3e273b5, type: 2}
+  - {fileID: 11400000, guid: 21c2d61e0250880428118f7d660276a3, type: 2}
+  - {fileID: 11400000, guid: 0acf5de692376b443b376ee0653f0f04, type: 2}
+  - {fileID: 11400000, guid: 8cbf7de9063c35f42b786328c566a169, type: 2}
+  - {fileID: 11400000, guid: a4ece5f45f32fca4c90a95d418ea7ada, type: 2}
+  - {fileID: 11400000, guid: 3cae196d30284324894582f970c63aef, type: 2}
+  - {fileID: 11400000, guid: 166eb73747fa65940858f30b796a18c3, type: 2}
+  - {fileID: 11400000, guid: 6b4d079ae95b61749ac4a293f914fbd8, type: 2}
+  - {fileID: 11400000, guid: d88b103961f1412449a848e586ec3f2f, type: 2}
+  - {fileID: 11400000, guid: 5531e72e67d4f404b9d46b28aa6ec9b1, type: 2}
+  - {fileID: 11400000, guid: 942f0a3fb18f5c644a00f73a542d322d, type: 2}
+  - {fileID: 11400000, guid: 94986d0c65523cf458cf8b67edf43f45, type: 2}
+  - {fileID: 11400000, guid: 0ff095ea96737ed43a77a05553eaf974, type: 2}
   - {fileID: 11400000, guid: 78c991d2d9b2560498a9c92415aba774, type: 2}
+  - {fileID: 11400000, guid: 4e2d5bb91ef25fd4ab3157a699bf21fe, type: 2}
+  - {fileID: 11400000, guid: 47f0b573a3f782c468272712d85d0e3a, type: 2}
+  - {fileID: 11400000, guid: c60eb20811bc13b4c97c2235be40d15a, type: 2}
+  - {fileID: 11400000, guid: 837baff703fae9b4d9f201b4e95707f2, type: 2}
+  - {fileID: 11400000, guid: 70e7bd37d36cfe247b3ea9b8a1d1ab9a, type: 2}
+  - {fileID: 11400000, guid: 307b13f907bd9804db938802f45a9a8d, type: 2}
+  - {fileID: 11400000, guid: 9a61a90cdbf4f174c99f30eccb3f41fc, type: 2}
+  typeWeights:
+  - itemType: 0
+    weight: 40
+  - itemType: 1
+    weight: 15
+  - itemType: 2
+    weight: 15
+  - itemType: 3
+    weight: 10
+  - itemType: 4
+    weight: 15
+  - itemType: 5
+    weight: 15
+  - itemType: 6
+    weight: 15
+  - itemType: 7
+    weight: 15
+  rarityWeights:
+  - rarity: 0
+    weight: 50
+  - rarity: 1
+    weight: 35
+  - rarity: 2
+    weight: 25
+  - rarity: 3
+    weight: 15
+  dropCount: 1
 --- !u!114 &8587622382114397127
 MonoBehaviour:
   m_ObjectHideFlags: 0

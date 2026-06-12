@@ -46,6 +46,12 @@ public class PlayerController : BaseEntity
     public float bossDetectionRadius = 15f; 
     public LayerMask bossLayer; 
     private BaseEntity activeBoss;
+
+    [Header("--- SUPPORT SKILL ---")]
+    public ItemSO equippedSupportSkill; 
+    private float supportSkillCDTimer = 0f;
+    public int currentSupportSkillUses = 0; // Số lần dùng còn lại
+    private bool isSupportSkillInitialized = false;
     
     private Animator anim;
     private Rigidbody2D rb;
@@ -98,6 +104,8 @@ public class PlayerController : BaseEntity
         }
 
         HandleBossDetection();
+
+        HandleSupportSkill();
 
         HandleInput();
         HandleComboReset();
@@ -774,5 +782,156 @@ public class PlayerController : BaseEntity
             activeBoss = null;
             if (BossUIManager.Instance != null) BossUIManager.Instance.HideBossUI();
         }
+    }
+
+    // ==========================================
+    // LOGIC KỸ NĂNG HỖ TRỢ (BÙA)
+    // ==========================================
+    private void HandleSupportSkill()
+    {
+        if (equippedSupportSkill == null) return;
+
+        // 1. Nạp số lượng đạn khi mới lắp bùa vào
+        if (!isSupportSkillInitialized)
+        {
+            currentSupportSkillUses = equippedSupportSkill.maxUses;
+            isSupportSkillInitialized = true;
+        }
+
+        // 2. Trừ thời gian hồi chiêu
+        if (supportSkillCDTimer > 0)
+        {
+            supportSkillCDTimer -= Time.deltaTime;
+        }
+
+        // 3. Cập nhật UI liên tục
+        if (SupportSkillUI.Instance != null)
+        {
+            SupportSkillUI.Instance.UpdateUI(equippedSupportSkill, supportSkillCDTimer, currentSupportSkillUses);
+        }
+
+        // 4. Lắng nghe phím E để xuất chiêu
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            UseSupportSkill();
+        }
+    }
+
+    private Transform FindNearestEnemy(float radius)
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
+        Transform nearest = null;
+        float minDist = Mathf.Infinity;
+
+        foreach (var hit in hits)
+        {
+            if (hit.transform.root == this.transform) continue; // Bỏ qua bản thân
+
+            BaseEntity enemy = hit.GetComponentInParent<BaseEntity>();
+            // Kiểm tra xem có phải là Quái và còn sống không
+            if (enemy != null && enemy.currentHealth > 0 && enemy.CompareTag("Enemy"))
+            {
+                float dist = Vector2.Distance(transform.position, enemy.transform.position);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    nearest = enemy.transform;
+                }
+            }
+        }
+        return nearest;
+    }
+
+    private void UseSupportSkill()
+    {
+        if (equippedSupportSkill == null || equippedSupportSkill.skillPrefab == null) return;
+        if (supportSkillCDTimer > 0) return; 
+        if (currentSupportSkillUses <= 0) return; 
+
+        supportSkillCDTimer = equippedSupportSkill.skillCooldown;
+        currentSupportSkillUses--;
+
+        anim.SetTrigger("Attack"); 
+        
+        float finalDamage = Attack * equippedSupportSkill.damageMultiplier;
+        bool isCrit = false;
+
+        if (UnityEngine.Random.Range(0f, 100f) <= CritRate)
+        {
+            finalDamage *= baseData.critDamageMultiplier; 
+            isCrit = true;
+        }
+
+        float facingDir = transform.localScale.x >= 0 ? 1f : -1f;
+        Vector3 spawnPos = transform.position + new Vector3(facingDir * 0.8f, 0.5f, 0); // Mặc định ở trước mặt
+        
+        Transform targetEnemy = FindNearestEnemy(15f); 
+        
+        // [QUAN TRỌNG]: Nhận diện xem đây là Đạn bay (Fire Ball) hay Đánh thẳng (Sét)
+        bool isProjectile = equippedSupportSkill.skillPrefab.GetComponent<Projectile>() != null;
+
+        if (targetEnemy != null)
+        {
+            // Xoay mặt Player về phía kẻ địch
+            float dirToEnemy = Mathf.Sign(targetEnemy.position.x - transform.position.x);
+            if (dirToEnemy != 0 && dirToEnemy != facingDir)
+            {
+                facingDir = dirToEnemy;
+                Vector3 playerScale = transform.localScale;
+                playerScale.x = Mathf.Abs(playerScale.x) * facingDir;
+                transform.localScale = playerScale;
+            }
+
+            if (isProjectile)
+            {
+                // NẾU LÀ ĐẠN LỬA: Sinh ra trước mặt
+                spawnPos = transform.position + new Vector3(facingDir * 0.8f, 0.5f, 0);
+            }
+            else
+            {
+                // NẾU LÀ SÉT: Đánh thẳng vào chân kẻ địch
+                Collider2D col = targetEnemy.GetComponent<Collider2D>();
+                float bottomY = col != null ? col.bounds.min.y : targetEnemy.position.y;
+                spawnPos = new Vector3(targetEnemy.position.x, bottomY + 0.5f, targetEnemy.position.z);
+            }
+        }
+
+        GameObject vfx = Instantiate(equippedSupportSkill.skillPrefab, spawnPos, Quaternion.identity);
+        
+        Vector3 vfxScale = vfx.transform.localScale;
+        vfxScale.x = Mathf.Abs(vfxScale.x) * facingDir;
+        vfx.transform.localScale = vfxScale;
+
+        UniversalHitbox hb = vfx.GetComponent<UniversalHitbox>();
+        if (hb != null)
+        {
+            hb.owner = this.gameObject;
+            hb.damageOverride = finalDamage; 
+            hb.isCriticalOverride = isCrit; 
+        }
+
+        // Nếu là Đạn Lửa và có mục tiêu -> Gán mục tiêu để nó bay theo
+        if (isProjectile && targetEnemy != null)
+        {
+            Projectile proj = vfx.GetComponent<Projectile>();
+            if (proj != null) proj.SetTarget(targetEnemy);
+        }
+
+        if (currentSupportSkillUses <= 0)
+        {
+            Debug.Log("<color=yellow>Bùa đã hết số lần sử dụng! Tự động hủy.</color>");
+            equippedSupportSkill = null; 
+            
+            if (SupportSkillUI.Instance != null) SupportSkillUI.Instance.UpdateUI(null, 0, 0);
+            if (InventoryManager.Instance != null) InventoryManager.Instance.RemoveBrokenEquipment(ItemType.SupportSkill);
+        }
+    }
+
+    // Hàm này để hệ thống Inventory/Trang bị gọi khi bạn nhặt hoặc mặc bùa mới vào
+    public void EquipSupportSkill(ItemSO newSkill)
+    {
+        equippedSupportSkill = newSkill;
+        isSupportSkillInitialized = false; // Ép nạp lại số lượng đạn theo bùa mới
+        supportSkillCDTimer = 0f;
     }
 }

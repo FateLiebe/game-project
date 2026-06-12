@@ -81,8 +81,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -580951121
+  m_SortingLayer: -5
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 1458815001837193271, guid: c3a4103b7cecf3e46b330a7f93598413, type: 3}
@@ -130,6 +130,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UniversalHitbox
   baseKnockback: {x: 5, y: 2}
+  damageOverride: 0
+  isCriticalOverride: 0
   owner: {fileID: 0}
 --- !u!114 &4133038491484117697
 MonoBehaviour:
