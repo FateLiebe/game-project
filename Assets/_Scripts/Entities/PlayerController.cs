@@ -897,10 +897,6 @@ public class PlayerController : BaseEntity
         }
 
         GameObject vfx = Instantiate(equippedSupportSkill.skillPrefab, spawnPos, Quaternion.identity);
-        
-        Vector3 vfxScale = vfx.transform.localScale;
-        vfxScale.x = Mathf.Abs(vfxScale.x) * facingDir;
-        vfx.transform.localScale = vfxScale;
 
         UniversalHitbox hb = vfx.GetComponent<UniversalHitbox>();
         if (hb != null)

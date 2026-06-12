@@ -24,9 +24,9 @@ MonoBehaviour:
   maxAirDashes: 2
   comboResetTime: 0.6
   doubleTapThreshold: 0.25
-  baseMaxHealth: 30
-  baseAttack: 10
-  baseDefense: 4
+  baseMaxHealth: 45
+  baseAttack: 15
+  baseDefense: 6
   baseCritRate: 5
   critDamageMultiplier: 1.7
   healthGrowth: 10

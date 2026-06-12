@@ -8,11 +8,14 @@ public class Projectile : MonoBehaviour
     public float lifeTime = 4f;
     public bool destroyOnHit = true;
 
+    [Tooltip("Nếu ảnh gốc quay sang TRÁI thay vì phải, nhập 180. Mặc định 0.")]
+    public float rotationOffset = 0f;
+
     private Transform target;
     private Vector2 currentDirection;
     private float timer = 0f;
     private UniversalHitbox hitbox;
-    private bool hasHit = false; // cờ chống hit nhiều lần
+    private bool hasHit = false;
 
     public void SetTarget(Transform customTarget)
     {
@@ -40,7 +43,10 @@ public class Projectile : MonoBehaviour
         if (target != null)
             currentDirection = (target.position - transform.position).normalized;
         else
-            currentDirection = new Vector2(Mathf.Sign(transform.localScale.x), 0);
+        {
+            // Không có target: bay theo hướng rotation hiện tại của prefab
+            currentDirection = transform.right;
+        }
     }
 
     private void Update()
@@ -52,11 +58,9 @@ public class Projectile : MonoBehaviour
 
         transform.position += (Vector3)(currentDirection * speed * Time.deltaTime);
 
+        // Rotation hoàn toàn xử lý hướng, không đụng scale
         float angle = Mathf.Atan2(currentDirection.y, currentDirection.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
-
-        if (currentDirection.x < 0) transform.localScale = new Vector3(1, -1, 1);
-        else transform.localScale = new Vector3(1, 1, 1);
+        transform.rotation = Quaternion.Euler(0, 0, angle + rotationOffset);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -73,15 +77,11 @@ public class Projectile : MonoBehaviour
         bool shouldHit = (!ownerIsPlayer && victimIsPlayer) || (ownerIsPlayer && !victimIsPlayer);
         if (!shouldHit) return;
 
-        // Đánh dấu đã hit để chặn UniversalHitbox gọi lại lần 2
         hasHit = true;
 
-        // Huỷ collider ngay lập tức để không trigger thêm
-        // UniversalHitbox.OnTriggerEnter2D sẽ chạy cùng frame này và apply dame
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.enabled = false;
 
-        // Destroy sau 1 frame để UniversalHitbox kịp chạy
         Destroy(gameObject, 0.05f);
     }
 }

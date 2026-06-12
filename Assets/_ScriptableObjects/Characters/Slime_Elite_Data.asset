@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a0712c07d5164498e71fd8cd2c3224, type: 3}
+  m_Name: Slime_Elite_Data
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDataSO
+  moveSpeed: 8.5
+  jumpForce: 0
+  fastFallSpeed: 0
+  maxJumps: 0
+  dashForce: 0
+  dashTime: 0
+  dashStallTime: 0
+  dashRechargeTime: 0
+  maxDashes: 0
+  maxAirDashes: 0
+  comboResetTime: 0
+  doubleTapThreshold: 0
+  baseMaxHealth: 35
+  baseAttack: 11
+  baseDefense: 4
+  baseCritRate: 5
+  critDamageMultiplier: 1.7
+  healthGrowth: 10
+  attackGrowth: 5
+  defenseGrowth: 3
+  critRateGrowth: 0.5
+  statPointsPerLevel: 3

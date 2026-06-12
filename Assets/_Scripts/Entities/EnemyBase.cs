@@ -149,6 +149,22 @@ public class EnemyBase : BaseEntity
 
     [Header("Combat References")]
     [SerializeField] protected GameObject attackHitbox;
-    public void EnableHitbox() { if (attackHitbox != null) attackHitbox.SetActive(true); }
-    public void DisableHitbox() { if (attackHitbox != null) attackHitbox.SetActive(false); }
+    [SerializeField] protected GameObject rangedAttackHitbox;
+    
+    public void EnableHitbox() 
+    { 
+        if (attackHitbox != null) 
+        {
+            attackHitbox.SetActive(true); 
+            // [BẢO HIỂM]: Ép buộc Hitbox (và VFX chém) TỰ ĐỘNG TẮT sau 0.5 giây.
+            // Điều này đảm bảo VFX sẽ được reset và đánh lại ở lần tiếp theo!
+            CancelInvoke(nameof(DisableHitbox));
+            Invoke(nameof(DisableHitbox), 0.5f); 
+        }
+    }
+    
+    public void DisableHitbox() 
+    { 
+        if (attackHitbox != null) attackHitbox.SetActive(false); 
+    }
 }

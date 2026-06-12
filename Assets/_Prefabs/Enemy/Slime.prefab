@@ -87,7 +87,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 441982573
-  m_SortingLayer: -2
+  m_SortingLayer: -6
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 2013698182933852923, guid: 9698bbc3075572e43ae80d710164a960, type: 3}
@@ -202,6 +202,7 @@ MonoBehaviour:
   damagePopupPrefab: {fileID: 4376294689076033710, guid: 44f05228ddad8ca4c88eeac3e598a23e, type: 3}
   currentHealth: 0
   timeMultiplier: 1
+  isDead: 0
   currentLevel: 1
   currentStatPoints: 0
   currentEXP: 0
@@ -217,6 +218,9 @@ MonoBehaviour:
   addedAttackPoints: 0
   addedDefensePoints: 0
   addedCritPoints: 0
+  currentShield: 0
+  buffAttack: 0
+  buffDefense: 0
   rank: 0
   expMultiplier: 10
   attackCooldowns:
@@ -228,6 +232,12 @@ MonoBehaviour:
   lineOfSight: 6
   attackRange: 1.8
   idleDuration: 1.5
+  isFlying: 0
+  rangedAttackRange: 6
+  eliteOutlineMaterial: {fileID: 0}
+  rangedProjectilePrefab: {fileID: 0}
+  rangedSpawnPoint: {fileID: 0}
+  rangedAttackHitbox: {fileID: 0}
   wallCheck: {fileID: 6647960011637078497}
   ledgeCheck: {fileID: 3692552232569930197}
   groundLayer:
@@ -515,6 +525,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UniversalHitbox
   baseKnockback: {x: 5, y: 2}
+  damageOverride: 0
+  isCriticalOverride: 0
   owner: {fileID: 245024772673585027}
 --- !u!1 &2397319144070609469
 GameObject:
