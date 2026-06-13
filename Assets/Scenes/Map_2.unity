@@ -46056,6 +46056,8 @@ MonoBehaviour:
   - {fileID: 5397665213651409093, guid: 006f4c304fe7d604daa535e8fc60c081, type: 3}
   - {fileID: 5397665213651409093, guid: 66cac62c9a37bc1409a58f61788d0b5e, type: 3}
   - {fileID: 5711959625865724975, guid: b39fb2cc31408b245b1fc49a6e7d79b7, type: 3}
+  - {fileID: 4867303414417849165, guid: 7523685865de3ed49817b72e816b21a6, type: 3}
+  - {fileID: 4867303414417849165, guid: 5813caaf93167a541a4643873aef2f1d, type: 3}
   spawnDelay: 10
   spawnNodes: []
   maxDistanceFromPlayer: 25

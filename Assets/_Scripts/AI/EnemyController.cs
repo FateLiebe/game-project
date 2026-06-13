@@ -49,6 +49,12 @@ public class EnemyController : EnemyBase
     private int facingDir = 1;
     private bool canAction = true;
     private int currentAttackIndex = 0;
+    private bool isAttackVFXAllowed = false;
+
+    // [ELITE] Vị trí player được chụp tại thời điểm quyết định lùi ra đánh xa
+    // Dùng để tính toán điểm đứng lùi — không cập nhật liên tục theo player
+    private Vector2 rangedRepositionTargetPos;
+    private bool isRepositioning = false; // Đang trong pha lùi ra để đánh xa
 
     protected override void Start()
     {
@@ -103,8 +109,10 @@ public class EnemyController : EnemyBase
             return true;
         }
 
-        // Đòn xa chỉ dùng khi NGOÀI tầm gần và là Elite
-        if (rank == EnemyRank.Elite && dist > attackRange && dist <= rangedAttackRange && CanAttack(1))
+        // [ELITE] Đòn xa: chỉ dùng khi đang đứng đúng vị trí đã lùi ra (isRepositioning = false)
+        // và đã thoát khỏi tầm gần, và đòn gần đang CD
+        if (rank == EnemyRank.Elite && !isRepositioning
+            && dist > attackRange && dist <= rangedAttackRange && CanAttack(1))
         {
             attackToUse = 1;
             return true;
@@ -142,13 +150,67 @@ public class EnemyController : EnemyBase
         if (targetEntity == null || targetEntity.currentHealth <= 0) { playerTarget = null; SwitchState(EnemyState.Idle); return; }
 
         float distToPlayer = Vector2.Distance(transform.position, playerTarget.position);
-        if (distToPlayer > lineOfSight * 1.5f) { playerTarget = null; SwitchState(EnemyState.Idle); return; }
+        if (distToPlayer > lineOfSight * 1.5f) { playerTarget = null; isRepositioning = false; SwitchState(EnemyState.Idle); return; }
 
+        // --- ELITE: Ưu tiên đánh gần trước ---
+        // Nếu trong tầm gần và đòn gần sẵn sàng → đánh gần ngay, huỷ pha lùi nếu đang có
+        if (rank == EnemyRank.Elite && distToPlayer <= attackRange && CanAttack(0))
+        {
+            isRepositioning = false;
+            currentAttackIndex = 0;
+            SwitchState(EnemyState.Attack);
+            return;
+        }
+
+        // --- ELITE: Quyết định lùi ra để đánh xa ---
+        // Điều kiện: ngoài tầm gần, đòn gần đang CD, đòn xa sẵn sàng, chưa đang lùi
+        if (rank == EnemyRank.Elite && !isRepositioning
+            && distToPlayer > attackRange && !CanAttack(0) && CanAttack(1))
+        {
+            // Chụp vị trí player ngay lúc này để tính điểm đứng lùi — không cập nhật nữa
+            rangedRepositionTargetPos = playerTarget.position;
+            isRepositioning = true;
+        }
+
+        // --- ELITE đang trong pha lùi ra ---
+        if (rank == EnemyRank.Elite && isRepositioning)
+        {
+            float distToSnapshot = Vector2.Distance(transform.position, rangedRepositionTargetPos);
+
+            // Đã lùi đủ xa so với vị trí snapshot → kiểm tra có thể đánh xa không
+            if (distToSnapshot >= rangedAttackRange * 0.9f)
+            {
+                isRepositioning = false;
+                if (CanUseAnyAttack(distToPlayer, out int rangedAttack))
+                {
+                    currentAttackIndex = rangedAttack;
+                    SwitchState(EnemyState.Attack);
+                    return;
+                }
+            }
+            else
+            {
+                // Lùi ra: di chuyển ngược chiều so với snapshot
+                FacePlayer();
+                int retreatDir = (rangedRepositionTargetPos.x > transform.position.x) ? -1 : 1;
+                if (!CheckLedge() || CheckWall())
+                {
+                    // Bị chặn khi lùi → bỏ pha lùi, quay lại chase thường
+                    isRepositioning = false;
+                }
+                else
+                {
+                    rb.linearVelocity = new Vector2(chaseSpeed * retreatDir * timeMultiplier, rb.linearVelocity.y);
+                    return;
+                }
+            }
+        }
+
+        // --- Chase thường (non-Elite hoặc Elite không trong pha lùi) ---
         if (CanUseAnyAttack(distToPlayer, out int attackToUse)) { currentAttackIndex = attackToUse; SwitchState(EnemyState.Attack); return; }
 
         FacePlayer();
-        float stopDistance = (rank == EnemyRank.Elite && CanAttack(1)) ? rangedAttackRange : attackRange;
-        if (distToPlayer <= stopDistance || !CheckLedge() || CheckWall())
+        if (distToPlayer <= attackRange || !CheckLedge() || CheckWall())
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         else
             rb.linearVelocity = new Vector2(chaseSpeed * facingDir * timeMultiplier, rb.linearVelocity.y);
@@ -157,15 +219,16 @@ public class EnemyController : EnemyBase
     private IEnumerator PerformAttack()
     {
         canAction = false;
+        isAttackVFXAllowed = true;
         rb.linearVelocity = Vector2.zero;
 
         if (anim != null) { anim.SetInteger("attackType", currentAttackIndex); anim.SetTrigger("Attack"); }
-
         RecordAttackUsage(currentAttackIndex);
 
         float timer = 0f;
         while (timer < 1f) { timer += Time.deltaTime * timeMultiplier; yield return null; }
 
+        isAttackVFXAllowed = false; // Đóng trước khi animation có thể loop
         CancelCurrentAttackHitbox();
         canAction = true;
         SwitchState(EnemyState.Chase);
@@ -186,6 +249,8 @@ public class EnemyController : EnemyBase
     // Loại 2 & 3: VFX đòn gần
     public void TriggerMeleeAttackVFX()
     {
+        if (!isAttackVFXAllowed) return;  // Chặn nếu không trong pha attack
+        if (rangedProjectilePrefab == null || playerTarget == null) return;
         if (meleeVFXPrefab == null) return;
         Vector3 spawnPos = meleeSpawnPoint != null ? meleeSpawnPoint.transform.position : transform.position;
         GameObject vfx = Instantiate(meleeVFXPrefab, spawnPos, Quaternion.identity);
@@ -202,6 +267,7 @@ public class EnemyController : EnemyBase
     // Loại 2 & 3: VFX đòn xa (Projectile)
     public void TriggerRangedAttackVFX()
     {
+        if (!isAttackVFXAllowed) return;  // Chặn nếu không trong pha attack
         if (rangedProjectilePrefab == null || playerTarget == null) return;
         Vector3 spawnPos = rangedSpawnPoint != null ? rangedSpawnPoint.transform.position : transform.position;
         GameObject vfx = Instantiate(rangedProjectilePrefab, spawnPos, Quaternion.identity);
@@ -226,6 +292,7 @@ public class EnemyController : EnemyBase
         base.ApplyDamage(info);
         if (currentHealth > 0)
         {
+            isRepositioning = false; // Huỷ pha lùi khi bị đánh
             CancelCurrentAttackHitbox();
             StopAllCoroutines();
             SwitchState(EnemyState.Hurt);

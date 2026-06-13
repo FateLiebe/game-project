@@ -7,8 +7,8 @@ public class TimeAnomalyManager : MonoBehaviour
     public static TimeAnomalyManager Instance;
 
     [Header("Time Stop Settings")]
-    [SerializeField] private float slowFactor = 0.01f; // 99% Làm chậm
-    [SerializeField] private float duration = 2f;      // Kéo dài 2 giây
+    [SerializeField] private float slowFactor = 0.07f; // 93% Làm chậm
+    [SerializeField] private float duration = 3f;      // Kéo dài 3 giây
 
     private void Awake()
     {
@@ -67,7 +67,7 @@ public class TimeAnomalyManager : MonoBehaviour
             }
         }
 
-        // TẬN HƯỞNG 2 GIÂY
+        // TẬN HƯỞNG 3 GIÂY
         yield return new WaitForSeconds(duration);
 
         // TRẢ LẠI THỜI GIAN NHƯ CŨ

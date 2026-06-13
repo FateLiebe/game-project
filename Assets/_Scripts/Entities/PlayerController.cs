@@ -501,6 +501,9 @@ public class PlayerController : BaseEntity
             actualKnockback = new Vector2(Mathf.Abs(info.knockbackForce.x) * pushDirection, info.knockbackForce.y);
         }
 
+        CancelAttack();
+        CancelDash();
+
         base.ApplyDamage(info); 
         
         if (currentHealth > 0)
@@ -593,6 +596,19 @@ public class PlayerController : BaseEntity
 
     protected override void Die()
     {
+        // Reset sạch tất cả params trước
+        anim.SetFloat("speed", 0f);
+        anim.SetBool("isGrounded", false);
+        anim.SetBool("isJumping", false);
+        anim.SetBool("isFalling", false);
+        anim.SetBool("isAttacking", false);
+        anim.SetBool("isDashingUpward", false);
+        anim.ResetTrigger("Attack");
+        anim.ResetTrigger("Dash");
+        anim.ResetTrigger("Backdash");
+        anim.ResetTrigger("Hurt");
+
+        // Sau đó mới set isDead để Animator chuyển state ngay lập tức
         anim.SetBool("isDead", true);
         
         if (hurtbox != null) hurtbox.gameObject.SetActive(false);

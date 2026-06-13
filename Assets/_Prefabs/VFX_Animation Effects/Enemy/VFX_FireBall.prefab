@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: -7703882220789103637}
   - component: {fileID: 1244364746588979868}
   - component: {fileID: 3425531176703807073}
-  - component: {fileID: 841783422020454027}
   m_Layer: 0
   m_Name: VFX_FireBall
   m_TagString: Untagged
@@ -150,7 +149,7 @@ MonoBehaviour:
   homingDuration: 0.5
   lifeTime: 4
   destroyOnHit: 1
-  spriteFacesLeft: 0
+  rotationOffset: 0
 --- !u!61 &3425531176703807073
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -197,18 +196,3 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.7272949, y: 0.8374357}
   m_EdgeRadius: 0
---- !u!114 &841783422020454027
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1874829119412524165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e4c87131860c1b418c133ed0e789b31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BossHitboxData
-  skillType: 3
-  fireBallMaxRange: 15
-  spawnPosition: {x: 0, y: 0, z: 0}

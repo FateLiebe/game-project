@@ -51446,6 +51446,8 @@ MonoBehaviour:
   enemyPrefabs:
   - {fileID: 245024772673585027, guid: 55044af5364a21744825e814a8e7be2b, type: 3}
   - {fileID: 3044470078229157313, guid: c3ed061b28298fc4ca88444efcba12a2, type: 3}
+  - {fileID: 2900202431377940426, guid: 7ae7306b938db2c45b491f12a6f4c5a4, type: 3}
+  - {fileID: 3800420002992781208, guid: 6419af10e4f59c44b85c29dd437c2478, type: 3}
   spawnDelay: 10
   spawnNodes: []
   maxDistanceFromPlayer: 30

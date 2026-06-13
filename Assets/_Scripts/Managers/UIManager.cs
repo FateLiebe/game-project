@@ -12,7 +12,7 @@ public class UIManager : MonoBehaviour
 
     [Header("Menus")]
     public GameObject pauseMenu;
-    public GameObject gameOverMenu; // <-- Biến bị thiếu làm báo lỗi đây!
+    public GameObject gameOverMenu;
 
     private bool isPaused = false;
     private bool isGameOver = false;

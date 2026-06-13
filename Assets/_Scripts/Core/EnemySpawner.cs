@@ -22,7 +22,7 @@ public class EnemySpawner : MonoBehaviour
 
     private GameObject[] enemiesAtNodes; 
     
-    // [THÊM MỚI]: Mảng lưu đồng hồ đếm ngược cho từng Node riêng biệt
+    // Mảng lưu đồng hồ đếm ngược cho từng Node riêng biệt
     private float[] nodeRespawnTimers; 
 
     private void Awake()
@@ -62,7 +62,12 @@ public class EnemySpawner : MonoBehaviour
 
         int startLevel = (player != null && player.currentLevel > 1) ? player.currentLevel + 3 : 1;
 
-        for (int i = 0; i < spawnNodes.Length; i++)
+        // Tạo danh sách index node rồi shuffle trước khi spawn lần đầu
+        List<int> nodeIndices = new List<int>();
+        for (int i = 0; i < spawnNodes.Length; i++) nodeIndices.Add(i);
+        ShuffleList(nodeIndices);
+
+        foreach (int i in nodeIndices)
         {
             SpawnEnemyAtNode(i, startLevel);
         }
@@ -81,40 +86,70 @@ public class EnemySpawner : MonoBehaviour
 
             Vector2 playerPos = player.transform.position;
 
+            // Bước 1: Cập nhật đồng hồ cho từng node
             for (int i = 0; i < enemiesAtNodes.Length; i++)
             {
-                // NẾU QUÁI ĐÃ CHẾT (Bị null)
                 if (enemiesAtNodes[i] == null)
                 {
-                    // Bắt đầu trừ lùi đồng hồ của RIÊNG NODE ĐÓ đi 0.5s
+                    // Quái đã chết: trừ lùi đồng hồ của riêng node đó đi 0.5s
                     nodeRespawnTimers[i] -= 0.5f;
-
-                    // Chỉ khi nào đồng hồ của Node này đếm về 0 (Đã chết đủ 10s)
-                    if (nodeRespawnTimers[i] <= 0f)
-                    {
-                        float distanceToPlayer = Vector2.Distance(playerPos, (Vector2)spawnNodes[i].position);
-
-                        // Quái đã đủ giờ, kiểm tra thêm điều kiện khoảng cách để xuất hiện
-                        if (distanceToPlayer >= minDistanceFromPlayer && distanceToPlayer <= maxDistanceFromPlayer)
-                        {
-                            int spawnLevel = (player.currentLevel == 1) ? 1 : player.currentLevel + 3;
-                            SpawnEnemyAtNode(i, spawnLevel);
-                        }
-                    }
                 }
                 else
                 {
-                    // NẾU QUÁI VẪN CÒN SỐNG: Giữ đồng hồ luôn đầy ở mốc 10s
+                    // Quái vẫn sống: giữ đồng hồ luôn đầy ở mốc spawnDelay
                     nodeRespawnTimers[i] = spawnDelay;
                 }
             }
+
+            // Bước 2: Gom các node đã hết giờ và đủ điều kiện khoảng cách
+            List<int> readyNodes = new List<int>();
+            for (int i = 0; i < enemiesAtNodes.Length; i++)
+            {
+                if (enemiesAtNodes[i] == null && nodeRespawnTimers[i] <= 0f)
+                {
+                    float distanceToPlayer = Vector2.Distance(playerPos, (Vector2)spawnNodes[i].position);
+                    if (distanceToPlayer >= minDistanceFromPlayer && distanceToPlayer <= maxDistanceFromPlayer)
+                    {
+                        readyNodes.Add(i);
+                    }
+                }
+            }
+
+            // Bước 3: Xáo trộn danh sách node sẵn sàng rồi spawn
+            ShuffleList(readyNodes);
+
+            int spawnLevel = (player.currentLevel == 1) ? 1 : player.currentLevel + 3;
+            foreach (int nodeIndex in readyNodes)
+            {
+                SpawnEnemyAtNode(nodeIndex, spawnLevel);
+            }
+        }
+    }
+
+    // Hàm tiện ích: Fisher-Yates shuffle dùng chung
+    private void ShuffleList(List<int> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            int temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
         }
     }
 
     private void SpawnEnemyAtNode(int nodeIndex, int level)
     {
         Transform selectedNode = spawnNodes[nodeIndex];
-        GameObject randomPrefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+
+        // Chọn ngẫu nhiên prefab từ danh sách, bỏ qua nếu null
+        int attempts = 0;
+        GameObject randomPrefab = null;
+        while (randomPrefab == null && attempts < enemyPrefabs.Length)
+        {
+            randomPrefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+            attempts++;
+        }
         if (randomPrefab == null) return;
 
         GameObject newEnemy = Instantiate(randomPrefab, selectedNode.position, Quaternion.identity, transform);
@@ -126,6 +161,9 @@ public class EnemySpawner : MonoBehaviour
         }
 
         enemiesAtNodes[nodeIndex] = newEnemy;
+
+        // Reset đồng hồ của node này sau khi spawn xong
+        nodeRespawnTimers[nodeIndex] = spawnDelay;
     }
 
     private void HandlePlayerLevelUp(int newLevel)
