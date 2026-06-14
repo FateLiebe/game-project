@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Collections; // [BẮT BUỘC]: Để chạy được Coroutine (IEnumerator)
 
 public class UIManager : MonoBehaviour
 {
@@ -10,12 +11,21 @@ public class UIManager : MonoBehaviour
     public Slider hpSlider;
     public Image perfectDodgeCDBorder;
 
-    [Header("Menus")]
-    public GameObject pauseMenu;
+    [Header("Menus (Khác)")]
     public GameObject gameOverMenu;
+    
+    [Header("Pause UI (Tích hợp)")]
+    public GameObject pauseScreen;       
+    
+    [Header("Cài đặt Âm thanh (UI)")]
+    public Toggle audioToggle;
+    public Slider volumeSlider;
 
-    private bool isPaused = false;
-    private bool isGameOver = false;
+    [Header("Scene Settings")]
+    public string mainMenuSceneName = "Main_Menu";
+
+    [Header("Victory UI")]
+    public GameObject victoryMenu;
 
     private void Awake()
     {
@@ -25,48 +35,150 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        // Khi vừa load game/load màn, đặt mọi thứ về bình thường
-        isPaused = false;
-        isGameOver = false;
-        Time.timeScale = 1f; 
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+            HandleGameStateChanged(GameManager.Instance.CurrentState);
+        }
+    }
 
-        // Ép ẩn Menu đi (chữa cái lỗi ấn Restart xong Menu vẫn hiện)
-        if (pauseMenu != null) pauseMenu.SetActive(false);
-        if (gameOverMenu != null) gameOverMenu.SetActive(false);
+    private void OnDestroy()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+        }
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && !isGameOver) TogglePause();
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.GameOver)
+            {
+                GameManager.Instance.TogglePause();
+            }
+        }
+    }
+
+    private void HandleGameStateChanged(GameManager.GameState newState)
+    {
+        if (pauseScreen != null) pauseScreen.SetActive(newState == GameManager.GameState.Paused);
+        if (gameOverMenu != null) gameOverMenu.SetActive(newState == GameManager.GameState.GameOver);
+        if (victoryMenu != null) victoryMenu.SetActive(newState == GameManager.GameState.Victory);
     }
 
     public void UpdateDodgeCD(float currentTimer, float maxCooldown)
     {
-        if (perfectDodgeCDBorder != null)
+        if (perfectDodgeCDBorder != null) perfectDodgeCDBorder.fillAmount = currentTimer / maxCooldown;
+    }
+
+    // ==========================================
+    // CHỨC NĂNG CỦA CÁC NÚT BẤM (GẮN VÀO ONCLICK)
+    // ==========================================
+
+    public void ResumeGame() 
+    { 
+        if (GameManager.Instance != null) GameManager.Instance.TogglePause(); 
+    }
+
+    private void PerformSave()
+    {
+        PlayerController player = FindFirstObjectByType<PlayerController>();
+        if (player != null && InventoryManager.Instance != null && SaveDataManager.Instance != null)
         {
-            perfectDodgeCDBorder.fillAmount = currentTimer / maxCooldown;
+            SaveDataManager.Instance.CollectDataFromGame(player, InventoryManager.Instance);
+            SaveDataManager.Instance.SaveGameToFile();
+            Debug.Log("<color=green>Đã Lưu Game thành công từ UI!</color>");
+        }
+        else
+        {
+            Debug.LogError("Không thể Lưu Game: Thiếu Player hoặc InventoryManager.");
         }
     }
 
-    public void TogglePause()
+    public void SaveGame() { PerformSave(); }
+
+    public void SaveAndExit()
     {
-        isPaused = !isPaused;
-        if (pauseMenu != null) pauseMenu.SetActive(isPaused);
-        Time.timeScale = isPaused ? 0f : 1f; 
+        // 1. Lưu lại toàn bộ dữ liệu
+        PerformSave();
+        
+        // 2. Mở khóa thời gian
+        Time.timeScale = 1f; 
+        
+        // 3. Chốt State chuẩn bị về Menu
+        if (GameManager.Instance != null) 
+        {
+            GameManager.Instance.ChangeState(GameManager.GameState.MainMenu);
+        }
+        
+        // 4. [BẢN VÁ TRIỆT ĐỂ]: Gọi Coroutine dọn dẹp các Map (Additive) rác trước khi về Menu
+        StartCoroutine(UnloadMapsAndGoToMenu());
     }
 
-    // --- CÁC HÀM GẮN VÀO NÚT BẤM (BUTTONS) ---
-    public void ResumeGame() { TogglePause(); }
+    // Luồng dọn dẹp bộ nhớ an toàn
+    private IEnumerator UnloadMapsAndGoToMenu()
+    {
+        // Vòng lặp ngược: an toàn tuyệt đối khi xóa phần tử
+        for (int i = SceneManager.sceneCount - 1; i >= 0; i--)
+        {
+            Scene s = SceneManager.GetSceneAt(i);
+            // Xóa sạch mọi thứ đang được nạp, ngoại trừ sườn Core_Gameplay
+            if (s.name != "Core_Gameplay" && s.isLoaded)
+            {
+                yield return SceneManager.UnloadSceneAsync(s);
+            }
+        }
 
-    public void RestartGame()
+        // Sau khi bộ nhớ đã sạch bóng, mới an tâm load về Main Menu
+        SceneManager.LoadScene(mainMenuSceneName);
+    }
+
+    // ==========================================
+    // KHU VỰC LOGIC GAMEOVER & VICTORY (GIAI ĐOẠN 4)
+    // ==========================================
+
+    public void LoadLastSave()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("Core_Gameplay"); // Load lại scene gốc, GameLoader sẽ tự load Map_1
+        if (SaveDataManager.Instance != null) SaveDataManager.Instance.LoadGameFromFile();
+        GameLoader.currentLoadMode = GameLoader.LoadMode.Respawn;
+        StartCoroutine(CleanAndReloadGame());
     }
 
-    public void QuitGame() 
-    { 
-        Application.Quit(); 
-        Debug.Log("Đã bấm nút Thoát Game!"); 
+    public void QuitToMenuWithoutSave()
+    {
+        Time.timeScale = 1f;
+        if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.MainMenu);
+        StartCoroutine(UnloadMapsAndGoToMenu()); // Tái sử dụng hàm dọn dẹp đã viết ở Giai đoạn 3
+    }
+
+    private IEnumerator CleanAndReloadGame()
+    {
+        // Unload Map rác
+        for (int i = SceneManager.sceneCount - 1; i >= 0; i--)
+        {
+            Scene s = SceneManager.GetSceneAt(i);
+            if (s.name != "Core_Gameplay" && s.isLoaded) yield return SceneManager.UnloadSceneAsync(s);
+        }
+        
+        // Gọi GameLoader nạp lại Map
+        GameLoader loader = FindFirstObjectByType<GameLoader>();
+        if (loader != null) loader.StartLoad();
+    }
+
+    // ==========================================
+    // KHU VỰC LOGIC ÂM THANH (Dành cho sau này)
+    // ==========================================
+    
+    public void OnAudioToggleChanged(bool isOn)
+    {
+        Debug.Log("Trạng thái âm thanh hiện tại: " + (isOn ? "BẬT" : "TẮT"));
+    }
+
+    public void OnVolumeSliderChanged(float value)
+    {
+        Debug.Log("Mức âm lượng hiện tại: " + value);
     }
 }

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3124a28971ba53044a7e1af36f0e447a, type: 3}
   m_Name: BaoVat3
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemID: BaoVat3
   itemName: "B\u1EA3o V\u1EADt 3"
   description: 
   icon: {fileID: 1866985168, guid: 3004fc65676a97e469c78fa733b779c3, type: 3}
@@ -24,3 +25,7 @@ MonoBehaviour:
   critDamageBonus: 15
   speedBonus: 0
   healAmount: 0
+  skillPrefab: {fileID: 0}
+  damageMultiplier: 1.5
+  skillCooldown: 5
+  maxUses: 3

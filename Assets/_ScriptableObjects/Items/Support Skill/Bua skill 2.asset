@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3124a28971ba53044a7e1af36f0e447a, type: 3}
   m_Name: Bua skill 2
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemID: BuaSkill2
   itemName: Fire Ball
   description: "B\u1EAFn ra c\u1EA7u l\u1EEDa v\xE0o k\u1EBB \u0111\u1ECBch"
   icon: {fileID: 1210084849, guid: b435831bd28698245b39e1b4daee86e9, type: 3}

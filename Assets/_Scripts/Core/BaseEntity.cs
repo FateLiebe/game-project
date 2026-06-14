@@ -144,6 +144,12 @@ public class BaseEntity : MonoBehaviour
             OnExpChanged?.Invoke(currentEXP, expToNextLevel);
         }
     }
+    public void RefreshUIAfterLoad()
+    {
+        OnHealthChanged?.Invoke(currentHealth, MaxHealth);
+        OnLevelChanged?.Invoke(currentLevel);
+        OnExpChanged?.Invoke(currentEXP, expToNextLevel);
+    }
 
     public void GainEXP(float amount)
     {

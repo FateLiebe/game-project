@@ -23,6 +23,11 @@ public enum ItemRarity
 [CreateAssetMenu(fileName = "NewItem", menuName = "Data/Item")]
 public class ItemSO : ScriptableObject
 {
+
+    [Header("System")]
+    [Tooltip("ID duy nhất để lưu Save/Load (VD: wp_sword_01)")]
+    public string itemID;
+
     [Header("Thông tin cơ bản")]
     public string itemName;
     [TextArea] public string description;

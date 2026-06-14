@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3124a28971ba53044a7e1af36f0e447a, type: 3}
   m_Name: Giay3
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemID: Giay3
   itemName: "Gi\xE0y 3"
   description: 
   icon: {fileID: 386806952, guid: d5a96453bf4ad3c43ad6615f13f249a8, type: 3}
@@ -24,3 +25,7 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0.5
   healAmount: 0
+  skillPrefab: {fileID: 0}
+  damageMultiplier: 1.5
+  skillCooldown: 5
+  maxUses: 3

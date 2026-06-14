@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3124a28971ba53044a7e1af36f0e447a, type: 3}
   m_Name: BinhMau
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemID: BinhMau
   itemName: "B\xECnh M\xE1u"
   description: 
   icon: {fileID: 189804300, guid: 3a6cac4ef058b5243a458056c66b05b7, type: 3}

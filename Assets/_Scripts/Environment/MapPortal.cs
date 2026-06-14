@@ -31,6 +31,9 @@ public class MapPortal : MonoBehaviour
     {
         Debug.Log($"<color=yellow>Đang tải không gian: {nextMapName}...</color>");
         
+        //Báo cho toàn game biết đang Loading (để chặn các tương tác rác nếu có)
+        if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.Loading);
+
         Rigidbody2D rb = playerObj.GetComponent<Rigidbody2D>();
         PlayerController playerCtrl = playerObj.GetComponent<PlayerController>();
 
@@ -73,6 +76,9 @@ public class MapPortal : MonoBehaviour
             playerCtrl.enabled = true;
             playerCtrl.ForceGroundedState();
         }
+
+        //Trả lại trạng thái Gameplay bình thường
+        if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.Gameplay);
         
         Debug.Log("<color=green>Chuyển không gian thành công!</color>");
     }

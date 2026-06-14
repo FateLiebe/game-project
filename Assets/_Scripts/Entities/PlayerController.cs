@@ -84,6 +84,20 @@ public class PlayerController : BaseEntity
 
     private void Update()
     {
+        // [FIX CHẶN INPUT]: Dừng mọi tương tác nếu game không ở trạng thái Gameplay
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay)
+        {
+            // Triệt tiêu vận tốc ngang để không bị trượt đi
+            horizontalInput = 0;
+            verticalInput = 0;
+            if (currentState != PlayerState.Dashing && currentState != PlayerState.DashStalling)
+            {
+                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            }
+            UpdateAnimations();
+            return; // Dừng chạy các code bên dưới
+        }
+
         HandleDashRecharge();
         if (perfectDodgeTimer > 0)
         {
@@ -617,7 +631,21 @@ public class PlayerController : BaseEntity
         
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         this.enabled = false; 
+        if (GameManager.Instance != null) GameManager.Instance.GameOver();
         Debug.Log("<color=red>GAME OVER!</color>");
+    }
+
+    // Đánh thức nhân vật
+    public void Revive()
+    {
+        if (hurtbox != null) hurtbox.gameObject.SetActive(true);
+        gameObject.layer = LayerMask.NameToLayer("Player"); // Trả lại Layer gốc
+        anim.SetBool("isDead", false);
+        isDead = false;
+        this.enabled = true; // Nhận nút bấm trở lại
+
+        anim.Rebind();
+        anim.Update(0f);
     }
 
     private bool CanDash()
@@ -945,5 +973,14 @@ public class PlayerController : BaseEntity
         equippedSupportSkill = newSkill;
         isSupportSkillInitialized = false; // Ép nạp lại số lượng đạn theo bùa mới
         supportSkillCDTimer = 0f;
+    }
+
+    public void LoadSupportSkillFromSave(ItemSO savedSkill, int savedUses)
+    {
+        equippedSupportSkill = savedSkill;
+        currentSupportSkillUses = savedUses;
+        isSupportSkillInitialized = true; // [Chặn bug ghi đè]
+        supportSkillCDTimer = 0f;
+        if (SupportSkillUI.Instance != null) SupportSkillUI.Instance.UpdateUI(equippedSupportSkill, 0f, currentSupportSkillUses);
     }
 }

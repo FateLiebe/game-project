@@ -1,0 +1,35 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+[System.Serializable]
+public class InventorySlotData
+{
+    public string itemID;
+    public int quantity;
+    public InventorySlotData(string id, int amount) { itemID = id; quantity = amount; }
+}
+
+[System.Serializable]
+public class GameData
+{
+    public float currentHealth; public int currentLevel; public float currentEXP; public float expToNextLevel; 
+    public int currentStatPoints; public int addedHealthPoints; public int addedAttackPoints; public int addedDefensePoints; public int addedCritPoints;     
+    public string currentSceneName; public float posX; public float posY; public float posZ;
+    public string weaponID; public string helmetID; public string armorID; public string pantsID; public string bootsID; public string accessoryID;
+    public string equippedSupportSkillID; public int currentSupportSkillUses;   
+    public List<InventorySlotData> inventoryItems; 
+
+    public string checkSceneName = "Map_1";
+    public float checkX;
+    public float checkY;
+    public float checkZ;
+
+    public GameData()
+    {
+        currentHealth = 30f; currentLevel = 1; currentEXP = 0f; expToNextLevel = 30f; 
+        currentStatPoints = 0; addedHealthPoints = 0; addedAttackPoints = 0; addedDefensePoints = 0; addedCritPoints = 0;
+        currentSceneName = "Map_1"; posX = 0f; posY = 0f; posZ = 0f;
+        weaponID = ""; helmetID = ""; armorID = ""; pantsID = ""; bootsID = ""; accessoryID = ""; equippedSupportSkillID = ""; currentSupportSkillUses = 0;
+        inventoryItems = new List<InventorySlotData>();
+    }
+}

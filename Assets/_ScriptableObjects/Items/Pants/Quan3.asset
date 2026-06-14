@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3124a28971ba53044a7e1af36f0e447a, type: 3}
   m_Name: Quan3
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemID: Quan3
   itemName: "Qu\u1EA7n 3"
   description: 
   icon: {fileID: 1717557583, guid: f4fd30f67e290f540b0f90f8d6d42504, type: 3}
@@ -24,3 +25,7 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  skillPrefab: {fileID: 0}
+  damageMultiplier: 1.5
+  skillCooldown: 5
+  maxUses: 3

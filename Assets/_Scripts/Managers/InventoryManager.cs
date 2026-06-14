@@ -108,7 +108,7 @@ public class InventoryManager : MonoBehaviour
         return true; 
     }
 
-    private void UpdateUI()
+    public void UpdateUI()
     {
         if (slots == null) return;
 
@@ -337,5 +337,15 @@ public class InventoryManager : MonoBehaviour
                 break;
             }
         }
+    }
+
+    public void LoadEquippedItemFromSave(ItemSO item)
+    {
+        if (item == null) return;
+        foreach (EquipmentSlotUI slot in equipSlots)
+        {
+            if (slot.allowedItemType == item.itemType) { slot.UpdateSlot(item); break; }
+        }
+        RecalculatePlayerStats();
     }
 }
