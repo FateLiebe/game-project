@@ -67,6 +67,9 @@ public class BossController : EnemyBase
     private float nextDecisionTime = 0f;
     private bool isInTransitionSkill = false;
 
+    private Queue<int> recentSkills = new Queue<int>();
+    private const int RECENT_SKILL_LIMIT = 3;
+
     protected override void Start()
     {
         // 1. Tìm Player và set level Boss = Player + 3
@@ -213,6 +216,7 @@ public class BossController : EnemyBase
         {
             AddIfAvailable(candidates, 6, dist);
             AddIfAvailable(candidates, 4, dist);
+            AddIfAvailable(candidates, 3, dist);
             AddIfAvailable(candidates, 0, dist);
         }
         else if (dist <= midRange)
@@ -220,6 +224,7 @@ public class BossController : EnemyBase
             AddIfAvailable(candidates, 0, dist);
             AddIfAvailable(candidates, 1, dist);
             AddIfAvailable(candidates, 4, dist);
+            AddIfAvailable(candidates, 3, dist);
             AddIfAvailable(candidates, 6, dist);
         }
         else if (dist <= maxRange)
@@ -227,27 +232,75 @@ public class BossController : EnemyBase
             AddIfAvailable(candidates, 2, dist);
             AddIfAvailable(candidates, 5, dist);
             AddIfAvailable(candidates, 1, dist);
+            AddIfAvailable(candidates, 3, dist);
+            AddIfAvailable(candidates, 4, dist);
         }
         else
         {
             AddIfAvailable(candidates, 2, dist);
             AddIfAvailable(candidates, 5, dist);
+            AddIfAvailable(candidates, 3, dist);
+            AddIfAvailable(candidates, 4, dist);
         }
 
-        if (candidates.Count == 0) return -1;
+        if (candidates.Count == 0)
+        {
+            // Fallback: bỏ luật chống spam
+            if (dist <= meleeRange)
+            {
+                ForceAdd(candidates, 6, dist);
+                ForceAdd(candidates, 4, dist);
+                ForceAdd(candidates, 0, dist);
+                ForceAdd(candidates, 3, dist);
+            }
+            else if (dist <= midRange)
+            {
+                ForceAdd(candidates, 0, dist);
+                ForceAdd(candidates, 1, dist);
+                ForceAdd(candidates, 4, dist);
+                ForceAdd(candidates, 6, dist);
+                ForceAdd(candidates, 3, dist);
+            }
+            else if (dist <= maxRange)
+            {
+                ForceAdd(candidates, 2, dist);
+                ForceAdd(candidates, 5, dist);
+                ForceAdd(candidates, 1, dist);
+                ForceAdd(candidates, 3, dist);
+                ForceAdd(candidates, 4, dist);
+            }
+            else
+            {
+                ForceAdd(candidates, 2, dist);
+                ForceAdd(candidates, 5, dist);
+                ForceAdd(candidates, 3, dist);
+                ForceAdd(candidates, 4, dist);
+            }
+        }
+
+        if (candidates.Count == 0)
+            return -1;
+
         return candidates[Random.Range(0, candidates.Count)];
     }
 
     private void AddIfAvailable(List<int> candidates, int skillIndex, float dist)
     {
-        // YÊU CẦU ĐẶC BIỆT: Skill 4 (Smack Buff) chỉ dùng ở Phase 2
-        if (skillIndex == 4 && !isPhase2) return;
+        if ((skillIndex == 3 || skillIndex == 4) && !isPhase2) return;
 
-        float reqRange = (skillIndex < skillRanges.Length) ? skillRanges[skillIndex] : 99f;
-        if (CanAttack(skillIndex) && dist <= reqRange)
-        {
-            candidates.Add(skillIndex);
-        }
+        float reqRange = (skillIndex < skillRanges.Length)
+            ? skillRanges[skillIndex]
+            : 99f;
+
+        if (!CanAttack(skillIndex)) return;
+
+        if (dist > reqRange) return;
+
+        // Chống spam 3 skill gần nhất
+        if (recentSkills.Contains(skillIndex))
+            return;
+
+        candidates.Add(skillIndex);
     }
 
     private bool IsMeleeSkill(int skillIndex) { return skillIndex == 4 || skillIndex == 6; }
@@ -382,6 +435,7 @@ public class BossController : EnemyBase
         if (anim != null) anim.SetTrigger("Attack");
 
         RecordAttackUsage(skillIndex);
+        RegisterUsedSkill(skillIndex);
 
         float timer = 0f;
         while (timer < castTime)
@@ -484,6 +538,30 @@ public class BossController : EnemyBase
     {
         yield return new WaitForSeconds(2.5f);
         Destroy(gameObject);
+    }
+
+    private void RegisterUsedSkill(int skillIndex)
+    {
+        recentSkills.Enqueue(skillIndex);
+
+        while (recentSkills.Count > RECENT_SKILL_LIMIT)
+        {
+            recentSkills.Dequeue();
+        }
+    }
+
+    private void ForceAdd(List<int> candidates, int skillIndex, float dist)
+    {
+        if (skillIndex == 4 && !isPhase2) return;
+
+        float reqRange = (skillIndex < skillRanges.Length)
+            ? skillRanges[skillIndex]
+            : 99f;
+
+        if (CanAttack(skillIndex) && dist <= reqRange)
+        {
+            candidates.Add(skillIndex);
+        }
     }
 
     private void OnDrawGizmosSelected()

@@ -86,8 +86,15 @@ public class BossSkillManager : MonoBehaviour
                 AuraEffect aura = vfx.GetComponent<AuraEffect>();
                 if (aura != null)
                 {
-                    if (skillIndex == 3) 
-                        aura.SetupAura(bossEntity, 5f, 0, 0, bossEntity.Defense * 5f); 
+                    if (skillIndex == 3)
+                    {
+                        BossController boss = bossEntity as BossController;
+                        if (boss != null)
+                        {
+                            boss.ActivateEnergyShield();
+                        }
+                    }
+                         
                     else if (skillIndex == 4) 
                         aura.SetupAura(bossEntity, 5f, bossEntity.Attack * 0.5f, bossEntity.Defense * 0.5f, 0);
                 }

@@ -583,7 +583,7 @@ MonoBehaviour:
   patrolSpeed: 2
   chaseSpeed: 3.5
   lineOfSight: 6
-  attackRange: 1.8
+  attackRange: 3
   idleDuration: 1.5
   spriteFacesLeft: 0
   isFlying: 0

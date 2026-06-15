@@ -5,11 +5,13 @@ public class ItemPickup : MonoBehaviour
 {
     public ItemSO itemData;
     private SpriteRenderer sr;
+    private Collider2D col;
     private bool canPickUp = true; // Mặc định cho phép nhặt (dành cho đồ rớt từ thùng)
 
     private void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
+        col = GetComponent<Collider2D>();
     }
 
     private void Start()
@@ -24,8 +26,20 @@ public class ItemPickup : MonoBehaviour
         if (sr == null) sr = GetComponent<SpriteRenderer>();
         if (sr != null && itemData != null) sr.sprite = itemData.icon;
 
-        SetupCoroutine(); // Bắt đầu Coroutine để tạm thời vô hiệu hóa nhặt đồ
-        
+        StartCoroutine(SetupCoroutine(lockPickup)); // Bắt đầu Coroutine để tạm thời vô hiệu hóa nhặt đồ
+    }
+
+    private IEnumerator SetupCoroutine(bool lockPickup)
+    {
+        canPickUp = false; // Tắt cảm biến nhặt ngay khi setup
+        if (col != null) col.enabled = false; // Vô hiệu hóa collider để tránh nhặt ngay lập tức
+
+        // Đợi 1 giây để đảm bảo đồ đã nảy lên và rơi xuống đất
+        yield return new WaitForSeconds(1f); 
+
+        canPickUp = true; // Bật lại cảm biến nhặt sau khi setup xong
+        if (col != null) col.enabled = true; // Kích hoạt lại collider để cho phép nhặt đồ
+
         if (lockPickup)
         {
             StartCoroutine(PickupCooldown());
@@ -36,22 +50,16 @@ public class ItemPickup : MonoBehaviour
         }
     }
 
-    private IEnumerator SetupCoroutine()
-    {
-        canPickUp = false; // Tắt cảm biến nhặt ngay khi setup
-        // Đợi 0.3 giây để đảm bảo đồ đã nảy lên và rơi xuống đất
-        yield return new WaitForSeconds(0.3f); 
-        canPickUp = true; // Bật lại cảm biến nhặt sau khi setup xong
-    }
-
     private IEnumerator PickupCooldown()
     {
-        canPickUp = false; // Tắt cảm biến nhặt
-        
-        // Đợi 1.5 giây để cục đồ có thời gian nảy lên và rơi hẳn xuống đất
+        canPickUp = false; // Tắt cảm biến nhặt ngay khi setup
+        if (col != null) col.enabled = false; // Vô hiệu hóa collider để tránh nhặt ngay lập tức
+
+        // Đợi 1.5 giây để đảm bảo đồ đã nảy lên và rơi xuống đất
         yield return new WaitForSeconds(1.5f); 
-        
-        canPickUp = true; // Bật lại cảm biến nhặt
+
+        canPickUp = true; // Bật lại cảm biến nhặt sau khi setup xong
+        if (col != null) col.enabled = true; // Kích hoạt lại collider để cho phép nhặt đồ
     }
 
     private void OnTriggerStay2D(Collider2D other)
