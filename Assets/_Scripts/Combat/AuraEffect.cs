@@ -22,16 +22,24 @@ public class AuraEffect : MonoBehaviour
         Invoke(nameof(RemoveAura), duration);
     }
 
+    // private void Update()
+    // {
+    //     // Bám dính lấy chủ nhân khi di chuyển
+    //     if (ownerEntity != null)
+    //     {
+    //         transform.position = ownerEntity.centerSpawnPoint.position;
+    //     }
+    //     else
+    //     {
+    //         Destroy(gameObject); 
+    //     }
+    // }
+
     private void Update()
     {
-        // Bám dính lấy chủ nhân khi di chuyển
-        if (ownerEntity != null)
+        if (ownerEntity == null)
         {
-            transform.position = ownerEntity.transform.position + new Vector3(0, 0.5f, 0); // Lệch lên 0.5 để nằm giữa người
-        }
-        else
-        {
-            Destroy(gameObject); 
+            Destroy(gameObject);
         }
     }
 

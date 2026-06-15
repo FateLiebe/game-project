@@ -196,18 +196,18 @@ MonoBehaviour:
   attackHitbox: {fileID: 0}
   rangedAttackHitbox: {fileID: 0}
   meleeRange: 4
-  midRange: 13
+  midRange: 14
   maxRange: 20
   skillRanges:
-  - 5
-  - 5
-  - 13
+  - 8
+  - 8
+  - 15
   - 99
   - 99
   - 20
-  - 6
+  - 3.5
   meleeAttackDelay: 3
-  rangedAttackDelay: 5
+  rangedAttackDelay: 4
   preferredCombatDistance: 6.2
   combatDistanceBuffer: 1.4
   decisionInterval: 0.2
@@ -433,7 +433,7 @@ Transform:
   m_GameObject: {fileID: 4323579510381643751}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.08, y: -1.35, z: 0}
+  m_LocalPosition: {x: -0.08, y: -0.63, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -79,7 +79,11 @@ public class BossSkillManager : MonoBehaviour
                 vfx.transform.localScale = scale;
             }
 
-            if (attachToBoss) vfx.transform.SetParent(this.transform);
+            if (attachToBoss)
+            {
+                vfx.transform.SetParent(centerSpawnPoint);
+                vfx.transform.localPosition = Vector3.zero;
+            }
 
             if (isAura)
             {
@@ -92,11 +96,12 @@ public class BossSkillManager : MonoBehaviour
                         if (boss != null)
                         {
                             boss.ActivateEnergyShield();
+                            aura.SetupAura(bossEntity, 10f, 0, 0, 0);
                         }
                     }
                          
                     else if (skillIndex == 4) 
-                        aura.SetupAura(bossEntity, 5f, bossEntity.Attack * 0.5f, bossEntity.Defense * 0.5f, 0);
+                        aura.SetupAura(bossEntity, 15f, bossEntity.Attack * 0.5f, bossEntity.Defense * 0.5f, 0);
                 }
             }
             else

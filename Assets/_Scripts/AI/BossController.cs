@@ -18,7 +18,7 @@ public class BossController : EnemyBase
     private float globalAttackTimer = 0f;
 
     [Header("--- BOSS AI TUNING ---")]
-    public float preferredCombatDistance = 6.2f;
+    public float preferredCombatDistance = 8f;
     public float combatDistanceBuffer = 1.4f;
     public float decisionInterval = 0.2f;
     public float repositionDuration = 0.45f;
@@ -223,6 +223,7 @@ public class BossController : EnemyBase
         {
             AddIfAvailable(candidates, 0, dist);
             AddIfAvailable(candidates, 1, dist);
+            AddIfAvailable(candidates, 2, dist);
             AddIfAvailable(candidates, 4, dist);
             AddIfAvailable(candidates, 3, dist);
             AddIfAvailable(candidates, 6, dist);
@@ -286,7 +287,15 @@ public class BossController : EnemyBase
 
     private void AddIfAvailable(List<int> candidates, int skillIndex, float dist)
     {
-        if ((skillIndex == 3 || skillIndex == 4) && !isPhase2) return;
+        // Skill 4 chỉ dùng khi phase 2 (HP ≤ 50%)
+        if (skillIndex == 4 && !isPhase2) return;
+
+        // Skill 3 chỉ dùng khi HP ≤ 75%
+        if (skillIndex == 3)
+        {
+            float hpPercent = (MaxHealth > 0f) ? currentHealth / MaxHealth : 1f;
+            if (hpPercent > 0.75f) return;
+        }
 
         float reqRange = (skillIndex < skillRanges.Length)
             ? skillRanges[skillIndex]
@@ -296,9 +305,8 @@ public class BossController : EnemyBase
 
         if (dist > reqRange) return;
 
-        // Chống spam 3 skill gần nhất
-        if (recentSkills.Contains(skillIndex))
-            return;
+        // Chống spam ngay cả khi danh sách chỉ có 1
+        if (recentSkills.Contains(skillIndex)) return;
 
         candidates.Add(skillIndex);
     }
@@ -542,17 +550,35 @@ public class BossController : EnemyBase
 
     private void RegisterUsedSkill(int skillIndex)
     {
+        // Nếu skill đã có trong queue, xóa nó trước
+        // để tránh chiếm 2 slot — queue luôn chứa các skill KHÁC NHAU gần nhất
+        if (recentSkills.Contains(skillIndex))
+        {
+            Queue<int> temp = new Queue<int>();
+            foreach (int s in recentSkills)
+            {
+                if (s != skillIndex) temp.Enqueue(s);
+            }
+            recentSkills = temp;
+        }
+
         recentSkills.Enqueue(skillIndex);
 
         while (recentSkills.Count > RECENT_SKILL_LIMIT)
-        {
             recentSkills.Dequeue();
-        }
     }
 
     private void ForceAdd(List<int> candidates, int skillIndex, float dist)
     {
+        // Skill 4 chỉ dùng khi phase 2 (HP ≤ 50%)
         if (skillIndex == 4 && !isPhase2) return;
+
+        // Skill 3 chỉ dùng khi HP ≤ 75%
+        if (skillIndex == 3)
+        {
+            float hpPercent = (MaxHealth > 0f) ? currentHealth / MaxHealth : 1f;
+            if (hpPercent > 0.75f) return;
+        }
 
         float reqRange = (skillIndex < skillRanges.Length)
             ? skillRanges[skillIndex]
