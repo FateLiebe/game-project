@@ -21,8 +21,6 @@ public class EnemySpawner : MonoBehaviour
     public BaseEntity player;
 
     private GameObject[] enemiesAtNodes; 
-    
-    // Mảng lưu đồng hồ đếm ngược cho từng Node riêng biệt
     private float[] nodeRespawnTimers; 
 
     private void Awake()
@@ -32,17 +30,20 @@ public class EnemySpawner : MonoBehaviour
         {
             spawnNodes = new Transform[nodeCount];
             enemiesAtNodes = new GameObject[nodeCount]; 
-            nodeRespawnTimers = new float[nodeCount]; // Khởi tạo mảng đồng hồ
+            nodeRespawnTimers = new float[nodeCount]; 
             
             for (int i = 0; i < nodeCount; i++)
             {
                 spawnNodes[i] = transform.GetChild(i);
-                nodeRespawnTimers[i] = spawnDelay; // Cài đặt đồng hồ ban đầu là 10s
+                nodeRespawnTimers[i] = spawnDelay; 
             }
         }
     }
 
-    private void Start()
+    // =======================================================
+    // [BẢN VÁ LỖI]: Đổi thành IEnumerator để có thể chờ đợi
+    // =======================================================
+    private IEnumerator Start()
     {
         if (player == null)
         {
@@ -51,6 +52,10 @@ public class EnemySpawner : MonoBehaviour
         }
 
         if (player != null) player.OnLevelChanged += HandlePlayerLevelUp;
+
+        // BẮT BUỘC CHỜ 0.2 GIÂY ĐỂ GAMELOADER KỊP NẠP FILE SAVE VÀO PLAYER
+        // Nếu không chờ, Spawner sẽ đọc nhầm Level lúc chưa chết của Player thay vì Level đã Save
+        yield return new WaitForSeconds(0.2f);
 
         InitialSpawnAll();
         StartCoroutine(RespawnRoutine());
@@ -62,7 +67,6 @@ public class EnemySpawner : MonoBehaviour
 
         int startLevel = (player != null && player.currentLevel > 1) ? player.currentLevel + 3 : 1;
 
-        // Tạo danh sách index node rồi shuffle trước khi spawn lần đầu
         List<int> nodeIndices = new List<int>();
         for (int i = 0; i < spawnNodes.Length; i++) nodeIndices.Add(i);
         ShuffleList(nodeIndices);
@@ -75,7 +79,6 @@ public class EnemySpawner : MonoBehaviour
 
     private IEnumerator RespawnRoutine()
     {
-        // Thay vì chờ 1 cục 10s, giờ hệ thống sẽ "đi tuần" cứ 0.5s một lần để check đồng hồ
         WaitForSeconds checkInterval = new WaitForSeconds(0.5f);
 
         while (true)
@@ -86,22 +89,18 @@ public class EnemySpawner : MonoBehaviour
 
             Vector2 playerPos = player.transform.position;
 
-            // Bước 1: Cập nhật đồng hồ cho từng node
             for (int i = 0; i < enemiesAtNodes.Length; i++)
             {
                 if (enemiesAtNodes[i] == null)
                 {
-                    // Quái đã chết: trừ lùi đồng hồ của riêng node đó đi 0.5s
                     nodeRespawnTimers[i] -= 0.5f;
                 }
                 else
                 {
-                    // Quái vẫn sống: giữ đồng hồ luôn đầy ở mốc spawnDelay
                     nodeRespawnTimers[i] = spawnDelay;
                 }
             }
 
-            // Bước 2: Gom các node đã hết giờ và đủ điều kiện khoảng cách
             List<int> readyNodes = new List<int>();
             for (int i = 0; i < enemiesAtNodes.Length; i++)
             {
@@ -115,7 +114,6 @@ public class EnemySpawner : MonoBehaviour
                 }
             }
 
-            // Bước 3: Xáo trộn danh sách node sẵn sàng rồi spawn
             ShuffleList(readyNodes);
 
             int spawnLevel = (player.currentLevel == 1) ? 1 : player.currentLevel + 3;
@@ -126,7 +124,6 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    // Hàm tiện ích: Fisher-Yates shuffle dùng chung
     private void ShuffleList(List<int> list)
     {
         for (int i = list.Count - 1; i > 0; i--)
@@ -142,7 +139,6 @@ public class EnemySpawner : MonoBehaviour
     {
         Transform selectedNode = spawnNodes[nodeIndex];
 
-        // Chọn ngẫu nhiên prefab từ danh sách, bỏ qua nếu null
         int attempts = 0;
         GameObject randomPrefab = null;
         while (randomPrefab == null && attempts < enemyPrefabs.Length)
@@ -161,8 +157,6 @@ public class EnemySpawner : MonoBehaviour
         }
 
         enemiesAtNodes[nodeIndex] = newEnemy;
-
-        // Reset đồng hồ của node này sau khi spawn xong
         nodeRespawnTimers[nodeIndex] = spawnDelay;
     }
 

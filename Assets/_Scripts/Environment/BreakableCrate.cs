@@ -115,7 +115,7 @@ public class BreakableCrate : BaseEntity
 
             Rigidbody2D rb = loot.GetComponent<Rigidbody2D>();
             if (rb != null)
-                rb.AddForce(new Vector2(Random.Range(-2f, 2f), 4f), ForceMode2D.Impulse);
+                rb.AddForce(Vector2.up * 3f, ForceMode2D.Impulse);
 
             ItemPickup pickup = loot.GetComponent<ItemPickup>();
             if (pickup != null) pickup.Setup(selected);
@@ -136,22 +136,4 @@ public class BreakableCrate : BaseEntity
         }
         return list[list.Count - 1];
     }
-
-#if UNITY_EDITOR
-    [ContextMenu("Test Roll Loot (xem Console)")]
-    private void TestRollLoot()
-    {
-        if (itemPool.Count == 0) { Debug.Log("itemPool trống."); return; }
-        for (int i = 0; i < 10; i++)
-        {
-            ItemType type = RollWeighted(typeWeights, t => t.weight).itemType;
-            ItemRarity rarity = RollWeighted(rarityWeights, r => r.weight).rarity;
-            var candidates = itemPool.Where(x => x != null && x.itemType == type && x.rarity == rarity).ToList();
-            string result = candidates.Count > 0
-                ? $"[{type}] [{rarity}] → {candidates[Random.Range(0, candidates.Count)].itemName}"
-                : $"[{type}] [{rarity}] → không có item khớp, nới lỏng về type";
-            Debug.Log($"Roll {i + 1}: {result}");
-        }
-    }
-#endif
 }

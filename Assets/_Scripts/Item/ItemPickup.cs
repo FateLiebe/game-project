@@ -18,14 +18,30 @@ public class ItemPickup : MonoBehaviour
     }
 
     // Hàm này được gọi bởi InventoryManager khi bạn bấm nút "Vứt bỏ"
-    public void Setup(ItemSO item)
+    public void Setup(ItemSO item, bool lockPickup = false)
     {
         itemData = item;
         if (sr == null) sr = GetComponent<SpriteRenderer>();
         if (sr != null && itemData != null) sr.sprite = itemData.icon;
+
+        SetupCoroutine(); // Bắt đầu Coroutine để tạm thời vô hiệu hóa nhặt đồ
         
-        // Vừa vứt ra khỏi túi -> Khóa không cho nhặt ngay lập tức
-        StartCoroutine(PickupCooldown());
+        if (lockPickup)
+        {
+            StartCoroutine(PickupCooldown());
+        }
+        else
+        {
+            canPickUp = true;
+        }
+    }
+
+    private IEnumerator SetupCoroutine()
+    {
+        canPickUp = false; // Tắt cảm biến nhặt ngay khi setup
+        // Đợi 0.3 giây để đảm bảo đồ đã nảy lên và rơi xuống đất
+        yield return new WaitForSeconds(0.3f); 
+        canPickUp = true; // Bật lại cảm biến nhặt sau khi setup xong
     }
 
     private IEnumerator PickupCooldown()

@@ -285,7 +285,7 @@ public class InventoryManager : MonoBehaviour
         GameObject loot = Instantiate(droppedItemPrefab, player.transform.position + dropOffset, Quaternion.identity);
         
         ItemPickup pickup = loot.GetComponent<ItemPickup>();
-        if (pickup != null) pickup.Setup(selectedItem);
+        if (pickup != null) pickup.Setup(selectedItem, true);
         
         Rigidbody2D rb = loot.GetComponent<Rigidbody2D>();
         if (rb != null) rb.AddForce(new Vector2(Random.Range(-2f, 2f), 3f), ForceMode2D.Impulse);
