@@ -162,6 +162,14 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.ides": {
+      "version": "file:com.unity.ides",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.test-framework": "1.1.9"
+      }
+    },
     "com.unity.inputsystem": {
       "version": "1.19.0",
       "depth": 0,
