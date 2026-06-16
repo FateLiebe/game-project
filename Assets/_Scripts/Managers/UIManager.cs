@@ -66,6 +66,10 @@ public class UIManager : MonoBehaviour
         if (pauseScreen != null) pauseScreen.SetActive(newState == GameManager.GameState.Paused);
         if (gameOverMenu != null) gameOverMenu.SetActive(newState == GameManager.GameState.GameOver);
         if (victoryMenu != null) victoryMenu.SetActive(newState == GameManager.GameState.Victory);
+
+        // [AUDIO] Phát âm thanh game over
+        if (newState == GameManager.GameState.GameOver)
+            AudioManager.Instance?.PlayGameOver();
     }
 
     public void UpdateDodgeCD(float currentTimer, float maxCooldown)
@@ -79,6 +83,7 @@ public class UIManager : MonoBehaviour
 
     public void ResumeGame() 
     { 
+        AudioManager.Instance?.PlayUIClick(); // [AUDIO]
         if (GameManager.Instance != null) GameManager.Instance.TogglePause(); 
     }
 
@@ -169,16 +174,25 @@ public class UIManager : MonoBehaviour
     }
 
     // ==========================================
-    // KHU VỰC LOGIC ÂM THANH (Dành cho sau này)
+    // KHU VỰC LOGIC ÂM THANH (PauseScreen)
+    // Kết nối Slider (1-10) và Toggle vào các hàm này
     // ==========================================
     
-    public void OnAudioToggleChanged(bool isOn)
-    {
-        Debug.Log("Trạng thái âm thanh hiện tại: " + (isOn ? "BẬT" : "TẮT"));
-    }
-
+    /// <summary>Gắn vào OnValueChanged của Slider âm lượng (1-10)</summary>
     public void OnVolumeSliderChanged(float value)
     {
-        Debug.Log("Mức âm lượng hiện tại: " + value);
+        AudioManager.Instance?.SetVolume(value);
+    }
+
+    /// <summary>Gắn vào OnValueChanged của Toggle bật/tắt âm thanh</summary>
+    public void OnAudioToggleChanged(bool isOn)
+    {
+        AudioManager.Instance?.SetMute(!isOn); // isOn=true → không mute
+    }
+
+    /// <summary>Gắn vào OnClick của bất kỳ nút UI nào</summary>
+    public void OnUIButtonClick()
+    {
+        AudioManager.Instance?.PlayUIClick();
     }
 }

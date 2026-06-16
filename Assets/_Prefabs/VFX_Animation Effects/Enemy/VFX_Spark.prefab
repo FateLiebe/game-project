@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7988138307317118169}
   - component: {fileID: -4014419443391423588}
   - component: {fileID: 2239849911630092598}
+  - component: {fileID: -7221580491493627929}
   m_Layer: 0
   m_Name: VFX_Spark
   m_TagString: Untagged
@@ -149,6 +150,7 @@ MonoBehaviour:
   homingDuration: 0.5
   lifeTime: 4
   destroyOnHit: 1
+  rotationOffset: 0
 --- !u!61 &2239849911630092598
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -195,3 +197,16 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 3.729721, y: 0.77778625}
   m_EdgeRadius: 0
+--- !u!114 &-7221580491493627929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 637893682034085563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04334d066120a3648984a96d22180e3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX_SoundTrigger
+  skillIndex: 1

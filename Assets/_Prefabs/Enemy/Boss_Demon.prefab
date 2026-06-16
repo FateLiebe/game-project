@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6287053421100623968}
   - component: {fileID: 259003522531114190}
   - component: {fileID: 2774010049184118321}
+  - component: {fileID: 1704326107059936956}
   m_Layer: 12
   m_Name: Boss_Demon
   m_TagString: Enemy
@@ -239,10 +240,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSkillManager
   breathPrefab: {fileID: 5449488308164107964, guid: 58713f2186e414f43b7da9979b0133c8, type: 3}
   breathFirePrefab: {fileID: 8110977411408255527, guid: 5cde22041dace0446a8999091aa0ca60, type: 3}
-  electroShockPrefab: {fileID: 7175377170976055196, guid: dce87b8906e388d439ff50c0ed6fab6c, type: 3}
+  electroShockPrefab: {fileID: 7175377170976055196, guid: 7a3fa03fae2276b4ba0cb24aac32af0a, type: 3}
   energyShieldPrefab: {fileID: 8715321228497821081, guid: af2f723c1fc32be40a3917213efab2f6, type: 3}
   energySmackPrefab: {fileID: 6009337913290153366, guid: 700be860c78a6c445adf2514e53385d7, type: 3}
-  fireBallPrefab: {fileID: 1874829119412524165, guid: c7d59756739271541add2b106a523e90, type: 3}
+  fireBallPrefab: {fileID: 1874829119412524165, guid: 6a920aa41341e664fbfed3c900ad9e8b, type: 3}
   slashHorizontalPrefab: {fileID: 2624578184461395664, guid: 10a757b2b2d3bbf4499cefea1ea1e960, type: 3}
   mouthSpawnPoint: {fileID: 5411609221870134086}
   centerSpawnPoint: {fileID: 5676239734773764475}
@@ -284,6 +285,18 @@ CapsuleCollider2D:
   m_Offset: {x: -0.060840607, y: -0.8613052}
   m_Size: {x: 2.7710953, y: 4.8435917}
   m_Direction: 0
+--- !u!114 &1704326107059936956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 489847095588347529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5014856679c55a40a2dae9d2261e5c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossAudio
 --- !u!1 &669959966866999981
 GameObject:
   m_ObjectHideFlags: 0

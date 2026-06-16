@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -2158176059968091293}
   - component: {fileID: -3428098783838890735}
   - component: {fileID: 6575222923510890864}
+  - component: {fileID: 5619811289818642309}
   m_Layer: 0
   m_Name: VFX_Charged
   m_TagString: Untagged
@@ -149,6 +150,7 @@ MonoBehaviour:
   homingDuration: 0.5
   lifeTime: 4
   destroyOnHit: 1
+  rotationOffset: 0
 --- !u!61 &6575222923510890864
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -195,3 +197,16 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.1884384, y: 1.7570152}
   m_EdgeRadius: 0
+--- !u!114 &5619811289818642309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3300235389599462935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04334d066120a3648984a96d22180e3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX_SoundTrigger
+  skillIndex: 1

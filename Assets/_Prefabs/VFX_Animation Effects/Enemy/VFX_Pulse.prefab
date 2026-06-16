@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4634662934274122859}
   - component: {fileID: 4133038491484117697}
   - component: {fileID: 6178761356249339701}
+  - component: {fileID: -5007604083211009162}
   m_Layer: 0
   m_Name: VFX_Pulse
   m_TagString: Untagged
@@ -149,6 +150,7 @@ MonoBehaviour:
   homingDuration: 0.5
   lifeTime: 4
   destroyOnHit: 1
+  rotationOffset: 0
 --- !u!61 &6178761356249339701
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -195,3 +197,16 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.8758698, y: 0.9700532}
   m_EdgeRadius: 0
+--- !u!114 &-5007604083211009162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8691085832257008598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04334d066120a3648984a96d22180e3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX_SoundTrigger
+  skillIndex: 1

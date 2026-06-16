@@ -38,6 +38,8 @@ public class GameLoader : MonoBehaviour
         yield return loadOp;
         yield return null;
 
+        AudioManager.Instance?.RestartAmbientCycle();
+
         // 4. ÁP DỤNG DỮ LIỆU HOẶC SPAWN TÂN THỦ
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         PlayerController player = playerObj != null ? playerObj.GetComponent<PlayerController>() : null;

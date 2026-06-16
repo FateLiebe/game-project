@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5313618735215909124}
   - component: {fileID: 5198125784140827213}
   - component: {fileID: 9183280723506371547}
+  - component: {fileID: 4863926933923299399}
   m_Layer: 10
   m_Name: VFX_ElectroShock_Player
   m_TagString: Untagged
@@ -191,3 +192,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa2e24f87517d4540a8daf30135f1882, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VFX_AutoDestroy
+--- !u!114 &4863926933923299399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7175377170976055196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04334d066120a3648984a96d22180e3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX_SoundTrigger
+  directClip: {fileID: 8300000, guid: b43e6ce7165753f489b41ea510562a8e, type: 3}
+  skillIndex: 0
+  volume: 1

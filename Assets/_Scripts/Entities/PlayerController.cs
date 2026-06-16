@@ -5,6 +5,7 @@ using System.Collections.Generic; // [MỚI]: Dùng để chứa danh sách kẻ
 public class PlayerController : BaseEntity
 {
     public enum PlayerState { Grounded, Airborne, Dashing, DashStalling, Attacking }
+    public PlayerState CurrentState => currentState; // [AUDIO] Cho phép PlayerAudio đọc state
 
     [Header("State Machine")]
     [SerializeField] private PlayerState currentState = PlayerState.Airborne;
@@ -55,6 +56,7 @@ public class PlayerController : BaseEntity
     
     private Animator anim;
     private Rigidbody2D rb;
+    private PlayerAudio playerAudio; // [AUDIO]
     private Coroutine dashCoroutine;
     private Coroutine attackCoroutine;
     private Vector2 currentDashDirection; 
@@ -85,6 +87,7 @@ public class PlayerController : BaseEntity
         rb = GetComponent<Rigidbody2D>();
         hurtbox = GetComponentInChildren<Hurtbox>(); 
         anim = GetComponent<Animator>();
+        playerAudio = GetComponent<PlayerAudio>(); // [AUDIO]
         originalGravity = rb.gravityScale;
         
         if (baseData != null) currentDashCharges = baseData.maxDashes;
@@ -343,6 +346,7 @@ public class PlayerController : BaseEntity
 
         if (isBackdash && previousState == PlayerState.Grounded) anim.SetTrigger("Backdash"); 
         else anim.SetTrigger("Dash"); 
+        playerAudio?.NotifyDash(); // [AUDIO]
 
         perfectDodgeTriggered = false; // [FIX #3]: Reset cờ khi bắt đầu lướt mới
 
@@ -558,6 +562,7 @@ public class PlayerController : BaseEntity
         anim.SetBool("isAttacking", true);
         anim.SetInteger("comboStep", comboStep);
         anim.SetTrigger("Attack");
+        playerAudio?.NotifyAttack(comboStep); // [AUDIO]
         
         lastAttackTime = Time.time;
 
@@ -690,6 +695,7 @@ public class PlayerController : BaseEntity
         currentState = PlayerState.Airborne;
 
         anim.SetTrigger("Jump");
+        playerAudio?.NotifyJump(); // [AUDIO]
     }
 
     private void HandleFastFall()

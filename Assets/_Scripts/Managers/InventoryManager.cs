@@ -241,6 +241,7 @@ public class InventoryManager : MonoBehaviour
                 if (tooltipUI != null) tooltipUI.HideTooltip();
                 UpdateUI();
                 RecalculatePlayerStats();
+                AudioManager.Instance?.PlayEquip(); // [AUDIO]
 
                 if (itemToEquip.itemType == ItemType.SupportSkill && player is PlayerController pc)
                 {
@@ -312,6 +313,7 @@ public class InventoryManager : MonoBehaviour
         }
 
         inventoryList.Add(slot.equippedItem);
+        AudioManager.Instance?.PlayUnequip(); // [AUDIO]
         
         if (slot.allowedItemType == ItemType.SupportSkill && player is PlayerController pc)
         {

@@ -70,19 +70,27 @@ public class StatsUIManager : MonoBehaviour
         if (uiPanel != null)
         {
             uiPanel.SetActive(!uiPanel.activeSelf);
-            if (uiPanel.activeSelf) UpdateUI();
-
-            // Nếu tắt túi đi thì dập luôn Tooltip
-            else if (ItemTooltipUI.Instance != null) ItemTooltipUI.Instance.HideTooltip();
+            if (uiPanel.activeSelf)
+            {
+                UpdateUI();
+                AudioManager.Instance?.PlayInventoryOpen(); // [AUDIO]
+            }
+            else
+            {
+                AudioManager.Instance?.PlayInventoryClose(); // [AUDIO]
+                if (ItemTooltipUI.Instance != null) ItemTooltipUI.Instance.HideTooltip();
+            }
         }
     }
 
     // [MỚI THÊM] Hàm dùng để gọi khi click ra ngoài UI
     public void CloseUI()
     {
-        if (uiPanel != null) uiPanel.SetActive(false);
-
-        // Click ra ngoài viền đen tự tắt túi thì tắt luôn Tooltip
+        if (uiPanel != null && uiPanel.activeSelf)
+        {
+            uiPanel.SetActive(false);
+            AudioManager.Instance?.PlayInventoryClose(); // [AUDIO]
+        }
         if (ItemTooltipUI.Instance != null) ItemTooltipUI.Instance.HideTooltip();
     }
 

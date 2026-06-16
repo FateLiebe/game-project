@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -6581641549875095032}
   - component: {fileID: -4345611850149176119}
   - component: {fileID: 492308169239884834}
+  - component: {fileID: 3597264811119001377}
   m_Layer: 0
   m_Name: VFX_WaveForm
   m_TagString: Untagged
@@ -149,6 +150,7 @@ MonoBehaviour:
   homingDuration: 0.5
   lifeTime: 4
   destroyOnHit: 1
+  rotationOffset: 0
 --- !u!61 &492308169239884834
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -195,3 +197,16 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 4.112915, y: 0.8941879}
   m_EdgeRadius: 0
+--- !u!114 &3597264811119001377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3066774315844575785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04334d066120a3648984a96d22180e3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX_SoundTrigger
+  skillIndex: 1

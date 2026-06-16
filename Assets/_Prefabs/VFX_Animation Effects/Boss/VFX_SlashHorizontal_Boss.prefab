@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 458152704705413007}
   - component: {fileID: -7502594587224700444}
   - component: {fileID: 1291478937101475496}
+  - component: {fileID: 5134269179773410368}
   m_Layer: 0
   m_Name: VFX_SlashHorizontal_Boss
   m_TagString: Untagged
@@ -207,3 +208,18 @@ MonoBehaviour:
   skillType: 2
   fireBallMaxRange: 15
   spawnPosition: {x: 0, y: 0, z: 0}
+--- !u!114 &5134269179773410368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2624578184461395664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04334d066120a3648984a96d22180e3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX_SoundTrigger
+  directClip: {fileID: 8300000, guid: b43e6ce7165753f489b41ea510562a8e, type: 3}
+  skillIndex: 6
+  volume: 1

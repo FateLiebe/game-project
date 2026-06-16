@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -7703882220789103637}
   - component: {fileID: 1244364746588979868}
   - component: {fileID: 3425531176703807073}
+  - component: {fileID: -2684572513986222167}
   m_Layer: 0
   m_Name: VFX_FireBall
   m_TagString: Untagged
@@ -196,3 +197,16 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.7272949, y: 0.8374357}
   m_EdgeRadius: 0
+--- !u!114 &-2684572513986222167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1874829119412524165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04334d066120a3648984a96d22180e3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX_SoundTrigger
+  skillIndex: 1

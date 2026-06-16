@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2393895483137353385}
   - component: {fileID: 1190017818233534379}
   - component: {fileID: 2986539725431689828}
+  - component: {fileID: -3405808306435978341}
   m_Layer: 0
   m_Name: VFX_EnergyShield_Boss
   m_TagString: Untagged
@@ -127,3 +128,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5739a7e9e910e074894f7763eebb747a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AuraEffect
+--- !u!114 &-3405808306435978341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8715321228497821081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04334d066120a3648984a96d22180e3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX_SoundTrigger
+  skillIndex: 3

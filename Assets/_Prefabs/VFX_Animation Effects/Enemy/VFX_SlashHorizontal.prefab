@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4202057358691001710}
   - component: {fileID: 1649717158107361379}
   - component: {fileID: 6592597822776705296}
+  - component: {fileID: -7565548853822371491}
   m_Layer: 0
   m_Name: VFX_SlashHorizontal
   m_TagString: Untagged
@@ -191,3 +192,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa2e24f87517d4540a8daf30135f1882, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VFX_AutoDestroy
+--- !u!114 &-7565548853822371491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3596601143442349861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04334d066120a3648984a96d22180e3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX_SoundTrigger
+  skillIndex: 1

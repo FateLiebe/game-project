@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1484562906154001577}
   - component: {fileID: 4238799998337107961}
   - component: {fileID: -642275392465510157}
+  - component: {fileID: 2542720662913242435}
   m_Layer: 0
   m_Name: VFX_EnergySmack
   m_TagString: Untagged
@@ -127,3 +128,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5739a7e9e910e074894f7763eebb747a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AuraEffect
+--- !u!114 &2542720662913242435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5695079241813451035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04334d066120a3648984a96d22180e3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX_SoundTrigger
+  skillIndex: 1
