@@ -31,6 +31,8 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
+*.slnx
+.vscode/
 
 # Các file meta tự sinh không cần thiết
 *.pidb.meta
