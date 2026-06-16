@@ -103,13 +103,13 @@ public class StatsUIManager : MonoBehaviour
         if (txtExp != null) txtExp.text = $"EXP: {player.currentEXP} / {player.expToNextLevel}";
         if (imgExpFill != null) imgExpFill.fillAmount = player.currentEXP / player.expToNextLevel;
 
-        txtStatPoints.text = $"Điểm tiềm năng: {player.currentStatPoints}";
-        txtHP.text = $"Máu: {player.currentHealth} / {player.MaxHealth}";
-        txtATK.text = $"Tấn công: {player.Attack}";
-        txtDEF.text = $"Phòng thủ: {player.Defense}";
-        txtCRIT.text = $"Tỉ lệ bạo kích: {player.CritRate}%";
-        if (txtCritDamage != null) txtCritDamage.text = $"Sát thương bạo kích: {player.CritDamage}%"; 
-        if (txtSpeed != null) txtSpeed.text = $"Tốc độ: {player.Speed}";
+        txtStatPoints.text = $"Stat Points: {player.currentStatPoints}";
+        txtHP.text = $"Health: {player.currentHealth} / {player.MaxHealth}";
+        txtATK.text = $"Attack: {player.Attack}";
+        txtDEF.text = $"Defense: {player.Defense}";
+        txtCRIT.text = $"Crit Rate: {player.CritRate}%";
+        if (txtCritDamage != null) txtCritDamage.text = $"Crit Damage: {player.CritDamage}%"; 
+        if (txtSpeed != null) txtSpeed.text = $"Speed: {player.Speed}";
 
         // Ẩn nút nếu hết điểm
         bool hasPoints = player.currentStatPoints > 0;

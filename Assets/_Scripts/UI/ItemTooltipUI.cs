@@ -133,22 +133,22 @@ public class ItemTooltipUI : MonoBehaviour
                     finalContent += "\n";
 
                 if (item.healthBonus > 0)
-                    finalContent += $"+{item.healthBonus} Máu\n";
+                    finalContent += $"+{item.healthBonus} Health\n";
 
                 if (item.attackBonus > 0)
-                    finalContent += $"+{item.attackBonus} Tấn công\n";
+                    finalContent += $"+{item.attackBonus} Attack\n";
 
                 if (item.defenseBonus > 0)
-                    finalContent += $"+{item.defenseBonus} Phòng thủ\n";
+                    finalContent += $"+{item.defenseBonus} Defense\n";
 
                 if (item.critRateBonus > 0)
-                    finalContent += $"+{item.critRateBonus}% Tỉ lệ bạo kích\n";
+                    finalContent += $"+{item.critRateBonus}% Crit Rate\n";
 
                 if (item.critDamageBonus > 0)
-                    finalContent += $"+{item.critDamageBonus}% ST bạo kích\n";
+                    finalContent += $"+{item.critDamageBonus}% Crit Damage\n";
 
                 if (item.speedBonus > 0)
-                    finalContent += $"+{item.speedBonus} Tốc độ\n";
+                    finalContent += $"+{item.speedBonus} Speed\n";
             }
 
             txtStats.text = finalContent;

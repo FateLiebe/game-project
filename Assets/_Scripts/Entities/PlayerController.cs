@@ -65,6 +65,14 @@ public class PlayerController : BaseEntity
     private float horizontalInput;
     private float verticalInput;
     private float originalGravity;
+
+    private float lastGroundedTime = 0f;
+    private const float COYOTE_TIME = 0.12f;
+
+    // Thêm vào phần khai báo biến
+    private int groundedFrameCount = 0;
+    private int notGroundedFrameCount = 0;
+    private const int GROUND_CONFIRM_FRAMES = 3;
     
     private Collider2D[] threatColliders = new Collider2D[20];
     
@@ -680,6 +688,8 @@ public class PlayerController : BaseEntity
         canAirAttack = true; 
         rb.gravityScale = originalGravity;
         currentState = PlayerState.Airborne;
+
+        anim.SetTrigger("Jump");
     }
 
     private void HandleFastFall()
@@ -741,30 +751,48 @@ public class PlayerController : BaseEntity
                     && rb.linearVelocity.y < -0.1f;
 
         anim.SetBool("isGrounded", grounded);
-        anim.SetBool("isJumping",  jumping);
+        //anim.SetBool("isJumping",  jumping);
         anim.SetBool("isFalling",  falling);
     }
 
     private void CheckGrounded()
     {
         if (currentState == PlayerState.Dashing || currentState == PlayerState.DashStalling) return;
-        if (Time.time - lastJumpTime <= 0.15f) return;
+        if (Time.time - lastJumpTime <= 0.25f) return;
+        if (rb.linearVelocity.y > 0.05f)
+        {
+            // Đang bay lên → reset counter, không xét grounded
+            groundedFrameCount = 0;
+            return;
+        }
 
         Collider2D col = GetComponent<Collider2D>();
+        float bottom = col.bounds.min.y;
+        float cx     = col.bounds.center.x;
+        float hw     = col.bounds.size.x * 0.25f;
 
-        // Đặt box BÊN DƯỚI chân, không phải bên trong collider
-        Vector2 feetPos = new Vector2(col.bounds.center.x, col.bounds.min.y - 0.05f);
-        Vector2 boxSize = new Vector2(col.bounds.size.x * 0.7f, 0.15f);
+        bool hitL = Physics2D.Raycast(new Vector2(cx - hw, bottom), Vector2.down, 0.08f, groundLayer);
+        bool hitC = Physics2D.Raycast(new Vector2(cx,       bottom), Vector2.down, 0.08f, groundLayer);
+        bool hitR = Physics2D.Raycast(new Vector2(cx + hw,  bottom), Vector2.down, 0.08f, groundLayer);
 
-        bool isGroundedNow = Physics2D.OverlapBox(feetPos, boxSize, 0f, groundLayer) != null;
+        bool isGroundedNow = hitL || hitC || hitR;
 
         if (isGroundedNow)
         {
-            if (currentState == PlayerState.Airborne) BecomeGrounded();
+            notGroundedFrameCount = 0;
+            groundedFrameCount++;
+
+            // Chỉ BecomeGrounded sau khi ổn định 3 frame liên tiếp
+            if (groundedFrameCount >= GROUND_CONFIRM_FRAMES && currentState == PlayerState.Airborne)
+                BecomeGrounded();
         }
         else
         {
-            if (currentState == PlayerState.Grounded)
+            groundedFrameCount = 0;
+            notGroundedFrameCount++;
+
+            // Chỉ rời Grounded sau khi không chạm đất 3 frame liên tiếp
+            if (notGroundedFrameCount >= GROUND_CONFIRM_FRAMES && currentState == PlayerState.Grounded)
                 currentState = PlayerState.Airborne;
         }
     }
