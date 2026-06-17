@@ -109,6 +109,10 @@ public class BossSkillManager : MonoBehaviour
                 UniversalHitbox hitbox = vfx.GetComponent<UniversalHitbox>();
                 if (hitbox != null) hitbox.owner = this.gameObject;
 
+                // [BREATH DOT] Gán owner cho BreathDOT (skill 0 & 1)
+                BreathDOT dot = vfx.GetComponent<BreathDOT>();
+                if (dot != null) dot.owner = this.gameObject;
+
                 // Truyền spawnPosition cho FireBall để tính dame theo khoảng cách
                 BossHitboxData bossData = vfx.GetComponent<BossHitboxData>();
                 if (bossData != null)

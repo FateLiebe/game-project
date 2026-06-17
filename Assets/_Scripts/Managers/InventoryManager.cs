@@ -34,17 +34,18 @@ public class InventoryManager : MonoBehaviour
     {
         if (slotsParent != null) slots = slotsParent.GetComponentsInChildren<ItemSlotUI>();
 
-        if (btnUse != null) btnUse.onClick.AddListener(UseItem);
-        if (btnDrop != null) btnDrop.onClick.AddListener(DropItem);
+        if (btnUse  != null) btnUse.onClick.AddListener(() => { AudioManager.Instance?.PlayUIClick(); UseItem(); });
+        if (btnDrop != null) btnDrop.onClick.AddListener(() => { AudioManager.Instance?.PlayUIClick(); DropItem(); });
     }
 
     private void Update()
     {
-        // Lắng nghe phím Q để uống bình máu
+        // [CHẶN] Không xử lý bàn phím khi Pause/GameOver/Victory
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay)
+            return;
+
         if (Input.GetKeyDown(KeyCode.Q))
-        {
             QuickUseConsumable();
-        }
     }
 
     // ===============================================
@@ -115,44 +116,31 @@ public class InventoryManager : MonoBehaviour
         List<ItemSO> displayList = new List<ItemSO>();
         Dictionary<string, int> consumableCounts = new Dictionary<string, int>();
 
-        // Phân loại và gom nhóm
         foreach (ItemSO item in inventoryList)
         {
             if (item.itemType == ItemType.Consumable)
             {
-                if (consumableCounts.ContainsKey(item.itemName))
-                {
-                    consumableCounts[item.itemName]++;
-                }
+                if (consumableCounts.ContainsKey(item.itemID))
+                    consumableCounts[item.itemID]++;
                 else
                 {
-                    consumableCounts[item.itemName] = 1;
-                    displayList.Add(item); 
+                    consumableCounts[item.itemID] = 1;
+                    displayList.Add(item);
                 }
             }
-            else
-            {
-                displayList.Add(item);
-            }
+            else displayList.Add(item);
         }
 
-        // Đổ dữ liệu ra các ô
         for (int i = 0; i < slots.Length; i++)
         {
             if (i < displayList.Count)
             {
                 int quantity = 1;
                 if (displayList[i].itemType == ItemType.Consumable)
-                {
-                    quantity = consumableCounts[displayList[i].itemName];
-                }
-                
+                    quantity = consumableCounts[displayList[i].itemID];
                 slots[i].UpdateSlot(displayList[i], quantity);
             }
-            else 
-            {
-                slots[i].UpdateSlot(null, 0);
-            }
+            else slots[i].UpdateSlot(null, 0);
         }
 
         UpdateConsumableQuickSlot();
@@ -168,7 +156,7 @@ public class InventoryManager : MonoBehaviour
             if (item.itemType == ItemType.Consumable)
             {
                 if (firstConsumable == null) firstConsumable = item;
-                if (item.itemName == firstConsumable.itemName) count++;
+                if (item.itemID == firstConsumable.itemID) count++; // [FIX] dùng itemID
             }
         }
 
@@ -196,7 +184,9 @@ public class InventoryManager : MonoBehaviour
             if (player != null) 
             {
                 player.Heal(itemToUse.healAmount);
-                Debug.Log($"<color=green>Đã dùng {itemToUse.itemName}, hồi {itemToUse.healAmount} HP.</color>");
+                // [AUDIO] Phát âm thanh của item (nếu có), fallback sang srcSFX chung
+                if (itemToUse.useSound != null)
+                    AudioManager.Instance?.PlayDirectClip(itemToUse.useSound);
             }
             inventoryList.Remove(itemToUse);
             UpdateUI(); 
@@ -216,6 +206,9 @@ public class InventoryManager : MonoBehaviour
         if (selectedItem.itemType == ItemType.Consumable)
         {
             if (player != null) player.Heal(selectedItem.healAmount);
+            // [AUDIO] Phát âm thanh của item
+            if (selectedItem.useSound != null)
+                AudioManager.Instance?.PlayDirectClip(selectedItem.useSound);
             RemoveSelectedItem();
         }
         else 

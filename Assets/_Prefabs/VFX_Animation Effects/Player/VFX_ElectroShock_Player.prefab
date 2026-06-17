@@ -178,7 +178,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UniversalHitbox
   baseKnockback: {x: 5, y: 2}
   damageOverride: 0
-  isCriticalOverride: 0
+  isCriticalOverride: 1
   owner: {fileID: 0}
 --- !u!114 &9183280723506371547
 MonoBehaviour:
@@ -204,6 +204,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04334d066120a3648984a96d22180e3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VFX_SoundTrigger
-  directClip: {fileID: 8300000, guid: b43e6ce7165753f489b41ea510562a8e, type: 3}
+  directClip: {fileID: 8300000, guid: d3f64363f5aaf134b810b85de6d062ed, type: 3}
   skillIndex: 0
   volume: 1

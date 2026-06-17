@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: -3795321890861956049}
   - component: {fileID: 2923525627916524948}
   - component: {fileID: -1296118855697777791}
+  - component: {fileID: 4108866401615306677}
   m_Layer: 0
   m_Name: VFX_BreathFire
   m_TagString: Untagged
@@ -153,7 +154,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -2.415665, y: -2.24168}
+  m_Offset: {x: -3.025631, y: -2.24168}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.84375, y: 0.84375}
@@ -163,7 +164,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 6.331161, y: 4.926601}
+  m_Size: {x: 8.210503, y: 4.926601}
   m_EdgeRadius: 0
 --- !u!114 &-3194321505519868883
 MonoBehaviour:
@@ -172,7 +173,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8110977411408255527}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2e4c120167cbb3c42a3aef730ba2c5c6, type: 3}
   m_Name: 
@@ -223,3 +224,20 @@ MonoBehaviour:
   directClip: {fileID: 8300000, guid: 2e2b146145dd0604696cd9cd6ad3ba24, type: 3}
   skillIndex: 1
   volume: 1
+--- !u!114 &4108866401615306677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8110977411408255527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 334f84c2056f3e342b1ac434b12f0cb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BreathDOT
+  totalDuration: 1
+  damageScaleTotal: 1.5
+  tickCount: 5
+  followSpawnPoint: 1
+  owner: {fileID: 0}

@@ -24,6 +24,10 @@ public class GameData
     public float checkY;
     public float checkZ;
 
+    // ÂM THANH
+    public float audioMasterVolume = 10f; // 1-10
+    public bool  audioIsMuted      = false;
+
     public GameData()
     {
         currentHealth = 30f; currentLevel = 1; currentEXP = 0f; expToNextLevel = 30f; 

@@ -1,89 +1,117 @@
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 
 /// <summary>
 /// AudioManager — Singleton quản lý TOÀN BỘ âm thanh game.
 /// Gắn vào GameObject "AudioManager" trong scene Core_Gameplay.
-/// DontDestroyOnLoad nên sống xuyên suốt các map.
 /// </summary>
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
 
     // ============================================================
-    // AUDIO SOURCES — mỗi "kênh" là 1 AudioSource riêng biệt
+    // AUDIO SOURCES (tự động tạo)
     // ============================================================
-    [Header("Audio Sources (tự động tạo, không cần kéo thả)")]
-    private AudioSource srcAmbient;   // Phát âm thanh môi trường
-    private AudioSource srcUI;        // Âm thanh UI / hệ thống
-    private AudioSource srcSFX;       // Âm thanh player / combat ngắn
+    private AudioSource srcAmbient;
+    private AudioSource srcSFX;      // SFX player (không bị Time Stop)
+    private AudioSource srcWorld;    // SFX world / VFX (bị Time Stop)
+    private AudioSource srcUI;
+    private AudioSource srcRun;      // Riêng cho run loop
+    private AudioSource bossWingSource;
 
     // ============================================================
     // ÂM THANH MÔI TRƯỜNG
-    // Kéo 8 file .wav/.ogg vào đây trong Inspector
     // ============================================================
-    [Header("🌿 Âm Thanh Môi Trường (kéo 8 file vào)")]
-    public AudioClip[] ambientClips;   // 8 file âm thanh môi trường
+    [Header("🌿 Âm Thanh Môi Trường")]
+    public AudioClip[] ambientClips;
+    [Range(0f, 1f)] public float ambientVolume = 0.6f;
 
     // ============================================================
     // ÂM THANH PLAYER
-    // Kéo từng file vào đúng ô tương ứng
     // ============================================================
     [Header("🗡️ Âm Thanh Player")]
-    public AudioClip[] attackCombo;    // [0]=combo1, [1]=combo2, [2]=combo3
+    public AudioClip[] attackCombo;
+    [Range(0f, 1f)] public float attackVolume = 1f;
+
     public AudioClip dashClip;
-    public AudioClip fallLoopClip;     // Lặp lại khi lơ lửng > 1.5s
+    [Range(0f, 1f)] public float dashVolume = 1f;
+
+    public AudioClip fallLoopClip;
+    [Range(0f, 1f)] public float fallLoopVolume = 0.8f;
+
     public AudioClip jumpClip;
-    public AudioClip landClip;         // Âm đáp đất (sau nhảy hoặc rơi)
-    public AudioClip runClip;          // Chạy (loop)
-    public AudioClip runToIdleClip;    // Khi dừng lại từ trạng thái chạy
+    [Range(0f, 1f)] public float jumpVolume = 1f;
+
+    public AudioClip landClip;
+    [Range(0f, 1f)] public float landVolume = 1f;
+
+    public AudioClip runClip;
+    [Range(0f, 1f)] public float runVolume = 0.6f;
 
     // ============================================================
     // ÂM THANH INVENTORY
     // ============================================================
     [Header("🎒 Âm Thanh Inventory")]
-    public AudioClip inventoryOpenClip;  // Mở túi đồ
-    public AudioClip inventoryCloseClip; // Đóng túi đồ
-    public AudioClip equipClip;          // Mặc trang bị
-    public AudioClip unequipClip;        // Cởi trang bị
+    public AudioClip inventoryOpenClip;
+    [Range(0f, 1f)] public float inventoryOpenVolume = 1f;
+
+    public AudioClip inventoryCloseClip;
+    [Range(0f, 1f)] public float inventoryCloseVolume = 1f;
+
+    public AudioClip equipClip;
+    [Range(0f, 1f)] public float equipVolume = 1f;
+
+    public AudioClip unequipClip;
+    [Range(0f, 1f)] public float unequipVolume = 1f;
 
     // ============================================================
-    // ÂM THANH VFX
-    // Kéo file âm thanh của từng VFX skill (theo thứ tự skill 0-6)
+    // ÂM THANH VFX / BOSS SKILLS
     // ============================================================
     [Header("✨ Âm Thanh VFX / Boss Skills (theo thứ tự skill 0-6)")]
-    public AudioClip[] vfxClips;       // index tương ứng với skillIndex của Boss
+    public AudioClip[] vfxClips;
+    [Range(0f, 1f)] public float vfxVolume = 1f;
 
     // ============================================================
     // ÂM THANH BOSS
     // ============================================================
     [Header("👾 Âm Thanh Boss")]
-    public AudioClip bossWingFlapClip; // Vỗ cánh — phát LOOP liên tục khi boss sống
+    public AudioClip bossWingFlapClip;
+    [Range(0f, 1f)] public float bossWingVolume = 0.5f;
 
     // ============================================================
     // ÂM THANH HỆ THỐNG
     // ============================================================
     [Header("⚙️ Âm Thanh Hệ Thống")]
-    public AudioClip perfectDodgeClip; // Kích hoạt Time Stop
-    public AudioClip gameOverClip;     // Người chơi die
-    public AudioClip uiClickClip;      // Bấm nút UI
+    public AudioClip perfectDodgeClip;
+    [Range(0f, 1f)] public float perfectDodgeVolume = 1f;
+
+    public AudioClip levelUpClip;
+    [Range(0f, 1f)] public float levelUpVolume = 1f;
+
+    public AudioClip gameOverClip;
+    [Range(0f, 1f)] public float gameOverVolume = 1f;
+
+    public AudioClip uiClickClip;
+    [Range(0f, 1f)] public float uiClickVolume = 0.8f;
 
     // ============================================================
-    // CÀI ĐẶT ÂM LƯỢNG (điều khiển từ PauseScreen)
+    // CÀI ĐẶT MASTER (lưu/load từ save)
     // ============================================================
-    [Header("🔊 Cài Đặt Âm Lượng")]
-    [Range(0f, 1f)] public float masterVolume = 1f;  // Lưu nội bộ (0-1)
+    [Header("🔊 Master Volume")]
+    [Range(1f, 10f)] public float masterSliderValue = 10f; // 1-10 như UI thấy
     public bool isMuted = false;
 
     // ============================================================
     // TRẠNG THÁI NỘI BỘ
     // ============================================================
     private Coroutine ambientCycleCoroutine;
-    private AudioSource bossWingSource;    // AudioSource riêng cho boss wing (loop)
-
-    private int[] lastThreeAmbient = new int[] { -1, -1, -1 }; // Tránh trùng lặp
+    private Coroutine fallLoopCoroutine;
+    private int[] lastThreeAmbient = new int[] { -1, -1, -1 };
     private int ambientHistoryIndex = 0;
+
+    // Time Stop — pitch của srcWorld và bossWingSource bị bóp
+    private float normalPitch = 1f;
+    private bool isTimeStopActive = false;
 
     // ============================================================
     // KHỞI TẠO
@@ -96,73 +124,65 @@ public class AudioManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             CreateAudioSources();
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+        else Destroy(gameObject);
     }
 
     private void CreateAudioSources()
     {
-        // Tạo các AudioSource tự động — không cần kéo thả trong Inspector
-        srcAmbient = gameObject.AddComponent<AudioSource>();
-        srcAmbient.loop = false;
-        srcAmbient.playOnAwake = false;
+        srcAmbient = AddSrc(loop: false);
+        srcSFX     = AddSrc(loop: false);   // Player SFX — không bị Time Stop
+        srcWorld   = AddSrc(loop: false);   // World/VFX SFX — bị Time Stop
+        srcUI      = AddSrc(loop: false);
+        srcRun     = AddSrc(loop: true);    // Run loop riêng
+        bossWingSource = AddSrc(loop: true);
+    }
 
-        srcSFX = gameObject.AddComponent<AudioSource>();
-        srcSFX.loop = false;
-        srcSFX.playOnAwake = false;
-
-        srcUI = gameObject.AddComponent<AudioSource>();
-        srcUI.loop = false;
-        srcUI.playOnAwake = false;
-
-        // Boss wing cần source riêng vì nó loop độc lập
-        bossWingSource = gameObject.AddComponent<AudioSource>();
-        bossWingSource.loop = true;
-        bossWingSource.playOnAwake = false;
+    private AudioSource AddSrc(bool loop)
+    {
+        var src = gameObject.AddComponent<AudioSource>();
+        src.loop = loop;
+        src.playOnAwake = false;
+        return src;
     }
 
     // ============================================================
-    // VOLUME CONTROL — gọi từ PauseScreen
-    // Nhận value từ 1-10 (người dùng thấy), chuyển nội bộ về 0-1
+    // VOLUME CONTROL
     // ============================================================
+    public float MasterVolume => isMuted ? 0f : Mathf.Clamp(masterSliderValue, 1f, 10f) / 10f;
 
     /// <summary>Gọi từ Slider (1-10) trên PauseScreen</summary>
     public void SetVolume(float sliderValue)
     {
-        masterVolume = Mathf.Clamp(sliderValue, 1f, 10f) / 10f;
-        ApplyVolume();
+        masterSliderValue = sliderValue;
+        ApplyVolumeToContinuousSources();
     }
 
-    /// <summary>Gọi từ Toggle trên PauseScreen</summary>
+    /// <summary>Gọi từ Toggle bật/tắt trên PauseScreen</summary>
     public void SetMute(bool muted)
     {
         isMuted = muted;
-        ApplyVolume();
+        ApplyVolumeToContinuousSources();
     }
 
-    private void ApplyVolume()
+    /// Cập nhật volume cho các source đang loop liên tục
+    private void ApplyVolumeToContinuousSources()
     {
-        float vol = isMuted ? 0f : masterVolume;
-        srcAmbient.volume    = vol * 0.6f;  // Môi trường nhỏ hơn một chút
-        srcSFX.volume        = vol;
-        srcUI.volume         = vol;
-        bossWingSource.volume = vol * 0.5f;
+        float m = MasterVolume;
+        srcAmbient.volume     = m * ambientVolume;
+        srcRun.volume         = m * runVolume;
+        bossWingSource.volume = m * bossWingVolume;
     }
 
     // ============================================================
-    // ÂM THANH MÔI TRƯỜNG — chu kỳ: nghỉ → phát → nghỉ
+    // ÂM THANH MÔI TRƯỜNG
     // ============================================================
-
-    /// <summary>
-    /// Gọi khi Player chuyển map (từ GameLoader hoặc script map).
-    /// Hủy chu kỳ cũ, bắt đầu chu kỳ mới ngay lập tức.
-    /// </summary>
     public void RestartAmbientCycle()
     {
         if (ambientCycleCoroutine != null) StopCoroutine(ambientCycleCoroutine);
         srcAmbient.Stop();
+        // Reset lịch sử để tránh phát lại clip cũ
+        lastThreeAmbient = new int[] { -1, -1, -1 };
+        ambientHistoryIndex = 0;
         ambientCycleCoroutine = StartCoroutine(AmbientCycleRoutine());
     }
 
@@ -176,48 +196,33 @@ public class AudioManager : MonoBehaviour
     {
         while (true)
         {
-            // --- NGHỈ NGẪU NHIÊN (7~9 giây) ---
-            float waitTime = Random.Range(7f, 9f);
-            yield return new WaitForSeconds(waitTime);
+            // Nghỉ 7~9s — dùng WaitForSecondsRealtime để không bị ảnh hưởng timeScale
+            yield return new WaitForSecondsRealtime(Random.Range(7f, 9f));
 
-            // --- CHỌN FILE NGẪU NHIÊN (không trùng 3 lần gần nhất) ---
             if (ambientClips == null || ambientClips.Length == 0) continue;
-
             int chosen = PickAmbientClip();
             AudioClip clip = ambientClips[chosen];
             if (clip == null) continue;
 
-            // --- PHÁT ---
-            float vol = isMuted ? 0f : masterVolume * 0.6f;
-            srcAmbient.volume = vol;
+            srcAmbient.volume = MasterVolume * ambientVolume;
+            srcAmbient.pitch  = 1f; // Ambient không bị Time Stop
             srcAmbient.clip   = clip;
             srcAmbient.Play();
 
-            // --- CHỜ HẾT FILE ---
-            yield return new WaitForSeconds(clip.length);
+            // Chờ hết clip (real time)
+            yield return new WaitForSecondsRealtime(clip.length);
 
-            // --- NGHỈ LẦN 2 (7~9 giây) rồi lặp lại ---
-            waitTime = Random.Range(7f, 9f);
-            yield return new WaitForSeconds(waitTime);
+            // Nghỉ lần 2
+            yield return new WaitForSecondsRealtime(Random.Range(7f, 9f));
         }
     }
 
-    /// <summary>Chọn index clip không trùng 3 lần gần nhất</summary>
     private int PickAmbientClip()
     {
-        if (ambientClips.Length <= 3)
-            return Random.Range(0, ambientClips.Length);
-
-        int chosen;
-        int safetyLoop = 0;
-        do
-        {
-            chosen = Random.Range(0, ambientClips.Length);
-            safetyLoop++;
-        }
-        while (System.Array.IndexOf(lastThreeAmbient, chosen) >= 0 && safetyLoop < 20);
-
-        // Ghi lịch sử vòng xoay 3 lần
+        if (ambientClips.Length <= 3) return Random.Range(0, ambientClips.Length);
+        int chosen; int safe = 0;
+        do { chosen = Random.Range(0, ambientClips.Length); safe++; }
+        while (System.Array.IndexOf(lastThreeAmbient, chosen) >= 0 && safe < 20);
         lastThreeAmbient[ambientHistoryIndex % 3] = chosen;
         ambientHistoryIndex++;
         return chosen;
@@ -226,44 +231,50 @@ public class AudioManager : MonoBehaviour
     // ============================================================
     // ÂM THANH PLAYER
     // ============================================================
-
     public void PlayAttack(int comboStep)
     {
-        // comboStep: 1, 2, 3 → index 0, 1, 2
         int idx = Mathf.Clamp(comboStep - 1, 0, (attackCombo?.Length ?? 1) - 1);
-        PlaySFX(attackCombo != null && attackCombo.Length > idx ? attackCombo[idx] : null);
+        if (attackCombo != null && attackCombo.Length > idx)
+            srcSFX.PlayOneShot(attackCombo[idx], MasterVolume * attackVolume);
     }
 
-    public void PlayDash()      => PlaySFX(dashClip);
-    public void PlayJump()      => PlaySFX(jumpClip);
-    public void PlayLand()      => PlaySFX(landClip);
-    public void PlayRunToIdle() => PlaySFX(runToIdleClip);
+    public void PlayDash()  => srcSFX.PlayOneShot(dashClip,  MasterVolume * dashVolume);
+    public void PlayJump()  => srcSFX.PlayOneShot(jumpClip,  MasterVolume * jumpVolume);
+    public void PlayLand()  => srcSFX.PlayOneShot(landClip,  MasterVolume * landVolume);
 
-    // Run loop — dùng srcAmbient phụ hoặc 1 source riêng? 
-    // Để đơn giản, dùng srcSFX với PlayOneShot để không cắt combo/attack sound
-    private Coroutine fallLoopCoroutine;
+    // --- RUN LOOP ---
+    public void StartRunLoop()
+    {
+        if (runClip == null || srcRun.isPlaying) return;
+        srcRun.clip   = runClip;
+        srcRun.volume = MasterVolume * runVolume;
+        srcRun.pitch  = 1f;
+        srcRun.Play();
+    }
 
+    public void StopRunLoop()
+    {
+        if (srcRun.isPlaying) srcRun.Stop();
+    }
+
+    // --- FALL LOOP ---
     public void StartFallLoop()
     {
-        if (fallLoopCoroutine != null) return; // Đã đang phát
+        if (fallLoopCoroutine != null) return;
         fallLoopCoroutine = StartCoroutine(FallLoopRoutine());
     }
 
     public void StopFallLoop()
     {
-        if (fallLoopCoroutine != null)
-        {
-            StopCoroutine(fallLoopCoroutine);
-            fallLoopCoroutine = null;
-        }
+        if (fallLoopCoroutine != null) { StopCoroutine(fallLoopCoroutine); fallLoopCoroutine = null; }
+        // Không dừng srcSFX vì PlayOneShot không block
     }
 
     private IEnumerator FallLoopRoutine()
     {
         while (fallLoopClip != null)
         {
-            float vol = isMuted ? 0f : masterVolume;
-            srcSFX.PlayOneShot(fallLoopClip, vol);
+            srcSFX.PlayOneShot(fallLoopClip, MasterVolume * fallLoopVolume);
             yield return new WaitForSeconds(fallLoopClip.length);
         }
     }
@@ -271,44 +282,39 @@ public class AudioManager : MonoBehaviour
     // ============================================================
     // ÂM THANH INVENTORY
     // ============================================================
-    public void PlayEquip()         => PlaySFX(equipClip);
-    public void PlayUnequip()       => PlaySFX(unequipClip);
-    public void PlayInventoryOpen() => PlayUI(inventoryOpenClip);
-    public void PlayInventoryClose()=> PlayUI(inventoryCloseClip);
+    public void PlayEquip()          => srcUI.PlayOneShot(equipClip,          MasterVolume * equipVolume);
+    public void PlayUnequip()        => srcUI.PlayOneShot(unequipClip,        MasterVolume * unequipVolume);
+    public void PlayInventoryOpen()  => srcUI.PlayOneShot(inventoryOpenClip,  MasterVolume * inventoryOpenVolume);
+    public void PlayInventoryClose() => srcUI.PlayOneShot(inventoryCloseClip, MasterVolume * inventoryCloseVolume);
 
     // ============================================================
-    // ÂM THANH VFX
-    // Gọi từ VFX_SoundTrigger.cs (gắn lên từng VFX prefab)
-    // skillIndex tương ứng với BossSkillManager
+    // ÂM THANH VFX / BOSS SKILLS (bị Time Stop)
     // ============================================================
     public void PlayVFX(int skillIndex)
     {
         if (vfxClips == null || skillIndex < 0 || skillIndex >= vfxClips.Length) return;
-        PlaySFX(vfxClips[skillIndex]);
+        if (vfxClips[skillIndex] == null) return;
+        srcWorld.PlayOneShot(vfxClips[skillIndex], MasterVolume * vfxVolume);
     }
 
-    /// <summary>Phát thẳng 1 AudioClip bất kỳ — dùng cho VFX không thuộc boss skill</summary>
+    /// <summary>Phát trực tiếp 1 AudioClip bất kỳ (VFX không phải boss skill)</summary>
     public void PlayDirectClip(AudioClip clip, float volumeScale = 1f)
     {
-        if (clip == null || srcSFX == null) return;
-        float vol = isMuted ? 0f : masterVolume * volumeScale;
-        srcSFX.PlayOneShot(clip, vol);
+        if (clip == null) return;
+        srcWorld.PlayOneShot(clip, MasterVolume * volumeScale);
     }
 
     // ============================================================
-    // ÂM THANH BOSS — WING FLAP LOOP
+    // ÂM THANH BOSS
     // ============================================================
-
-    /// <summary>Gọi từ BossAudio khi boss Awake/Start</summary>
     public void StartBossWingFlap(AudioClip clip)
     {
         if (clip == null || bossWingSource == null) return;
-        bossWingSource.clip = clip;
-        bossWingSource.volume = isMuted ? 0f : masterVolume * 0.5f;
+        bossWingSource.clip   = clip;
+        bossWingSource.volume = MasterVolume * bossWingVolume;
         bossWingSource.Play();
     }
 
-    /// <summary>Gọi từ BossAudio khi boss chết</summary>
     public void StopBossWingFlap()
     {
         if (bossWingSource != null) bossWingSource.Stop();
@@ -317,27 +323,41 @@ public class AudioManager : MonoBehaviour
     // ============================================================
     // ÂM THANH HỆ THỐNG
     // ============================================================
-    public void PlayPerfectDodge() => PlayUI(perfectDodgeClip);
-    public void PlayGameOver()     => PlayUI(gameOverClip);
-    public void PlayUIClick()      => PlayUI(uiClickClip);
+    // Perfect Dodge dùng srcUI (không bị ApplyTimeStop pitch)
+    public void PlayPerfectDodge() => srcUI.PlayOneShot(perfectDodgeClip, MasterVolume * perfectDodgeVolume);
+    public void PlayLevelUp()      => srcUI.PlayOneShot(levelUpClip,      MasterVolume * levelUpVolume);
+    public void PlayGameOver()     => srcUI.PlayOneShot(gameOverClip,     MasterVolume * gameOverVolume);
+    public void PlayUIClick()      => srcUI.PlayOneShot(uiClickClip,      MasterVolume * uiClickVolume);
 
     // ============================================================
-    // HÀM NỘI BỘ TIỆN ÍCH
+    // TIME STOP — Bóp pitch của srcWorld & bossWingSource
+    // srcSFX (player) KHÔNG bị ảnh hưởng
     // ============================================================
-
-    /// <summary>Phát SFX gameplay (attack, dash, jump...)</summary>
-    private void PlaySFX(AudioClip clip)
+    public void ApplyTimeStop(float slowFactor)
     {
-        if (clip == null || srcSFX == null) return;
-        float vol = isMuted ? 0f : masterVolume;
-        srcSFX.PlayOneShot(clip, vol);
+        if (isTimeStopActive) return;
+        isTimeStopActive = true;
+        const float TIME_STOP_PITCH = 0.5f; // Luôn làm chậm 50%
+        srcWorld.pitch       = TIME_STOP_PITCH;
+        bossWingSource.pitch = TIME_STOP_PITCH;
+        srcAmbient.pitch     = TIME_STOP_PITCH;
     }
 
-    /// <summary>Phát SFX UI / hệ thống</summary>
-    private void PlayUI(AudioClip clip)
+    public void RevertTimeStop()
     {
-        if (clip == null || srcUI == null) return;
-        float vol = isMuted ? 0f : masterVolume;
-        srcUI.PlayOneShot(clip, vol);
+        isTimeStopActive     = false;
+        srcWorld.pitch       = normalPitch;
+        bossWingSource.pitch = normalPitch;
+        srcAmbient.pitch     = normalPitch;
+    }
+
+    // ============================================================
+    // SAVE / LOAD SETTINGS
+    // ============================================================
+    public void LoadSettings(float sliderValue, bool muted)
+    {
+        masterSliderValue = sliderValue;
+        isMuted = muted;
+        ApplyVolumeToContinuousSources();
     }
 }

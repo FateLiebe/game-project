@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 7175377170976055196, guid: 439b86dab256e134cbc80589d1d95452, type: 3}
   damageMultiplier: 1.5
+  skillRange: 15
   skillCooldown: 5
   maxUses: 3

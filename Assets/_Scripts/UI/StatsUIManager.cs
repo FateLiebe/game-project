@@ -32,6 +32,10 @@ public class StatsUIManager : MonoBehaviour
     [SerializeField] private Button btnAddDEF;
     [SerializeField] private Button btnAddCRIT;
 
+    // [COMBAT WARNING] anti-spam
+    private float lastCombatWarningTime = -99f;
+    private const float COMBAT_WARNING_COOLDOWN = 2f;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -39,26 +43,39 @@ public class StatsUIManager : MonoBehaviour
 
     private void Start()
     {
-        if (btnAddHP != null) btnAddHP.onClick.AddListener(() => UpgradeStat("HP"));
-        if (btnAddATK != null) btnAddATK.onClick.AddListener(() => UpgradeStat("ATK"));
-        if (btnAddDEF != null) btnAddDEF.onClick.AddListener(() => UpgradeStat("DEF"));
-        if (btnAddCRIT != null) btnAddCRIT.onClick.AddListener(() => UpgradeStat("CRIT"));
+        if (btnAddHP   != null) btnAddHP.onClick.AddListener(() => { AudioManager.Instance?.PlayUIClick(); UpgradeStat("HP"); });
+        if (btnAddATK  != null) btnAddATK.onClick.AddListener(() => { AudioManager.Instance?.PlayUIClick(); UpgradeStat("ATK"); });
+        if (btnAddDEF  != null) btnAddDEF.onClick.AddListener(() => { AudioManager.Instance?.PlayUIClick(); UpgradeStat("DEF"); });
+        if (btnAddCRIT != null) btnAddCRIT.onClick.AddListener(() => { AudioManager.Instance?.PlayUIClick(); UpgradeStat("CRIT"); });
 
         if (uiPanel != null) uiPanel.SetActive(false);
     }
 
     private void Update()
     {
+        // [CHẶN] Không xử lý input khi game đang Paused/GameOver/Victory
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay)
+            return;
+
         if (Input.GetKeyDown(KeyCode.B))
         {
-            // [LOGIC CHẶN]: Đang ngoài giao diện mà bấm B, nhưng lại đang combat -> Chặn!
             if (!IsOpen && player != null && player.IsInCombat)
             {
-                Debug.Log("<color=red>Đang trong giao tranh, không thể mở túi đồ!</color>");
-                // Gợi ý: Có thể gọi hàm DamagePopup để hiện chữ "Đang giao tranh!" trôi nổi ở đây
-                return; 
+                // [POPUP] Hiển thị cảnh báo bằng DamagePopup, chống spam 2s
+                if (Time.time - lastCombatWarningTime >= COMBAT_WARNING_COOLDOWN)
+                {
+                    lastCombatWarningTime = Time.time;
+                    if (player.damagePopupPrefab != null)
+                    {
+                        GameObject popup = Instantiate(player.damagePopupPrefab,
+                            player.transform.position + new Vector3(0, 1.8f, 0),
+                            Quaternion.identity);
+                        DamagePopup ps = popup.GetComponent<DamagePopup>();
+                        if (ps != null) ps.SetupWarning("In combat!");
+                    }
+                }
+                return;
             }
-
             ToggleUI();
         }
 

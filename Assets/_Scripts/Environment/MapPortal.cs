@@ -77,6 +77,8 @@ public class MapPortal : MonoBehaviour
             playerCtrl.ForceGroundedState();
         }
 
+        AudioManager.Instance?.RestartAmbientCycle(); // [AUDIO] Reset ambient cycle khi vào map mới
+
         //Trả lại trạng thái Gameplay bình thường
         if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.Gameplay);
         

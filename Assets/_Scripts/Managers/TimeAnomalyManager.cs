@@ -20,6 +20,7 @@ public class TimeAnomalyManager : MonoBehaviour
     {
         AudioManager.Instance?.PlayPerfectDodge(); // [AUDIO] Âm thanh Time Stop
         StopAllCoroutines(); 
+        AudioManager.Instance?.RevertTimeStop(); // Reset pitch nếu còn dư từ lần trước
         StartCoroutine(TimeStopRoutine());
     }
 
@@ -69,9 +70,11 @@ public class TimeAnomalyManager : MonoBehaviour
         }
 
         // TẬN HƯỞNG 3 GIÂY
+        AudioManager.Instance?.ApplyTimeStop(slowFactor); // [AUDIO] Bóp pitch
         yield return new WaitForSeconds(duration);
 
         // TRẢ LẠI THỜI GIAN NHƯ CŨ
+        AudioManager.Instance?.RevertTimeStop(); // [AUDIO] Trả lại pitch
         foreach (var entity in affectedEntities)
         {
             if (entity != null) entity.timeMultiplier = 1f;

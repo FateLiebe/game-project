@@ -71,6 +71,18 @@ public class UniversalHitbox : MonoBehaviour
             };
 
             targetHurtbox.TakeDamage(info);
+
+            // [LOCK TARGET] Làm mới timer nếu skill của Player chạm trúng locked target
+            if (owner != null && owner.CompareTag("Player"))
+            {
+                PlayerController pc = owner.GetComponent<PlayerController>();
+                if (pc != null)
+                {
+                    // Kiểm tra xem target bị hit có phải là locked target không
+                    BaseEntity hitEntity = targetHurtbox.GetComponentInParent<BaseEntity>();
+                    if (hitEntity != null) pc.RefreshLockTimerIfMatch(hitEntity.transform);
+                }
+            }
         }
     }
 }

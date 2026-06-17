@@ -195,6 +195,10 @@ public class BaseEntity : MonoBehaviour
             DamagePopup popupScript = popup.GetComponent<DamagePopup>();
             if (popupScript != null) popupScript.SetupLevelUp();
         }
+
+        // [AUDIO] Chỉ phát âm thanh level up cho Player
+        if (CompareTag("Player"))
+            AudioManager.Instance?.PlayLevelUp();
     }
 
     public void AllocateStatPoint(string statType)

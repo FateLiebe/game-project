@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using System.Collections; // [BẮT BUỘC]: Để chạy được Coroutine (IEnumerator)
+using System.Collections;
 
 public class UIManager : MonoBehaviour
 {
@@ -40,25 +40,37 @@ public class UIManager : MonoBehaviour
             GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
             HandleGameStateChanged(GameManager.Instance.CurrentState);
         }
+        SyncAudioUI();
     }
 
     private void OnDestroy()
     {
         if (GameManager.Instance != null)
-        {
             GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
-        }
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.GameOver)
+            if (GameManager.Instance == null) return;
+            var state = GameManager.Instance.CurrentState;
+            if (state == GameManager.GameState.GameOver) return;
+
+            // ESC trong Inventory → đóng Inventory trước, rồi vào Pause
+            if (StatsUIManager.Instance != null && StatsUIManager.Instance.IsOpen)
             {
-                GameManager.Instance.TogglePause();
+                StatsUIManager.Instance.CloseUI();
+                GameManager.Instance.ChangeState(GameManager.GameState.Paused);
+                return;
             }
+
+            GameManager.Instance.TogglePause();
         }
+
+        // [CHẶN BÀN PHÍM] Khi PauseScreen đang mở, không để các phím B/E/Q... lọt qua
+        // Các script khác nên check GameManager.CurrentState == Paused trước khi xử lý input
+        // Cách đơn giản nhất: block input trong Update của StatsUIManager (đã làm bên dưới)
     }
 
     private void HandleGameStateChanged(GameManager.GameState newState)
@@ -67,7 +79,6 @@ public class UIManager : MonoBehaviour
         if (gameOverMenu != null) gameOverMenu.SetActive(newState == GameManager.GameState.GameOver);
         if (victoryMenu != null) victoryMenu.SetActive(newState == GameManager.GameState.Victory);
 
-        // [AUDIO] Phát âm thanh game over
         if (newState == GameManager.GameState.GameOver)
             AudioManager.Instance?.PlayGameOver();
     }
@@ -78,12 +89,12 @@ public class UIManager : MonoBehaviour
     }
 
     // ==========================================
-    // CHỨC NĂNG CỦA CÁC NÚT BẤM (GẮN VÀO ONCLICK)
+    // NÚT BẤM
     // ==========================================
 
     public void ResumeGame() 
     { 
-        AudioManager.Instance?.PlayUIClick(); // [AUDIO]
+        AudioManager.Instance?.PlayUIClick();
         if (GameManager.Instance != null) GameManager.Instance.TogglePause(); 
     }
 
@@ -96,56 +107,41 @@ public class UIManager : MonoBehaviour
             SaveDataManager.Instance.SaveGameToFile();
             Debug.Log("<color=green>Đã Lưu Game thành công từ UI!</color>");
         }
-        else
-        {
-            Debug.LogError("Không thể Lưu Game: Thiếu Player hoặc InventoryManager.");
-        }
+        else Debug.LogError("Không thể Lưu Game: Thiếu Player hoặc InventoryManager.");
     }
 
-    public void SaveGame() { PerformSave(); }
+    public void SaveGame()
+    {
+        AudioManager.Instance?.PlayUIClick();
+        PerformSave();
+    }
 
     public void SaveAndExit()
     {
-        // 1. Lưu lại toàn bộ dữ liệu
+        AudioManager.Instance?.PlayUIClick();
         PerformSave();
-        
-        // 2. Mở khóa thời gian
         Time.timeScale = 1f; 
-        
-        // 3. Chốt State chuẩn bị về Menu
-        if (GameManager.Instance != null) 
-        {
-            GameManager.Instance.ChangeState(GameManager.GameState.MainMenu);
-        }
-        
-        // 4. [BẢN VÁ TRIỆT ĐỂ]: Gọi Coroutine dọn dẹp các Map (Additive) rác trước khi về Menu
+        if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.MainMenu);
         StartCoroutine(UnloadMapsAndGoToMenu());
     }
 
-    // Luồng dọn dẹp bộ nhớ an toàn
     private IEnumerator UnloadMapsAndGoToMenu()
     {
-        // Vòng lặp ngược: an toàn tuyệt đối khi xóa phần tử
         for (int i = SceneManager.sceneCount - 1; i >= 0; i--)
         {
             Scene s = SceneManager.GetSceneAt(i);
-            // Xóa sạch mọi thứ đang được nạp, ngoại trừ sườn Core_Gameplay
-            if (s.name != "Core_Gameplay" && s.isLoaded)
-            {
-                yield return SceneManager.UnloadSceneAsync(s);
-            }
+            if (s.name != "Core_Gameplay" && s.isLoaded) yield return SceneManager.UnloadSceneAsync(s);
         }
-
-        // Sau khi bộ nhớ đã sạch bóng, mới an tâm load về Main Menu
         SceneManager.LoadScene(mainMenuSceneName);
     }
 
     // ==========================================
-    // KHU VỰC LOGIC GAMEOVER & VICTORY (GIAI ĐOẠN 4)
+    // GAME OVER & VICTORY
     // ==========================================
 
     public void LoadLastSave()
     {
+        AudioManager.Instance?.PlayUIClick();
         Time.timeScale = 1f;
         if (SaveDataManager.Instance != null) SaveDataManager.Instance.LoadGameFromFile();
         GameLoader.currentLoadMode = GameLoader.LoadMode.Respawn;
@@ -154,45 +150,36 @@ public class UIManager : MonoBehaviour
 
     public void QuitToMenuWithoutSave()
     {
+        AudioManager.Instance?.PlayUIClick();
         Time.timeScale = 1f;
         if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.MainMenu);
-        StartCoroutine(UnloadMapsAndGoToMenu()); // Tái sử dụng hàm dọn dẹp đã viết ở Giai đoạn 3
+        StartCoroutine(UnloadMapsAndGoToMenu());
     }
 
     private IEnumerator CleanAndReloadGame()
     {
-        // Unload Map rác
         for (int i = SceneManager.sceneCount - 1; i >= 0; i--)
         {
             Scene s = SceneManager.GetSceneAt(i);
             if (s.name != "Core_Gameplay" && s.isLoaded) yield return SceneManager.UnloadSceneAsync(s);
         }
-        
-        // Gọi GameLoader nạp lại Map
         GameLoader loader = FindFirstObjectByType<GameLoader>();
         if (loader != null) loader.StartLoad();
     }
 
     // ==========================================
-    // KHU VỰC LOGIC ÂM THANH (PauseScreen)
-    // Kết nối Slider (1-10) và Toggle vào các hàm này
+    // AUDIO SETTINGS
     // ==========================================
-    
-    /// <summary>Gắn vào OnValueChanged của Slider âm lượng (1-10)</summary>
-    public void OnVolumeSliderChanged(float value)
-    {
-        AudioManager.Instance?.SetVolume(value);
-    }
 
-    /// <summary>Gắn vào OnValueChanged của Toggle bật/tắt âm thanh</summary>
-    public void OnAudioToggleChanged(bool isOn)
-    {
-        AudioManager.Instance?.SetMute(!isOn); // isOn=true → không mute
-    }
+    public void OnVolumeSliderChanged(float value) => AudioManager.Instance?.SetVolume(value);
+    public void OnAudioToggleChanged(bool isOn)    => AudioManager.Instance?.SetMute(!isOn);
+    public void OnUIButtonClick()                  => AudioManager.Instance?.PlayUIClick();
 
-    /// <summary>Gắn vào OnClick của bất kỳ nút UI nào</summary>
-    public void OnUIButtonClick()
+    /// <summary>Đồng bộ Slider và Toggle khớp với AudioManager. Gọi sau load save.</summary>
+    public void SyncAudioUI()
     {
-        AudioManager.Instance?.PlayUIClick();
+        if (AudioManager.Instance == null) return;
+        volumeSlider?.SetValueWithoutNotify(AudioManager.Instance.masterSliderValue);
+        audioToggle?.SetIsOnWithoutNotify(!AudioManager.Instance.isMuted);
     }
 }

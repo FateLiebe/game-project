@@ -48,7 +48,10 @@ public class GameLoader : MonoBehaviour
         if (player != null)
         {
             if (currentLoadMode != LoadMode.NewGame && SaveDataManager.Instance != null && inv != null)
+            {
                 SaveDataManager.Instance.ApplyLoadedDataToPlayer(player, inv);
+                UIManager.Instance?.SyncAudioUI(); // Đồng bộ Slider/Toggle với settings đã load
+            }
             else
             {
                 MapSpawnPoint spawnPoint = FindFirstObjectByType<MapSpawnPoint>();

@@ -77,6 +77,20 @@ public class DamagePopup : MonoBehaviour
         moveYSpeed = 1.5f; 
     }
 
+    // ==========================================
+    // 4. POPUP CẢNH BÁO (màu đỏ, chữ tự do)
+    // ==========================================
+    public void SetupWarning(string message)
+    {
+        isLevelUp = false;
+        textMesh.text = message;
+        textMesh.fontSize = 4.5f;
+        textColor = Color.red;
+        textMesh.color = textColor;
+        disappearTimer = 1.2f;
+        moveYSpeed = 1.5f;
+    }
+
     private void Update()
     {
         // Bay từ từ lên trên

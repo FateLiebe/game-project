@@ -11,11 +11,12 @@ GameObject:
   - component: {fileID: 8358251534348272181}
   - component: {fileID: 6385186201545111892}
   - component: {fileID: 2875497008190005096}
-  - component: {fileID: -1557584770919460773}
-  - component: {fileID: 6369605113434682165}
   - component: {fileID: 2496015324031983715}
+  - component: {fileID: 6369605113434682165}
+  - component: {fileID: -1557584770919460773}
   - component: {fileID: 8155773979830720677}
   - component: {fileID: -1106689183620854204}
+  - component: {fileID: 557305530220967238}
   m_Layer: 0
   m_Name: VFX_Breath
   m_TagString: Untagged
@@ -119,34 +120,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &-1557584770919460773
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5449488308164107964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa2e24f87517d4540a8daf30135f1882, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VFX_AutoDestroy
---- !u!114 &6369605113434682165
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5449488308164107964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e4c120167cbb3c42a3aef730ba2c5c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UniversalHitbox
-  baseKnockback: {x: 5, y: 2}
-  damageOverride: 0
-  isCriticalOverride: 0
-  owner: {fileID: 0}
 --- !u!61 &2496015324031983715
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -181,7 +154,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -2.4156647, y: -2.2416804}
+  m_Offset: {x: -2.979126, y: -2.1712477}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.84375, y: 0.84375}
@@ -191,8 +164,36 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 6.3311615, y: 4.926601}
+  m_Size: {x: 7.627121, y: 4.7857356}
   m_EdgeRadius: 0
+--- !u!114 &6369605113434682165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5449488308164107964}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e4c120167cbb3c42a3aef730ba2c5c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UniversalHitbox
+  baseKnockback: {x: 5, y: 2}
+  damageOverride: 0
+  isCriticalOverride: 0
+  owner: {fileID: 0}
+--- !u!114 &-1557584770919460773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5449488308164107964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa2e24f87517d4540a8daf30135f1882, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VFX_AutoDestroy
 --- !u!114 &8155773979830720677
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -223,3 +224,20 @@ MonoBehaviour:
   directClip: {fileID: 8300000, guid: 2e2b146145dd0604696cd9cd6ad3ba24, type: 3}
   skillIndex: 0
   volume: 1
+--- !u!114 &557305530220967238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5449488308164107964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 334f84c2056f3e342b1ac434b12f0cb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BreathDOT
+  totalDuration: 1
+  damageScaleTotal: 1.2
+  tickCount: 4
+  followSpawnPoint: 1
+  owner: {fileID: 0}

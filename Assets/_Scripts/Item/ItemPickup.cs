@@ -6,7 +6,11 @@ public class ItemPickup : MonoBehaviour
     public ItemSO itemData;
     private SpriteRenderer sr;
     private Collider2D col;
-    private bool canPickUp = true; // Mặc định cho phép nhặt (dành cho đồ rớt từ thùng)
+    private bool canPickUp = true;
+
+    [Tooltip("Thời gian trước khi item tự biến mất (giây). 0 = không bao giờ biến mất")]
+    public float despawnTime = 45f;
+    private const float FADE_DURATION = 5f; // Mờ dần 5s trước khi xóa
 
     private void Awake()
     {
@@ -17,6 +21,7 @@ public class ItemPickup : MonoBehaviour
     private void Start()
     {
         if (itemData != null && sr != null) sr.sprite = itemData.icon;
+        if (despawnTime > 0f) StartCoroutine(DespawnRoutine());
     }
 
     // Hàm này được gọi bởi InventoryManager khi bạn bấm nút "Vứt bỏ"
@@ -68,7 +73,6 @@ public class ItemPickup : MonoBehaviour
         if (!other.CompareTag("Player")) return;
         if (itemData == null) return;
         
-        // Guard null
         if (InventoryManager.Instance == null)
         {
             Debug.LogWarning("InventoryManager.Instance NULL khi nhặt đồ!");
@@ -77,5 +81,26 @@ public class ItemPickup : MonoBehaviour
         
         if (InventoryManager.Instance.AddItem(itemData))
             Destroy(gameObject);
+    }
+
+    private IEnumerator DespawnRoutine()
+    {
+        float waitTime = Mathf.Max(0f, despawnTime - FADE_DURATION);
+        yield return new WaitForSeconds(waitTime);
+
+        // Mờ dần
+        float elapsed = 0f;
+        Color c = sr != null ? sr.color : Color.white;
+        while (elapsed < FADE_DURATION)
+        {
+            elapsed += Time.deltaTime;
+            if (sr != null)
+            {
+                c.a = 1f - (elapsed / FADE_DURATION);
+                sr.color = c;
+            }
+            yield return null;
+        }
+        Destroy(gameObject);
     }
 }

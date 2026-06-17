@@ -54,6 +54,15 @@ public class PlayerController : BaseEntity
     public int currentSupportSkillUses = 0; // Số lần dùng còn lại
     private bool isSupportSkillInitialized = false;
     
+    // [LOCK TARGET] Enemy được khóa mục tiêu trong 45s
+    private Transform lockedTarget;
+    private float lockedTargetTimer = 0f;
+    private const float LOCK_DURATION = 45f;
+
+    // [COMBAT POPUP] chống spam
+    private float lastCombatWarningTime = -99f;
+    private const float COMBAT_WARNING_COOLDOWN = 2f;
+    
     private Animator anim;
     private Rigidbody2D rb;
     private PlayerAudio playerAudio; // [AUDIO]
@@ -119,12 +128,15 @@ public class PlayerController : BaseEntity
             UIManager.Instance.UpdateDodgeCD(perfectDodgeTimer, perfectDodgeCooldown);
         }
 
+        // Chặn input khi inventory mở — nhưng vẫn cho B được xử lý bởi StatsUIManager
         if (StatsUIManager.Instance != null && StatsUIManager.Instance.IsOpen)
         {
             horizontalInput = 0; 
             verticalInput = 0;
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y); 
             UpdateAnimations(); 
+            // [LOCK TARGET] tiếp tục đếm thời gian
+            UpdateLockedTarget();
             return; 
         }
 
@@ -869,6 +881,9 @@ public class PlayerController : BaseEntity
     {
         if (equippedSupportSkill == null) return;
 
+        // 0. Cập nhật lock target mỗi frame (đếm ngược timer, kiểm tra còn sống/tầm bắn)
+        UpdateLockedTarget();
+
         // 1. Nạp số lượng đạn khi mới lắp bùa vào
         if (!isSupportSkillInitialized)
         {
@@ -877,46 +892,78 @@ public class PlayerController : BaseEntity
         }
 
         // 2. Trừ thời gian hồi chiêu
-        if (supportSkillCDTimer > 0)
-        {
-            supportSkillCDTimer -= Time.deltaTime;
-        }
+        if (supportSkillCDTimer > 0) supportSkillCDTimer -= Time.deltaTime;
 
         // 3. Cập nhật UI liên tục
         if (SupportSkillUI.Instance != null)
-        {
             SupportSkillUI.Instance.UpdateUI(equippedSupportSkill, supportSkillCDTimer, currentSupportSkillUses);
-        }
 
         // 4. Lắng nghe phím E để xuất chiêu
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            UseSupportSkill();
-        }
+        if (Input.GetKeyDown(KeyCode.E)) UseSupportSkill();
+    }
+
+    // ==========================================
+    // LOCK TARGET
+    // ==========================================
+    private void UpdateLockedTarget()
+    {
+        if (lockedTarget == null) return;
+        lockedTargetTimer -= Time.deltaTime;
+        if (lockedTargetTimer <= 0f) { lockedTarget = null; return; }
+
+        BaseEntity e = lockedTarget.GetComponentInParent<BaseEntity>();
+        if (e == null || e.currentHealth <= 0) { lockedTarget = null; return; }
+
+        // Hủy nếu ngoài tầm bắn
+        float maxRange = (equippedSupportSkill != null && equippedSupportSkill.skillRange > 0f)
+                         ? equippedSupportSkill.skillRange : 15f;
+        if (Vector2.Distance(transform.position, lockedTarget.position) > maxRange)
+            lockedTarget = null;
+    }
+
+    /// <summary>Gọi từ UniversalHitbox khi skill chạm trúng — làm mới timer nếu đúng locked target.</summary>
+    public void RefreshLockTimerIfMatch(Transform hitTransform)
+    {
+        if (lockedTarget == null || hitTransform == null) return;
+        // So sánh root transform để tránh nhầm child collider
+        if (hitTransform.root == lockedTarget.root || hitTransform == lockedTarget)
+            lockedTargetTimer = LOCK_DURATION;
+    }
+
+    // Backward compat — giữ nguyên để không phá code cũ
+    public void RefreshLockTimer()
+    {
+        if (lockedTarget != null) lockedTargetTimer = LOCK_DURATION;
     }
 
     private Transform FindNearestEnemy(float radius)
     {
+        // Nếu đang có locked target hợp lệ → dùng nó (kể cả quay hướng khác)
+        UpdateLockedTarget();
+        if (lockedTarget != null) return lockedTarget;
+
+        float facingDir = transform.localScale.x >= 0 ? 1f : -1f;
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
         Transform nearest = null;
         float minDist = Mathf.Infinity;
 
         foreach (var hit in hits)
         {
-            if (hit.transform.root == this.transform) continue; // Bỏ qua bản thân
+            if (hit.transform.root == this.transform) continue;
+            if (hit.GetComponentInParent<BreakableCrate>() != null) continue; // Bỏ qua Crate
 
             BaseEntity enemy = hit.GetComponentInParent<BaseEntity>();
-            // Kiểm tra xem có phải là Quái và còn sống không
-            if (enemy != null && enemy.currentHealth > 0 && enemy.CompareTag("Enemy"))
-            {
-                float dist = Vector2.Distance(transform.position, enemy.transform.position);
-                if (dist < minDist)
-                {
-                    minDist = dist;
-                    nearest = enemy.transform;
-                }
-            }
+            if (enemy == null || enemy.currentHealth <= 0 || !enemy.CompareTag("Enemy")) continue;
+
+            // Chỉ chọn enemy cùng hướng mặt
+            float dx = enemy.transform.position.x - transform.position.x;
+            if (Mathf.Sign(dx) != facingDir && Mathf.Abs(dx) > 0.5f) continue;
+
+            float dist = Vector2.Distance(transform.position, enemy.transform.position);
+            if (dist < minDist) { minDist = dist; nearest = enemy.transform; }
         }
+
+        if (nearest != null) { lockedTarget = nearest; lockedTargetTimer = LOCK_DURATION; }
         return nearest;
     }
 

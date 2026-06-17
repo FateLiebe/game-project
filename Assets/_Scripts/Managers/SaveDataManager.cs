@@ -83,6 +83,13 @@ public class SaveDataManager : MonoBehaviour
                 else currentData.inventoryItems.Add(new InventorySlotData(item.itemID, 1));
             }
         }
+
+        // Lưu cài đặt âm thanh
+        if (AudioManager.Instance != null)
+        {
+            currentData.audioMasterVolume = AudioManager.Instance.masterSliderValue;
+            currentData.audioIsMuted      = AudioManager.Instance.isMuted;
+        }
     }
 
     // Dành riêng cho việc chạm vào Trạm Lưu (Auto-Save)
@@ -98,8 +105,8 @@ public class SaveDataManager : MonoBehaviour
         currentData.posY = cpTransform.position.y;
         currentData.posZ = cpTransform.position.z;
 
-        // 3. Ghi chốt tọa độ "Hồi Sinh" (Để chết thì luôn về Trạm)
-        currentData.checkSceneName = currentData.currentSceneName;
+        // 3. Luôn ghi chốt tọa độ "Hồi Sinh" = trạm vừa chạm (trạm cuối cùng gặp)
+        currentData.checkSceneName = currentData.currentSceneName; // Scene hiện tại
         currentData.checkX = cpTransform.position.x;
         currentData.checkY = cpTransform.position.y;
         currentData.checkZ = cpTransform.position.z;
@@ -158,6 +165,13 @@ public class SaveDataManager : MonoBehaviour
             if (item != null) for (int i = 0; i < slotData.quantity; i++) inv.inventoryList.Add(item);
         }
         inv.UpdateUI(); 
+
+        // Nạp cài đặt âm thanh và đồng bộ UI
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.LoadSettings(currentData.audioMasterVolume, currentData.audioIsMuted);
+            UIManager.Instance?.SyncAudioUI(); // Cập nhật Slider/Toggle trên PauseScreen
+        }
 
         // ==========================================
         // PHÂN LUỒNG TỌA ĐỘ BẮT ĐẦU

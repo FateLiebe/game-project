@@ -45,6 +45,8 @@ public class ItemSO : ScriptableObject
 
     [Header("Giá trị sử dụng (Dành cho đồ tiêu hao)")]
     public int healAmount;
+    [Tooltip("Âm thanh phát khi dùng vật phẩm này (kéo thả AudioClip vào đây)")]
+    public AudioClip useSound;
 
     [Header("--- SUPPORT SKILL SETTINGS (Dành cho Bùa) ---")]
     [Tooltip("Prefab VFX/Đạn bắn ra (Bắt buộc phải gắn UniversalHitbox)")]
@@ -53,6 +55,9 @@ public class ItemSO : ScriptableObject
     [Tooltip("Hệ số sát thương (VD: 1.5 = 150% ATK của Player)")]
     public float damageMultiplier = 1.5f;
         
+    [Tooltip("Tầm bắn tối đa (0 = dùng mặc định 15). Enemy ngoài tầm sẽ bị hủy khóa mục tiêu")]
+    public float skillRange = 0f;
+
     [Tooltip("Thời gian hồi chiêu (Giây)")]
     public float skillCooldown = 5f;
         
