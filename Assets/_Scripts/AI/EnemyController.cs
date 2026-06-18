@@ -70,8 +70,9 @@ public class EnemyController : EnemyBase
 
     protected override void Start()
     {
-        base.Start(); // Sets Kinematic + gravity=0
-        anim = GetComponent<Animator>();
+        base.Start();
+        if (anim == null) anim = GetComponent<Animator>();
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
 
         if (rank == EnemyRank.Elite && eliteOutlineMaterial != null && sr != null)
             sr.material = eliteOutlineMaterial;
@@ -91,6 +92,30 @@ public class EnemyController : EnemyBase
         UpdateFacingVisual();
         SwitchState(EnemyState.Patrol);
         _prevPosition = rb.position;
+    }
+
+    protected virtual void OnEnable()
+    {
+        // Reset state for pooling
+        if (anim != null)
+        {
+            anim.Rebind();
+            anim.Update(0f);
+        }
+        
+        SwitchState(EnemyState.Idle);
+        canAction = true;
+        isAttackVFXAllowed = false;
+        playerTarget = null;
+        
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null) col.enabled = true;
+
+        if (rb != null)
+        {
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.linearVelocity = Vector2.zero;
+        }
     }
 
     protected override void Update()
@@ -317,7 +342,9 @@ public class EnemyController : EnemyBase
     {
         if (!isAttackVFXAllowed || meleeVFXPrefab == null) return;
         Vector3 spawnPos = meleeSpawnPoint != null ? meleeSpawnPoint.transform.position : transform.position;
-        GameObject vfx = Instantiate(meleeVFXPrefab, spawnPos, Quaternion.identity);
+        GameObject vfx;
+        if (ObjectPoolManager.Instance != null) vfx = ObjectPoolManager.Instance.Get(meleeVFXPrefab, spawnPos, Quaternion.identity);
+        else vfx = Instantiate(meleeVFXPrefab, spawnPos, Quaternion.identity);
 
         float finalFacing = isVfxFacingLeftDefault ? -facingDir : facingDir;
         Vector3 vfxScale  = vfx.transform.localScale;
@@ -332,7 +359,9 @@ public class EnemyController : EnemyBase
     {
         if (!isAttackVFXAllowed || rangedProjectilePrefab == null || playerTarget == null) return;
         Vector3 spawnPos = rangedSpawnPoint != null ? rangedSpawnPoint.transform.position : transform.position;
-        GameObject vfx   = Instantiate(rangedProjectilePrefab, spawnPos, Quaternion.identity);
+        GameObject vfx;
+        if (ObjectPoolManager.Instance != null) vfx = ObjectPoolManager.Instance.Get(rangedProjectilePrefab, spawnPos, Quaternion.identity);
+        else vfx = Instantiate(rangedProjectilePrefab, spawnPos, Quaternion.identity);
 
         Projectile proj  = vfx.GetComponent<Projectile>();
         if (proj != null) proj.SetTarget(playerTarget);
@@ -407,7 +436,14 @@ public class EnemyController : EnemyBase
     private IEnumerator DeathRoutine()
     {
         yield return new WaitForSeconds(0.833f);
-        Destroy(gameObject);
+        ReturnOrDestroy();
+    }
+
+    private void ReturnOrDestroy()
+    {
+        PooledObject po = GetComponent<PooledObject>();
+        if (po != null) po.ReturnToPool();
+        else Destroy(gameObject);
     }
 
     #endregion

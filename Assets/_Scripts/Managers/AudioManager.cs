@@ -145,6 +145,23 @@ public class AudioManager : MonoBehaviour
         return src;
     }
 
+    private void OnEnable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        if (srcRun != null) srcRun.Stop();
+        if (bossWingSource != null) bossWingSource.Stop();
+        if (srcAmbient != null) srcAmbient.Stop();
+    }
+
     // ============================================================
     // VOLUME CONTROL
     // ============================================================

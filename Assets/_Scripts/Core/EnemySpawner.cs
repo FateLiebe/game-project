@@ -194,7 +194,11 @@ public class EnemySpawner : MonoBehaviour
             randomPrefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
         if (randomPrefab == null) return;
 
-        GameObject newEnemy = Instantiate(randomPrefab, selectedNode.position, Quaternion.identity, transform);
+        GameObject newEnemy;
+        if (ObjectPoolManager.Instance != null)
+            newEnemy = ObjectPoolManager.Instance.Get(randomPrefab, selectedNode.position, Quaternion.identity);
+        else
+            newEnemy = Instantiate(randomPrefab, selectedNode.position, Quaternion.identity, transform);
         
         BaseEntity enemyStats = newEnemy.GetComponent<BaseEntity>();
         if (enemyStats != null) enemyStats.SetLevel(level);

@@ -209,4 +209,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04334d066120a3648984a96d22180e3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VFX_SoundTrigger
+  directClip: {fileID: 8300000, guid: 2d617407cc24b8f439774de656fa77b9, type: 3}
   skillIndex: 1
+  volume: 1

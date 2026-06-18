@@ -39,8 +39,13 @@ public class AuraEffect : MonoBehaviour
     {
         if (ownerEntity == null)
         {
-            Destroy(gameObject);
+            ReturnOrDestroy();
         }
+    }
+
+    private void OnDisable()
+    {
+        ownerEntity = null;
     }
 
     private void RemoveAura()
@@ -52,6 +57,13 @@ public class AuraEffect : MonoBehaviour
             ownerEntity.buffDefense -= activeDefenseBuff;
             ownerEntity.currentShield = 0;
         }
-        Destroy(gameObject);
+        ReturnOrDestroy();
+    }
+
+    private void ReturnOrDestroy()
+    {
+        PooledObject po = GetComponent<PooledObject>();
+        if (po != null) po.ReturnToPool();
+        else Destroy(gameObject);
     }
 }

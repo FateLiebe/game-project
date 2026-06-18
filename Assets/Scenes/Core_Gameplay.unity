@@ -20188,7 +20188,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: d3f64363f5aaf134b810b85de6d062ed, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 8300000, guid: 2d617407cc24b8f439774de656fa77b9, type: 3}
   vfxVolume: 1
   bossWingFlapClip: {fileID: 8300000, guid: 977aefcaea481244fbff4d56dc0e1fbd, type: 3}
   bossWingVolume: 1

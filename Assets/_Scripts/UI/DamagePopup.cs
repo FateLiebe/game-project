@@ -19,6 +19,16 @@ public class DamagePopup : MonoBehaviour
         textMesh = GetComponent<TextMeshPro>();
     }
 
+    // Reset state khi được lấy từ pool (SetActive true)
+    private void OnEnable()
+    {
+        moveYSpeed      = 2f;
+        isLevelUp       = false;
+        disappearTimer  = 0f;
+        colorYellow.a   = 1f;
+        colorOrange.a   = 1f;
+    }
+
     // ==========================================
     // 1. CÀI ĐẶT POPUP SÁT THƯƠNG
     // ==========================================
@@ -111,7 +121,7 @@ public class DamagePopup : MonoBehaviour
             {
                 textColor.a -= disappearSpeed * Time.deltaTime;
                 textMesh.color = textColor;
-                if (textColor.a < 0) Destroy(gameObject);
+                if (textColor.a < 0) ReturnOrDestroy();
             }
             else
             {
@@ -123,8 +133,16 @@ public class DamagePopup : MonoBehaviour
                 currentColor.a = colorYellow.a;
                 textMesh.color = currentColor;
                 
-                if (colorYellow.a < 0) Destroy(gameObject);
+                if (colorYellow.a < 0) ReturnOrDestroy();
             }
         }
+    }
+
+    /// <summary>Trả về pool nếu được tạo qua ObjectPoolManager, ngược lại thì Destroy.</summary>
+    private void ReturnOrDestroy()
+    {
+        PooledObject po = GetComponent<PooledObject>();
+        if (po != null) po.ReturnToPool();
+        else Destroy(gameObject);
     }
 }

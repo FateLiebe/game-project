@@ -42,17 +42,15 @@ public class BreathDOT : MonoBehaviour
         box.enabled   = false; // Tắt collider vật lý — BreathDOT tự check thủ công
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        // Lấy mouthSpawnPoint từ boss
-        if (followSpawnPoint && owner != null)
-        {
-            BossSkillManager bsm = owner.GetComponent<BossSkillManager>();
-            if (bsm != null && bsm.mouthSpawnPoint != null)
-                spawnTransform = bsm.mouthSpawnPoint;
-        }
-
         StartCoroutine(DOTRoutine());
+    }
+
+    private void OnDisable()
+    {
+        owner = null;
+        spawnTransform = null;
     }
 
     private void Update()
@@ -63,6 +61,15 @@ public class BreathDOT : MonoBehaviour
 
     private IEnumerator DOTRoutine()
     {
+        yield return null; // Chờ 1 frame để BossSkillManager gán owner
+        
+        if (followSpawnPoint && owner != null)
+        {
+            BossSkillManager bsm = owner.GetComponent<BossSkillManager>();
+            if (bsm != null && bsm.mouthSpawnPoint != null)
+                spawnTransform = bsm.mouthSpawnPoint;
+        }
+
         if (tickCount <= 0) tickCount = 1;
         float interval      = totalDuration / tickCount;
         float damagePerTick = GetBaseDamage() * damageScaleTotal / tickCount;
@@ -73,7 +80,7 @@ public class BreathDOT : MonoBehaviour
             DealDamageInBox(damagePerTick);
         }
 
-        Destroy(gameObject);
+        ReturnOrDestroy();
     }
 
     private float GetBaseDamage()
@@ -118,5 +125,12 @@ public class BreathDOT : MonoBehaviour
         Gizmos.color = new Color(1f, 0.4f, 0f, 0.35f);
         Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, transform.lossyScale);
         Gizmos.DrawWireCube(box.offset, box.size);
+    }
+
+    private void ReturnOrDestroy()
+    {
+        PooledObject po = GetComponent<PooledObject>();
+        if (po != null) po.ReturnToPool();
+        else Destroy(gameObject);
     }
 }

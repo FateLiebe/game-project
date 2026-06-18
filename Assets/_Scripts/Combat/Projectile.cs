@@ -22,10 +22,25 @@ public class Projectile : MonoBehaviour
         target = customTarget;
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        Destroy(gameObject, lifeTime);
+        timer = 0f;
+        hasHit = false;
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null) col.enabled = true;
         hitbox = GetComponent<UniversalHitbox>();
+        
+        StartCoroutine(InitAndLifeTimeRoutine());
+    }
+
+    private void OnDisable()
+    {
+        target = null;
+    }
+
+    private System.Collections.IEnumerator InitAndLifeTimeRoutine()
+    {
+        yield return null; // Chờ 1 frame để SetTarget() kịp chạy nếu được gọi ngay sau khi Get() từ pool
 
         if (target == null)
         {
@@ -47,6 +62,9 @@ public class Projectile : MonoBehaviour
             // Không có target: bay theo hướng rotation hiện tại của prefab
             currentDirection = transform.right;
         }
+
+        yield return new WaitForSeconds(lifeTime);
+        ReturnOrDestroy();
     }
 
     private void Update()
@@ -82,6 +100,19 @@ public class Projectile : MonoBehaviour
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.enabled = false;
 
-        Destroy(gameObject, 0.05f);
+        StartCoroutine(HitDelayRoutine());
+    }
+
+    private System.Collections.IEnumerator HitDelayRoutine()
+    {
+        yield return new WaitForSeconds(0.05f);
+        ReturnOrDestroy();
+    }
+
+    private void ReturnOrDestroy()
+    {
+        PooledObject po = GetComponent<PooledObject>();
+        if (po != null) po.ReturnToPool();
+        else Destroy(gameObject);
     }
 }

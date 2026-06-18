@@ -68,7 +68,9 @@ public class BossSkillManager : MonoBehaviour
                 }
             }
 
-            GameObject vfx = Instantiate(vfxToSpawn, finalSpawnPos, Quaternion.identity);
+            GameObject vfx;
+            if (ObjectPoolManager.Instance != null) vfx = ObjectPoolManager.Instance.Get(vfxToSpawn, finalSpawnPos, Quaternion.identity);
+            else vfx = Instantiate(vfxToSpawn, finalSpawnPos, Quaternion.identity);
 
             // XỬ LÝ LẬT ẢNH CHO ĐÒN ĐÁNH TĨNH VÀ KHÔNG PHẢI SÉT
             if (!isAura && !isProjectile && !spawnAtPlayer)

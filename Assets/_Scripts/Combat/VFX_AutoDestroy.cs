@@ -2,18 +2,23 @@ using UnityEngine;
 
 public class VFX_AutoDestroy : MonoBehaviour
 {
-    private void Start()
+    private void OnEnable()
     {
         Animator anim = GetComponent<Animator>();
+        float delay = 1f;
         if (anim != null)
         {
-            // Tự động đọc xem Animation dài bao nhiêu giây và hẹn giờ tự hủy
             AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
-            Destroy(gameObject, stateInfo.length);
+            delay = stateInfo.length > 0 ? stateInfo.length : 1f;
         }
-        else
-        {
-            Destroy(gameObject, 1f); 
-        }
+        StartCoroutine(AutoDestroyRoutine(delay));
+    }
+
+    private System.Collections.IEnumerator AutoDestroyRoutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        PooledObject po = GetComponent<PooledObject>();
+        if (po != null) po.ReturnToPool();
+        else Destroy(gameObject);
     }
 }

@@ -67,9 +67,11 @@ public class StatsUIManager : MonoBehaviour
                     lastCombatWarningTime = Time.time;
                     if (player.damagePopupPrefab != null)
                     {
-                        GameObject popup = Instantiate(player.damagePopupPrefab,
-                            player.transform.position + new Vector3(0, 1.8f, 0),
-                            Quaternion.identity);
+                        GameObject popup;
+                        if (ObjectPoolManager.Instance != null)
+                            popup = ObjectPoolManager.Instance.Get(player.damagePopupPrefab, player.transform.position + new Vector3(0, 1.8f, 0), Quaternion.identity);
+                        else
+                            popup = Instantiate(player.damagePopupPrefab, player.transform.position + new Vector3(0, 1.8f, 0), Quaternion.identity);
                         DamagePopup ps = popup.GetComponent<DamagePopup>();
                         if (ps != null) ps.SetupWarning("In combat!");
                     }

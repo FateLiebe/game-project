@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// [PHASE 3] Subscribe vào PlayerController.OnSupportSkillUpdated thay vì bị gọi trực tiếp.
+/// </summary>
 public class SupportSkillUI : MonoBehaviour
 {
     public static SupportSkillUI Instance;
@@ -10,35 +13,47 @@ public class SupportSkillUI : MonoBehaviour
     public Image cdOverlay;
     public TextMeshProUGUI usesText;
 
-    private void Awake() 
-    { 
-        Instance = this; 
-        
-        // Khởi đầu luôn tự động ẩn UI đi
-        UpdateUI(null, 0, 0);
+    private void Awake()
+    {
+        Instance = this;
+        // Ẩn UI ban đầu
+        SetVisible(false);
+    }
+
+    private void Start()
+    {
+        // Subscribe vào event của Player
+        if (PlayerController.Instance != null)
+            PlayerController.Instance.OnSupportSkillUpdated += UpdateUI;
+        else
+            // Trường hợp PlayerController chưa tồn tại khi Start (rare) — fallback
+            Debug.LogWarning("[SupportSkillUI] PlayerController.Instance is null on Start.");
+    }
+
+    private void OnDestroy()
+    {
+        if (PlayerController.Instance != null)
+            PlayerController.Instance.OnSupportSkillUpdated -= UpdateUI;
     }
 
     public void UpdateUI(ItemSO skill, float currentCD, int usesLeft)
     {
-        // Ẩn các thành phần bên trong thay vì tắt luôn object cha
         if (skill == null || usesLeft <= 0)
         {
-            if (iconImage != null) iconImage.gameObject.SetActive(false);
-            if (cdOverlay != null) cdOverlay.gameObject.SetActive(false);
-            if (usesText != null) usesText.gameObject.SetActive(false);
+            SetVisible(false);
             return;
         }
 
-        // Hiện nội dung khi có bùa
-        if (iconImage != null) iconImage.gameObject.SetActive(true);
-        if (cdOverlay != null) cdOverlay.gameObject.SetActive(true);
-        if (usesText != null) usesText.gameObject.SetActive(true);
-
-        iconImage.sprite = skill.icon; 
-
-        if (currentCD > 0) cdOverlay.fillAmount = currentCD / skill.skillCooldown;
-        else cdOverlay.fillAmount = 0;
-
+        SetVisible(true);
+        iconImage.sprite = skill.icon;
+        cdOverlay.fillAmount = currentCD > 0 ? currentCD / skill.skillCooldown : 0f;
         usesText.text = usesLeft.ToString();
+    }
+
+    private void SetVisible(bool visible)
+    {
+        if (iconImage  != null) iconImage.gameObject.SetActive(visible);
+        if (cdOverlay  != null) cdOverlay.gameObject.SetActive(visible);
+        if (usesText   != null) usesText.gameObject.SetActive(visible);
     }
 }

@@ -41,12 +41,20 @@ public class UIManager : MonoBehaviour
             HandleGameStateChanged(GameManager.Instance.CurrentState);
         }
         SyncAudioUI();
+
+        // [PHASE 3] Subscribe vào event Player — không cần Player gọi UIManager trực tiếp nữa
+        if (PlayerController.Instance != null)
+            PlayerController.Instance.OnDodgeCooldownChanged += UpdateDodgeCD;
     }
 
     private void OnDestroy()
     {
         if (GameManager.Instance != null)
             GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+
+        // [PHASE 3] Unsubscribe để tránh memory leak
+        if (PlayerController.Instance != null)
+            PlayerController.Instance.OnDodgeCooldownChanged -= UpdateDodgeCD;
     }
 
     private void Update()
@@ -83,9 +91,11 @@ public class UIManager : MonoBehaviour
             AudioManager.Instance?.PlayGameOver();
     }
 
-    public void UpdateDodgeCD(float currentTimer, float maxCooldown)
+    // [PHASE 3] Handler nhận tín hiệu từ Player event — private, không còn cần public
+    private void UpdateDodgeCD(float currentTimer, float maxCooldown)
     {
-        if (perfectDodgeCDBorder != null) perfectDodgeCDBorder.fillAmount = currentTimer / maxCooldown;
+        if (perfectDodgeCDBorder != null)
+            perfectDodgeCDBorder.fillAmount = currentTimer / maxCooldown;
     }
 
     // ==========================================

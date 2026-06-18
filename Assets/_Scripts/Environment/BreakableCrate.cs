@@ -109,9 +109,18 @@ public class BreakableCrate : BaseEntity
             // Bước 4: Random đều trong danh sách đã lọc
             ItemSO selected = candidates[Random.Range(0, candidates.Count)];
 
-            // Bước 5: Spawn
+            // Bước 5: Spawn qua Object Pool
             Vector3 spawnPos = transform.position + new Vector3(Random.Range(-0.3f, 0.3f), 0f, 0f);
-            GameObject loot = Instantiate(droppedItemPrefab, spawnPos, Quaternion.identity);
+            
+            GameObject loot;
+            if (ObjectPoolManager.Instance != null)
+            {
+                loot = ObjectPoolManager.Instance.Get(droppedItemPrefab, spawnPos, Quaternion.identity);
+            }
+            else
+            {
+                loot = Instantiate(droppedItemPrefab, spawnPos, Quaternion.identity);
+            }
 
             Rigidbody2D rb = loot.GetComponent<Rigidbody2D>();
             if (rb != null)

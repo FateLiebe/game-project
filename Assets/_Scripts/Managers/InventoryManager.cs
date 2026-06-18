@@ -310,7 +310,9 @@ public class InventoryManager : MonoBehaviour
         if (droppedItemPrefab == null || player == null) return;
 
         Vector3 dropOffset = new Vector3(player.transform.localScale.x > 0 ? 1f : -1f, 0.5f, 0);
-        GameObject loot = Instantiate(droppedItemPrefab, player.transform.position + dropOffset, Quaternion.identity);
+        GameObject loot;
+        if (ObjectPoolManager.Instance != null) loot = ObjectPoolManager.Instance.Get(droppedItemPrefab, player.transform.position + dropOffset, Quaternion.identity);
+        else loot = Instantiate(droppedItemPrefab, player.transform.position + dropOffset, Quaternion.identity);
         
         ItemPickup pickup = loot.GetComponent<ItemPickup>();
         if (pickup != null) pickup.Setup(selectedItem, true);

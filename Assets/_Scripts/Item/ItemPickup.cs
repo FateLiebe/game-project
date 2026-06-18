@@ -18,9 +18,10 @@ public class ItemPickup : MonoBehaviour
         col = GetComponent<Collider2D>();
     }
 
-    private void Start()
+    private void OnEnable()
     {
         if (itemData != null && sr != null) sr.sprite = itemData.icon;
+        if (sr != null) sr.color = Color.white; // Reset màu nếu tái sử dụng
         if (despawnTime > 0f) StartCoroutine(DespawnRoutine());
     }
 
@@ -80,7 +81,7 @@ public class ItemPickup : MonoBehaviour
         }
         
         if (InventoryManager.Instance.AddItem(itemData))
-            Destroy(gameObject);
+            ReturnOrDestroy();
     }
 
     private IEnumerator DespawnRoutine()
@@ -101,6 +102,14 @@ public class ItemPickup : MonoBehaviour
             }
             yield return null;
         }
-        Destroy(gameObject);
+        ReturnOrDestroy();
+    }
+
+    /// <summary>Trả về pool nếu được tạo qua ObjectPoolManager, ngược lại thì Destroy.</summary>
+    private void ReturnOrDestroy()
+    {
+        PooledObject po = GetComponent<PooledObject>();
+        if (po != null) po.ReturnToPool();
+        else Destroy(gameObject);
     }
 }

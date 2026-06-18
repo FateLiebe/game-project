@@ -62,6 +62,14 @@ public class BaseEntity : MonoBehaviour
         InitializeStats();
     }
 
+    protected virtual void OnEnable()
+    {
+        currentHealth = MaxHealth;
+        currentShield = 0;
+        buffAttack = 0;
+        buffDefense = 0;
+    }
+
     public virtual void ApplyDamage(DamageInfo info)
     {
         // [FIX #4]: Chặn đứng mọi sát thương/EXP cộng dồn nếu đã chết
@@ -99,7 +107,9 @@ public class BaseEntity : MonoBehaviour
         
         if (damagePopupPrefab != null)
         {
-            GameObject popup = Instantiate(damagePopupPrefab, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
+            GameObject popup;
+            if (ObjectPoolManager.Instance != null) popup = ObjectPoolManager.Instance.Get(damagePopupPrefab, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
+            else popup = Instantiate(damagePopupPrefab, transform.position + new Vector3(0, 1f, 0), Quaternion.identity);
             DamagePopup popupScript = popup.GetComponent<DamagePopup>();
             if (popupScript != null) 
             {
@@ -159,7 +169,9 @@ public class BaseEntity : MonoBehaviour
 
         if (damagePopupPrefab != null)
         {
-            GameObject popup = Instantiate(damagePopupPrefab, transform.position + new Vector3(0.5f, 1f, 0), Quaternion.identity);
+            GameObject popup;
+            if (ObjectPoolManager.Instance != null) popup = ObjectPoolManager.Instance.Get(damagePopupPrefab, transform.position + new Vector3(0.5f, 1f, 0), Quaternion.identity);
+            else popup = Instantiate(damagePopupPrefab, transform.position + new Vector3(0.5f, 1f, 0), Quaternion.identity);
             DamagePopup popupScript = popup.GetComponent<DamagePopup>();
             if (popupScript != null) popupScript.SetupEXP(amount);
         }
@@ -191,7 +203,9 @@ public class BaseEntity : MonoBehaviour
 
         if (damagePopupPrefab != null)
         {
-            GameObject popup = Instantiate(damagePopupPrefab, transform.position + new Vector3(0, 1.5f, 0), Quaternion.identity);
+            GameObject popup;
+            if (ObjectPoolManager.Instance != null) popup = ObjectPoolManager.Instance.Get(damagePopupPrefab, transform.position + new Vector3(0, 1.5f, 0), Quaternion.identity);
+            else popup = Instantiate(damagePopupPrefab, transform.position + new Vector3(0, 1.5f, 0), Quaternion.identity);
             DamagePopup popupScript = popup.GetComponent<DamagePopup>();
             if (popupScript != null) popupScript.SetupLevelUp();
         }
