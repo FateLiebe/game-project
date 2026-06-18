@@ -988,6 +988,10 @@ MonoBehaviour:
   attackCooldowns:
   - 5
   - 4
+  isFlying: 0
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
   attackHitbox: {fileID: 0}
   rangedAttackHitbox: {fileID: 0}
   currentState: 0
@@ -997,7 +1001,6 @@ MonoBehaviour:
   attackRange: 1.8
   idleDuration: 1.5
   spriteFacesLeft: 1
-  isFlying: 0
   isVfxFacingLeftDefault: 1
   rangedAttackRange: 6
   eliteOutlineMaterial: {fileID: 2100000, guid: 8056fc6c7f858f04f8747bd239762b6b, type: 2}
@@ -1007,9 +1010,6 @@ MonoBehaviour:
   rangedSpawnPoint: {fileID: 4769957649181292672}
   wallCheck: {fileID: 2901326554630406575}
   ledgeCheck: {fileID: 1950828799489256577}
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
   playerLayer:
     serializedVersion: 2
     m_Bits: 1024

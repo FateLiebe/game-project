@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: BinhMau
   itemName: "B\xECnh M\xE1u"
-  description: "S\u1EED d\u1EE5ng s\u1EBD h\u1ED3i "
+  description: "S\u1EED d\u1EE5ng s\u1EBD h\u1ED3i 50 HP\n "
   icon: {fileID: 189804300, guid: 3a6cac4ef058b5243a458056c66b05b7, type: 3}
   itemType: 0
   rarity: 0

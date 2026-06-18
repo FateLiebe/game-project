@@ -225,24 +225,28 @@ MonoBehaviour:
   expMultiplier: 10
   attackCooldowns:
   - 3
+  isFlying: 0
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
   attackHitbox: {fileID: 2236896081292046355}
+  rangedAttackHitbox: {fileID: 0}
   currentState: 0
   patrolSpeed: 2
   chaseSpeed: 3.5
   lineOfSight: 6
   attackRange: 1.8
   idleDuration: 1.5
-  isFlying: 0
+  spriteFacesLeft: 0
+  isVfxFacingLeftDefault: 1
   rangedAttackRange: 6
   eliteOutlineMaterial: {fileID: 0}
+  meleeVFXPrefab: {fileID: 0}
+  meleeSpawnPoint: {fileID: 0}
   rangedProjectilePrefab: {fileID: 0}
   rangedSpawnPoint: {fileID: 0}
-  rangedAttackHitbox: {fileID: 0}
   wallCheck: {fileID: 6647960011637078497}
   ledgeCheck: {fileID: 3692552232569930197}
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
   playerLayer:
     serializedVersion: 2
     m_Bits: 1024

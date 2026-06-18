@@ -87,8 +87,15 @@ public class PlayerController : BaseEntity
     
     private Collider2D[] threatColliders = new Collider2D[20];
     
+    // [PHASE 2] Buffer tái sử dụng cho OverlapCircleNonAlloc — tránh cấp phát RAM mỗi frame
+    private static readonly Collider2D[] _enemyScanBuffer = new Collider2D[24];
+    
     // Lưu BaseEntity để đồng nhất danh tính của kẻ địch
     private List<BaseEntity> ignoredAttackers = new List<BaseEntity>();
+
+    // ==========================================
+    #region CORE UNITY METHODS
+    // ==========================================
 
     protected override void Start()
     {
@@ -160,6 +167,12 @@ public class PlayerController : BaseEntity
 
         rb.linearVelocity = new Vector2(targetSpeed, rb.linearVelocity.y);
     }
+    
+    #endregion
+
+    // ==========================================
+    #region INPUT & MOVEMENT
+    // ==========================================
 
     private void HandleInput()
     {
@@ -259,6 +272,12 @@ public class PlayerController : BaseEntity
 
         HandleFastFall();
     }
+
+    #endregion
+
+    // ==========================================
+    #region DODGE & PERFECT DODGE
+    // ==========================================
 
     private bool CheckIncomingAttackFromBehind(out float dirToThreat)
     {
@@ -501,6 +520,12 @@ public class PlayerController : BaseEntity
         yield return new WaitForSeconds(duration);
         isPhasingThrough = false;
     }
+    
+    #endregion
+
+    // ==========================================
+    #region HEALTH & DAMAGE (OVERRIDES)
+    // ==========================================
 
     public override void ApplyDamage(DamageInfo info)
     {
@@ -555,6 +580,12 @@ public class PlayerController : BaseEntity
             currentState = PlayerState.Airborne; 
         }
     }
+    
+    #endregion
+
+    // ==========================================
+    #region COMBAT & ATTACK
+    // ==========================================
 
     private void ExecuteAttack()
     {
@@ -672,6 +703,12 @@ public class PlayerController : BaseEntity
         anim.Rebind();
         anim.Update(0f);
     }
+    
+    #endregion
+
+    // ==========================================
+    #region MOVEMENT LOGIC EXTENSIONS
+    // ==========================================
 
     private bool CanDash()
     {
@@ -849,6 +886,12 @@ public class PlayerController : BaseEntity
         rb.gravityScale = originalGravity;
     }
 
+    #endregion
+
+    // ==========================================
+    #region BOSS DETECTION
+    // ==========================================
+
     private void HandleBossDetection()
     {
         // Quét 1 vòng tròn quanh Player để tìm Layer của Boss
@@ -874,8 +917,10 @@ public class PlayerController : BaseEntity
         }
     }
 
+    #endregion
+
     // ==========================================
-    // LOGIC KỸ NĂNG HỖ TRỢ (BÙA)
+    #region SUPPORT SKILLS
     // ==========================================
     private void HandleSupportSkill()
     {
@@ -943,14 +988,17 @@ public class PlayerController : BaseEntity
         if (lockedTarget != null) return lockedTarget;
 
         float facingDir = transform.localScale.x >= 0 ? 1f : -1f;
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, radius);
+        // [PHASE 2] NonAlloc: tái sử dụng _enemyScanBuffer, không cấp phát array mới
+        int count = Physics2D.OverlapCircleNonAlloc(transform.position, radius, _enemyScanBuffer);
         Transform nearest = null;
         float minDist = Mathf.Infinity;
 
-        foreach (var hit in hits)
+        for (int i = 0; i < count; i++)
         {
+            Collider2D hit = _enemyScanBuffer[i];
+            if (hit == null) continue;
             if (hit.transform.root == this.transform) continue;
-            if (hit.GetComponentInParent<BreakableCrate>() != null) continue; // Bỏ qua Crate
+            if (hit.GetComponentInParent<BreakableCrate>() != null) continue;
 
             BaseEntity enemy = hit.GetComponentInParent<BaseEntity>();
             if (enemy == null || enemy.currentHealth <= 0 || !enemy.CompareTag("Enemy")) continue;
@@ -1064,4 +1112,6 @@ public class PlayerController : BaseEntity
         supportSkillCDTimer = 0f;
         if (SupportSkillUI.Instance != null) SupportSkillUI.Instance.UpdateUI(equippedSupportSkill, 0f, currentSupportSkillUses);
     }
+    
+    #endregion
 }

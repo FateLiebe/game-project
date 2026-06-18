@@ -24,6 +24,10 @@ public class InventoryManager : MonoBehaviour
     private ItemSlotUI[] slots; 
     private ItemSO selectedItem; 
 
+    // ==========================================
+    #region CORE UNITY METHODS
+    // ==========================================
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -47,6 +51,12 @@ public class InventoryManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Q))
             QuickUseConsumable();
     }
+
+    #endregion
+
+    // ==========================================
+    #region INVENTORY LOGIC
+    // ==========================================
 
     // ===============================================
     // --- TÍNH TOÁN SỐ Ô THỰC TẾ ĐANG BỊ CHIẾM ---
@@ -109,6 +119,12 @@ public class InventoryManager : MonoBehaviour
         return true; 
     }
 
+    #endregion
+
+    // ==========================================
+    #region UI UPDATES
+    // ==========================================
+
     public void UpdateUI()
     {
         if (slots == null) return;
@@ -163,6 +179,18 @@ public class InventoryManager : MonoBehaviour
         if (ConsumableUI.Instance != null) ConsumableUI.Instance.UpdateUI(firstConsumable, count);
     }
 
+    public void ShowTooltip(ItemSO item)
+    {
+        selectedItem = item; 
+        if (tooltipUI != null) tooltipUI.ShowTooltip(item);
+    }
+
+    #endregion
+
+    // ==========================================
+    #region ITEM INTERACTIONS
+    // ==========================================
+
     // ===============================================
     // --- LOGIC PHÍM Q DÙNG NHANH BÌNH MÁU ---
     // ===============================================
@@ -191,12 +219,6 @@ public class InventoryManager : MonoBehaviour
             inventoryList.Remove(itemToUse);
             UpdateUI(); 
         }
-    }
-
-    public void ShowTooltip(ItemSO item)
-    {
-        selectedItem = item; 
-        if (tooltipUI != null) tooltipUI.ShowTooltip(item);
     }
 
     public void UseItem()
@@ -247,6 +269,12 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    #endregion
+
+    // ==========================================
+    #region EQUIPMENT LOGIC
+    // ==========================================
+
     private void RecalculatePlayerStats()
     {
         if (player == null) return;
@@ -269,6 +297,12 @@ public class InventoryManager : MonoBehaviour
 
         player.UpdateEquipmentStats(bonusHP, bonusATK, bonusDEF, bonusCRIT, bonusCritDmg, bonusSpeed);
     }
+
+    #endregion
+
+    // ==========================================
+    #region ITEM DROP & UNEQUIP
+    // ==========================================
 
     public void DropItem()
     {
@@ -334,6 +368,12 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    #endregion
+
+    // ==========================================
+    #region SAVE & LOAD
+    // ==========================================
+
     public void LoadEquippedItemFromSave(ItemSO item)
     {
         if (item == null) return;
@@ -343,4 +383,6 @@ public class InventoryManager : MonoBehaviour
         }
         RecalculatePlayerStats();
     }
+
+    #endregion
 }
