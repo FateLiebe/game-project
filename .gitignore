@@ -56,3 +56,6 @@ sysinfo.txt
 
 # Các packages của Unity
 Packages/com.unity.ide*/
+# Scripts and temporary files
+*.ps1
+temp_*.txt

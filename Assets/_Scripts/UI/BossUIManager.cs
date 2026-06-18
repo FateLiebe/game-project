@@ -44,12 +44,22 @@ public class BossUIManager : MonoBehaviour
     {
         currentBoss = boss;
         canvasGroup.alpha = 1f;
+
+        // Bật nhạc Boss khi thanh máu xuất hiện
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayBossMusic();
     }
 
     public void HideBossUI()
     {
         currentBoss = null;
         canvasGroup.alpha = 0f;
+
+        // Dừng nhạc Boss và quay lại nhạc môi trường
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StopMusic();
+            AudioManager.Instance.RestartAmbientCycle();
+        }
     }
 
     private void Update()

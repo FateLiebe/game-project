@@ -18,6 +18,15 @@ public class AudioManager : MonoBehaviour
     private AudioSource srcUI;
     private AudioSource srcRun;      // Riêng cho run loop
     private AudioSource bossWingSource;
+    private AudioSource srcMusic;    // BGM (Main Menu / Boss)
+
+    // ============================================================
+    // BGM - NHẠC NỀN
+    // ============================================================
+    [Header("🎵 BGM - Nhạc Nền")]
+    public AudioClip mainMenuMusic;
+    public AudioClip bossMusic;
+    [Range(0f, 1f)] public float musicVolume = 0.5f;
 
     // ============================================================
     // ÂM THANH MÔI TRƯỜNG
@@ -135,6 +144,7 @@ public class AudioManager : MonoBehaviour
         srcUI      = AddSrc(loop: false);
         srcRun     = AddSrc(loop: true);    // Run loop riêng
         bossWingSource = AddSrc(loop: true);
+        srcMusic   = AddSrc(loop: true);    // Nhạc nền loop
     }
 
     private AudioSource AddSrc(bool loop)
@@ -160,6 +170,17 @@ public class AudioManager : MonoBehaviour
         if (srcRun != null) srcRun.Stop();
         if (bossWingSource != null) bossWingSource.Stop();
         if (srcAmbient != null) srcAmbient.Stop();
+        
+        // Phát nhạc nền tương ứng
+        if (scene.name == "Main_Menu")
+        {
+            PlayMainMenuMusic();
+        }
+        else
+        {
+            // Dừng nhạc Main Menu khi vào game
+            StopMusic();
+        }
     }
 
     // ============================================================
@@ -188,6 +209,35 @@ public class AudioManager : MonoBehaviour
         srcAmbient.volume     = m * ambientVolume;
         srcRun.volume         = m * runVolume;
         bossWingSource.volume = m * bossWingVolume;
+        if (srcMusic != null) srcMusic.volume = m * musicVolume;
+    }
+
+    // ============================================================
+    // BGM CONTROL
+    // ============================================================
+    public void PlayMainMenuMusic()
+    {
+        if (mainMenuMusic == null || srcMusic == null) return;
+        srcMusic.clip = mainMenuMusic;
+        srcMusic.volume = musicVolume * MasterVolume;
+        srcMusic.Play();
+    }
+
+    public void PlayBossMusic()
+    {
+        if (bossMusic == null || srcMusic == null) return;
+        
+        // Ngừng nhạc môi trường để tập trung vào Boss
+        StopAmbient();
+        
+        srcMusic.clip = bossMusic;
+        srcMusic.volume = musicVolume * MasterVolume;
+        srcMusic.Play();
+    }
+
+    public void StopMusic()
+    {
+        if (srcMusic != null) srcMusic.Stop();
     }
 
     // ============================================================

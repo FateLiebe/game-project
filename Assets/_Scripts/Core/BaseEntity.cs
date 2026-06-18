@@ -64,6 +64,7 @@ public class BaseEntity : MonoBehaviour
 
     protected virtual void OnEnable()
     {
+        if (baseData == null) return;
         currentHealth = MaxHealth;
         currentShield = 0;
         buffAttack = 0;

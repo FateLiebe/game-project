@@ -194,6 +194,10 @@ MonoBehaviour:
   - 20
   - 4
   - 3.5
+  isFlying: 1
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
   attackHitbox: {fileID: 0}
   rangedAttackHitbox: {fileID: 0}
   meleeRange: 4

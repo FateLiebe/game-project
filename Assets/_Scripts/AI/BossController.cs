@@ -107,6 +107,7 @@ public class BossController : EnemyBase
         skillManager = GetComponent<BossSkillManager>();
 
         if (rb != null) rb.gravityScale = 0f;
+        isFlying = true; // [FIX]: Báo cho EnemyBase biết Boss đang bay để không áp dụng trọng lực
         currentTargetHeight = minFlightHeight;
         StartCoroutine(BehaviorTreeLoop());
     }
