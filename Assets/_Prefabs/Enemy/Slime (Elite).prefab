@@ -872,7 +872,7 @@ GameObject:
   - component: {fileID: 4613600319976381591}
   m_Layer: 6
   m_Name: RangedHitbox
-  m_TagString: Untagged
+  m_TagString: RangedHitbox
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1543,7 +1543,7 @@ GameObject:
   - component: {fileID: 7233004573066963188}
   m_Layer: 6
   m_Name: AttackHitbox
-  m_TagString: Untagged
+  m_TagString: AttackHitbox
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

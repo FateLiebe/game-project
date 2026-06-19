@@ -18,7 +18,12 @@ public class TimeAnomalyManager : MonoBehaviour
 
     public void TriggerPerfectDodge()
     {
-        AudioManager.Instance?.PlayPerfectDodge(); // [AUDIO] Âm thanh Time Stop
+        AudioManager.Instance?.PlayPerfectDodge(); // [AUDIO] Âm thanh Perfect Dodge
+        TriggerTimeStop();
+    }
+
+    public void TriggerTimeStop()
+    {
         StopAllCoroutines(); 
         AudioManager.Instance?.RevertTimeStop(); // Reset pitch nếu còn dư từ lần trước
         StartCoroutine(TimeStopRoutine());

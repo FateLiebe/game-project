@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -255,10 +255,24 @@ public partial class PlayerController
     #region HEALTH & DAMAGE (OVERRIDES)
     // ==========================================
 
+    // Biến cờ đánh dấu đòn đánh là Counter Attack
+    private bool isCounterAttacking = false;
+
     public override void ApplyDamage(DamageInfo info)
     {
+        // [COUNTER ATTACK CHECK]
+        if (currentState == PlayerState.Countering)
+        {
+            if (info.sourceHitbox != null && 
+               (info.sourceHitbox.CompareTag("AttackHitbox") || info.sourceHitbox.CompareTag("RangedHitbox")))
+            {
+                TriggerCounterAttack();
+                return; // Miễn nhiễm sát thương và chuyển sang phản đòn
+            }
+        }
+
         bool isDodging = (hurtbox != null && hurtbox.isPerfectDodging);
-        if (currentHealth <= 0 || isDodging) return;
+        if (currentHealth <= 0 || isDodging || isPhasingThrough) return; // Nếu đang trong quá trình phản đòn (isPhasingThrough) cũng miễn nhiễm
 
         // Truy ngược từ info.attacker (có thể là Hitbox) lên BaseEntity gốc
         if (info.attacker != null)
@@ -315,6 +329,84 @@ public partial class PlayerController
     #region COMBAT & ATTACK
     // ==========================================
 
+    private void ExecuteCounterStance()
+    {
+        // Kích hoạt state Countering
+        currentState = PlayerState.Countering;
+        rb.linearVelocity = Vector2.zero; // Đứng yên
+        
+        anim.SetTrigger("Counter"); // Trigger hoạt ảnh giơ khiên
+        
+        // Trừ cooldown
+        counterCooldownTimer = counterCooldown;
+        
+        if (counterCoroutine != null) StopCoroutine(counterCoroutine);
+        counterCoroutine = StartCoroutine(CounterStanceRoutine());
+    }
+
+    private IEnumerator CounterStanceRoutine()
+    {
+        yield return new WaitForSeconds(counterWindow);
+        
+        // Nếu không bị ai đánh trúng trong 0.2s -> Kết thúc stance
+        if (currentState == PlayerState.Countering)
+        {
+            currentState = PlayerState.Grounded; // hoặc Airborne tuỳ vào chạm đất
+        }
+    }
+
+    public void TriggerCounterAttack()
+    {
+        if (counterCoroutine != null) StopCoroutine(counterCoroutine);
+        
+        // Chỉ phát âm thanh Counter, KHÔNG làm chậm thời gian
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayCounterAttack();
+        
+        Debug.Log("<color=magenta>COUNTER ATTACK THÀNH CÔNG!</color>");
+        
+        // Bắt đầu chém Combo 3 (multiplier x2 sẽ tính trong GetCurrentMeleeDamage hoặc ép cứng)
+        CancelAttack();
+        attackCoroutine = StartCoroutine(PerformCounterAttackRoutine());
+    }
+
+    private IEnumerator PerformCounterAttackRoutine()
+    {
+        // KHÔNG đổi currentState thành Attacking để tránh kẹt logic di chuyển
+        isAttacking = true;
+        isCounterAttacking = true; 
+        
+        comboStep = 3;
+        currentAttackDuration = attackDurations[2]; 
+        lastAttackTime = Time.time; // [FIX LỖI]: Phải cập nhật thời gian để HandleComboReset không lập tức huỷ đòn đánh!
+        
+        anim.SetBool("isAttacking", true);
+        anim.SetInteger("comboStep", comboStep);
+        
+        anim.Play("Attack_Combo_3", 0, 0f);
+        
+        EnableHitbox();
+        playerAudio?.NotifyAttack(comboStep); 
+
+        isPhasingThrough = true; 
+        
+        yield return new WaitForSeconds(currentAttackDuration);
+        
+        isPhasingThrough = false;
+        isAttacking = false;
+        isCounterAttacking = false; 
+        anim.SetBool("isAttacking", false);
+        DisableHitbox();
+        
+        comboStep = 0; 
+        
+        // Thoát khỏi trạng thái Countering: phân định rõ dưới đất hay trên không
+        if (currentState == PlayerState.Countering)
+        {
+            if (groundedFrameCount > 0) ForceGroundedState();
+            else currentState = PlayerState.Airborne;
+        }
+    }
+
     private void ExecuteAttack()
     {
         lastAttackInputTime = -10f; 
@@ -333,6 +425,7 @@ public partial class PlayerController
         anim.SetBool("isAttacking", true);
         anim.SetInteger("comboStep", comboStep);
         anim.SetTrigger("Attack");
+        EnableHitbox(); // Bật hitbox cho đòn đánh thường
         playerAudio?.NotifyAttack(comboStep); // [AUDIO]
         
         lastAttackTime = Time.time;
@@ -365,6 +458,14 @@ public partial class PlayerController
     {
         if (attackCoroutine != null) StopCoroutine(attackCoroutine);
         isAttacking = false;
+        
+        // [FIX LỖI BẤT TỬ]: Phải reset các cờ này nếu bị ngắt ngang (ví dụ ấn Dash lúc đang chém)
+        isCounterAttacking = false;
+        
+        // Tránh ghi đè isPhasingThrough nếu đang là do Perfect Dodge sinh ra
+        if (currentState == PlayerState.Attacking || currentState == PlayerState.Countering) 
+            isPhasingThrough = false; 
+
         anim.SetBool("isAttacking", false);
         DisableHitbox(); 
     }

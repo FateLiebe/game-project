@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public partial class PlayerController
@@ -10,6 +10,20 @@ public partial class PlayerController
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
+
+        if (counterCooldownTimer > 0f) counterCooldownTimer -= Time.deltaTime;
+
+        if (Input.GetKeyDown(KeyCode.F) && counterCooldownTimer <= 0f)
+        {
+            if (currentState == PlayerState.Grounded || currentState == PlayerState.Airborne)
+            {
+                if (!isAttacking && currentState != PlayerState.Dashing && currentState != PlayerState.Countering)
+                {
+                    ExecuteCounterStance();
+                    return; // Chặn các input khác khi đang counter
+                }
+            }
+        }
 
         bool isJumpingUp = currentState == PlayerState.Airborne && rb.linearVelocity.y > 0.1f;
         
@@ -259,6 +273,11 @@ public partial class PlayerController
         
         int currentComboIndex = Mathf.Clamp(comboStep - 1, 0, comboDamageMultipliers.Length - 1);
         float multiplier = comboDamageMultipliers[currentComboIndex];
+        
+        if (isCounterAttacking) 
+        {
+            multiplier = 2f; // [COUNTER ATTACK]: Hệ số x2 thay vì x1.3 của combo 3
+        }
         
         float finalDamage = Attack * multiplier;
 

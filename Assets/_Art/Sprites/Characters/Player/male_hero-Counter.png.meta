@@ -1,0 +1,430 @@
+fileFormatVersion: 2
+guid: 9d9550c1f0f7fd5479008ce3349b40a4
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3262808920375143976
+    second: male_hero-Counter_0
+  - first:
+      213: 1567082282190834202
+    second: male_hero-Counter_1
+  - first:
+      213: -2452299988450282594
+    second: male_hero-Counter_2
+  - first:
+      213: -179468169252569446
+    second: male_hero-Counter_3
+  - first:
+      213: -4839789843652567946
+    second: male_hero-Counter_4
+  - first:
+      213: 1463855204031565319
+    second: male_hero-Counter_5
+  - first:
+      213: -5682044023475655834
+    second: male_hero-Counter_6
+  - first:
+      213: 2343987295165652945
+    second: male_hero-Counter_7
+  - first:
+      213: -1699082848697202183
+    second: male_hero-Counter_8
+  - first:
+      213: -620892525582309056
+    second: male_hero-Counter_9
+  - first:
+      213: -2267996289878189293
+    second: male_hero-Counter_10
+  - first:
+      213: -7000518383716116399
+    second: male_hero-Counter_11
+  - first:
+      213: -8306041831892703990
+    second: male_hero-Counter_12
+  - first:
+      213: -5213069285528685133
+    second: male_hero-Counter_13
+  - first:
+      213: -2431413395228837110
+    second: male_hero-Counter_14
+  - first:
+      213: -7510538736220752724
+    second: male_hero-Counter_15
+  - first:
+      213: 1088701218011285127
+    second: male_hero-Counter_16
+  - first:
+      213: 5176342936012999132
+    second: male_hero-Counter_17
+  - first:
+      213: 4590257964876161164
+    second: male_hero-Counter_18
+  - first:
+      213: 686967490500538220
+    second: male_hero-Counter_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: male_hero-Counter_0
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 47
+        width: 44
+        height: 39
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82eafec0d63d74d20800000000000000
+      internalID: 3262808920375143976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: male_hero-Counter_2
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 47
+        width: 44
+        height: 39
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e93f9b1472ea7fdd0800000000000000
+      internalID: -2452299988450282594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: male_hero-Counter_4
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 47
+        width: 44
+        height: 39
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67c9b8d87cc95dcb0800000000000000
+      internalID: -4839789843652567946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: male_hero-Counter_6
+      rect:
+        serializedVersion: 2
+        x: 424
+        y: 47
+        width: 44
+        height: 38
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66b2a9eb0135521b0800000000000000
+      internalID: -5682044023475655834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: male_hero-Counter_8
+      rect:
+        serializedVersion: 2
+        x: 553
+        y: 47
+        width: 44
+        height: 38
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f9c177b625ab68e0800000000000000
+      internalID: -1699082848697202183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: male_hero-Counter_10
+      rect:
+        serializedVersion: 2
+        x: 682
+        y: 47
+        width: 42
+        height: 38
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 31b18e504657680e0800000000000000
+      internalID: -2267996289878189293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: male_hero-Counter_12
+      rect:
+        serializedVersion: 2
+        x: 809
+        y: 47
+        width: 42
+        height: 38
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a05208016f20bbc80800000000000000
+      internalID: -8306041831892703990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: male_hero-Counter_14
+      rect:
+        serializedVersion: 2
+        x: 937
+        y: 47
+        width: 43
+        height: 38
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0b32433662e14ed0800000000000000
+      internalID: -2431413395228837110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: male_hero-Counter_16
+      rect:
+        serializedVersion: 2
+        x: 1064
+        y: 47
+        width: 43
+        height: 38
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78609165df7db1f00800000000000000
+      internalID: 1088701218011285127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: male_hero-Counter_18
+      rect:
+        serializedVersion: 2
+        x: 1192
+        y: 47
+        width: 44
+        height: 39
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c80e9df7c4fd3bf30800000000000000
+      internalID: 4590257964876161164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: d39262091b1203446ba5e12dae49a8b5
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      male_hero-Counter_0: 3262808920375143976
+      male_hero-Counter_1: 1567082282190834202
+      male_hero-Counter_10: -2267996289878189293
+      male_hero-Counter_11: -7000518383716116399
+      male_hero-Counter_12: -8306041831892703990
+      male_hero-Counter_13: -5213069285528685133
+      male_hero-Counter_14: -2431413395228837110
+      male_hero-Counter_15: -7510538736220752724
+      male_hero-Counter_16: 1088701218011285127
+      male_hero-Counter_17: 5176342936012999132
+      male_hero-Counter_18: 4590257964876161164
+      male_hero-Counter_19: 686967490500538220
+      male_hero-Counter_2: -2452299988450282594
+      male_hero-Counter_3: -179468169252569446
+      male_hero-Counter_4: -4839789843652567946
+      male_hero-Counter_5: 1463855204031565319
+      male_hero-Counter_6: -5682044023475655834
+      male_hero-Counter_7: 2343987295165652945
+      male_hero-Counter_8: -1699082848697202183
+      male_hero-Counter_9: -620892525582309056
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

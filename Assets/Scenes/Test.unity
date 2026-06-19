@@ -12761,6 +12761,8 @@ MonoBehaviour:
   bossWingVolume: 0.5
   perfectDodgeClip: {fileID: 8300000, guid: 96dc13dcf8e1fc5479b2d5e967500ea7, type: 3}
   perfectDodgeVolume: 1
+  counterAttackClip: {fileID: 0}
+  counterAttackVolume: 1
   levelUpClip: {fileID: 0}
   levelUpVolume: 1
   gameOverClip: {fileID: 8300000, guid: baaa4d9024a85bc4193a11a737b36eb5, type: 3}

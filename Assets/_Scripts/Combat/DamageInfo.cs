@@ -8,5 +8,6 @@ public struct DamageInfo // (Hoặc public class tùy code cũ của bạn)
     public float damage;
     public Vector2 knockbackForce;
     public GameObject attacker;
-    public bool isCritical; // [MỚI THÊM]: Cờ báo hiệu đòn đánh này có chí mạng không
+    public GameObject sourceHitbox; // [MỚI THÊM]: Lưu vết Hitbox để nhận diện Parry
+    public bool isCritical;  // [MỚI THÊM]: Cờ báo hiệu đòn đánh này có chí mạng không
 }

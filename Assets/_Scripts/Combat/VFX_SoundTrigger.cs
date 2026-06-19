@@ -24,15 +24,61 @@ public class VFX_SoundTrigger : MonoBehaviour
     [Range(0f, 1f)]
     public float volume = 1f;
 
-    private void Start()
+    [Header("Cài đặt tối ưu")]
+    [Tooltip("Bật cái này nếu muốn âm thanh tự tắt khi đạn nổ/biến mất (ví dụ đạn bay). Tắt đi cho các chiêu như Electro-shock")]
+    public bool stopAudioOnDestroy = false;
+
+    private AudioSource mySource;
+
+    private void OnEnable()
     {
         if (AudioManager.Instance == null) return;
 
-        if (directClip != null)
-            // Chế độ 1: Phát clip kéo thẳng vào
-            AudioManager.Instance.PlayDirectClip(directClip, volume);
+        AudioClip clipToPlay = directClip;
+        
+        if (clipToPlay == null && AudioManager.Instance.vfxClips != null)
+        {
+            if (skillIndex >= 0 && skillIndex < AudioManager.Instance.vfxClips.Length)
+                clipToPlay = AudioManager.Instance.vfxClips[skillIndex];
+        }
+
+        if (clipToPlay == null) return;
+
+        if (stopAudioOnDestroy)
+        {
+            // Nếu muốn tự tắt, tạo hoặc tái sử dụng AudioSource riêng để quản lý
+            if (mySource == null) mySource = gameObject.AddComponent<AudioSource>();
+            
+            mySource.clip = clipToPlay;
+            mySource.volume = AudioManager.Instance.MasterVolume * volume;
+            mySource.spatialBlend = 0f; // 2D sound
+            mySource.Play();
+        }
         else
-            // Chế độ 2: Phát theo skillIndex
-            AudioManager.Instance.PlayVFX(skillIndex);
+        {
+            // Phát thả ga (OneShot) như cũ, phù hợp cho Electro-shock
+            if (directClip != null)
+                AudioManager.Instance.PlayDirectClip(directClip, volume);
+            else
+                AudioManager.Instance.PlayVFX(skillIndex);
+        }
+    }
+
+    private void Update()
+    {
+        // Cập nhật âm lượng và Time Stop nếu dùng AudioSource riêng
+        if (mySource != null && AudioManager.Instance != null)
+        {
+            mySource.volume = AudioManager.Instance.MasterVolume * volume;
+            mySource.pitch = AudioManager.Instance.IsTimeStopActive ? 0.5f : 1f;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (stopAudioOnDestroy && mySource != null)
+        {
+            mySource.Stop();
+        }
     }
 }

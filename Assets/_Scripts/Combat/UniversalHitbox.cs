@@ -67,6 +67,7 @@ public class UniversalHitbox : MonoBehaviour
                 damage = finalDamage,
                 knockbackForce = finalKnockback,
                 attacker = this.owner,
+                sourceHitbox = this.gameObject, // Truyền trực tiếp GameObject Hitbox vào
                 isCritical = isCriticalHit 
             };
 

@@ -143,3 +143,4 @@ MonoBehaviour:
   directClip: {fileID: 8300000, guid: aec0240f2896efd43991aa408feb2f30, type: 3}
   skillIndex: 3
   volume: 1
+  stopAudioOnDestroy: 1

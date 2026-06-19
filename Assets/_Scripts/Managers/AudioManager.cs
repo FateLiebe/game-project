@@ -94,6 +94,9 @@ public class AudioManager : MonoBehaviour
     public AudioClip perfectDodgeClip;
     [Range(0f, 1f)] public float perfectDodgeVolume = 1f;
 
+    public AudioClip counterAttackClip;
+    [Range(0f, 1f)] public float counterAttackVolume = 1f;
+
     public AudioClip levelUpClip;
     [Range(0f, 1f)] public float levelUpVolume = 1f;
 
@@ -392,6 +395,7 @@ public class AudioManager : MonoBehaviour
     // ============================================================
     // Perfect Dodge dùng srcUI (không bị ApplyTimeStop pitch)
     public void PlayPerfectDodge() => srcUI.PlayOneShot(perfectDodgeClip, MasterVolume * perfectDodgeVolume);
+    public void PlayCounterAttack() => srcUI.PlayOneShot(counterAttackClip, MasterVolume * counterAttackVolume);
     public void PlayLevelUp()      => srcUI.PlayOneShot(levelUpClip,      MasterVolume * levelUpVolume);
     public void PlayGameOver()     => srcUI.PlayOneShot(gameOverClip,     MasterVolume * gameOverVolume);
     public void PlayUIClick()      => srcUI.PlayOneShot(uiClickClip,      MasterVolume * uiClickVolume);
@@ -400,10 +404,12 @@ public class AudioManager : MonoBehaviour
     // TIME STOP — Bóp pitch của srcWorld & bossWingSource
     // srcSFX (player) KHÔNG bị ảnh hưởng
     // ============================================================
+    public bool IsTimeStopActive { get; private set; } // [MỞ PUBLIC] Để các VFX Sound tự đồng bộ Pitch
+
     public void ApplyTimeStop(float slowFactor)
     {
-        if (isTimeStopActive) return;
-        isTimeStopActive = true;
+        if (IsTimeStopActive) return;
+        IsTimeStopActive = true;
         const float TIME_STOP_PITCH = 0.5f; // Luôn làm chậm 50%
         srcWorld.pitch       = TIME_STOP_PITCH;
         bossWingSource.pitch = TIME_STOP_PITCH;
@@ -412,7 +418,7 @@ public class AudioManager : MonoBehaviour
 
     public void RevertTimeStop()
     {
-        isTimeStopActive     = false;
+        IsTimeStopActive     = false;
         srcWorld.pitch       = normalPitch;
         bossWingSource.pitch = normalPitch;
         srcAmbient.pitch     = normalPitch;

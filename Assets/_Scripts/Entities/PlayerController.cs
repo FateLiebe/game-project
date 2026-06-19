@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public partial class PlayerController : BaseEntity
 {
-    public enum PlayerState { Grounded, Airborne, Dashing, DashStalling, Attacking }
+    public enum PlayerState { Grounded, Airborne, Dashing, DashStalling, Attacking, Countering }
     public PlayerState CurrentState => currentState; // [AUDIO] Cho phép PlayerAudio đọc state
 
     [Header("State Machine")]
@@ -38,6 +38,14 @@ public partial class PlayerController : BaseEntity
 
     private float perfectDodgeTimer = 0f;
     private float currentAttackDuration = 0f;
+    
+    [Header("Counter Attack System")]
+    private float counterWindow = 0.2f;
+    private float counterCooldown = 1f;
+    private float counterCooldownTimer = 0f;
+    private Coroutine counterCoroutine;
+
+    [Header("Timers & Input Buffer")]
     private bool isAttacking = false;
     private Hurtbox hurtbox;
 
