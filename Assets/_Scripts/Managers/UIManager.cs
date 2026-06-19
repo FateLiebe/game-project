@@ -68,8 +68,14 @@ public class UIManager : MonoBehaviour
             // ESC trong Inventory → đóng Inventory trước, rồi vào Pause
             if (StatsUIManager.Instance != null && StatsUIManager.Instance.IsOpen)
             {
-                StatsUIManager.Instance.CloseUI();
-                GameManager.Instance.ChangeState(GameManager.GameState.Paused);
+                if (ShopManager.Instance != null && ShopManager.Instance.isShopOpen)
+                {
+                    ShopManager.Instance.CloseShop();
+                }
+                else
+                {
+                    StatsUIManager.Instance.CloseUI();
+                }
                 return;
             }
 

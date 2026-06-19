@@ -28,7 +28,7 @@ public class SaveDataManager : MonoBehaviour
         else { NewGame(); }
     }
 
-    public void CollectDataFromGame(PlayerController player, InventoryManager inv)
+    public void CollectDataFromGame(PlayerController player, InventoryManager inv, bool savePosition = true)
     {
         if (currentData == null) return;
         
@@ -52,9 +52,12 @@ public class SaveDataManager : MonoBehaviour
         }
         
         // 3. Vị trí Lưu Tay (Lưu chính xác tọa độ Player đang đứng)
-        currentData.posX = player.transform.position.x;
-        currentData.posY = player.transform.position.y;
-        currentData.posZ = player.transform.position.z;
+        if (savePosition)
+        {
+            currentData.posX = player.transform.position.x;
+            currentData.posY = player.transform.position.y;
+            currentData.posZ = player.transform.position.z;
+        }
 
         // 4. Trang bị & Đồ đạc
         foreach (EquipmentSlotUI slot in inv.equipSlots)
@@ -72,6 +75,8 @@ public class SaveDataManager : MonoBehaviour
         }
         currentData.equippedSupportSkillID = player.equippedSupportSkill != null ? player.equippedSupportSkill.itemID : "";
         currentData.currentSupportSkillUses = player.currentSupportSkillUses;
+
+        currentData.coins = player.coins;
 
         currentData.inventoryItems.Clear();
         foreach (ItemSO item in inv.inventoryList) 
@@ -98,7 +103,7 @@ public class SaveDataManager : MonoBehaviour
         if (currentData == null) return;
 
         // 1. Gom toàn bộ thông số Máu, Cấp, Đồ đạc hiện tại
-        CollectDataFromGame(player, inv);
+        CollectDataFromGame(player, inv, false);
 
         // 2. Ghi đè tọa độ "Continue" thành tọa độ Trạm 
         currentData.posX = cpTransform.position.x;
@@ -137,6 +142,9 @@ public class SaveDataManager : MonoBehaviour
 
         ItemSO savedSkill = itemDatabase.GetItemByID(currentData.equippedSupportSkillID);
         if (savedSkill != null) player.LoadSupportSkillFromSave(savedSkill, currentData.currentSupportSkillUses);
+
+        // Nạp tiền
+        player.coins = currentData.coins;
 
         // ==========================================
         // PHÂN LUỒNG BƠM MÁU

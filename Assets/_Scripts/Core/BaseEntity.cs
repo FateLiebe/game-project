@@ -130,7 +130,33 @@ public class BaseEntity : MonoBehaviour
                 if (attackerEntity != null && info.attacker.CompareTag("Player"))
                 {
                     EnemyBase enemy = this as EnemyBase;
-                    if (enemy != null) attackerEntity.GainEXP(enemy.GetExpReward());
+                    if (enemy != null) 
+                    {
+                        attackerEntity.GainEXP(enemy.GetExpReward());
+                        
+                        // 50% rớt Coin từ quái
+                        if (UnityEngine.Random.value < 0.5f)
+                        {
+                            PlayerController player = attackerEntity as PlayerController;
+                            if (player != null)
+                            {
+                                int baseCoin = 5 * enemy.currentLevel;
+                                int coinReward = Mathf.RoundToInt(baseCoin * UnityEngine.Random.Range(0.9f, 1.1f));
+                                player.coins += coinReward;
+
+                                // Hiển thị popup Coin
+                                if (damagePopupPrefab != null)
+                                {
+                                    GameObject popup;
+                                    if (ObjectPoolManager.Instance != null) popup = ObjectPoolManager.Instance.Get(damagePopupPrefab, transform.position + new Vector3(0, 1.5f, 0), Quaternion.identity);
+                                    else popup = Instantiate(damagePopupPrefab, transform.position + new Vector3(0, 1.5f, 0), Quaternion.identity);
+                                    
+                                    DamagePopup popupScript = popup.GetComponent<DamagePopup>();
+                                    if (popupScript != null) popupScript.SetupCoin(coinReward);
+                                }
+                            }
+                        }
+                    }
                 }
             }
             Die();

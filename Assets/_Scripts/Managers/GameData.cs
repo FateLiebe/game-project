@@ -23,6 +23,7 @@ public class GameData
     public float checkX;
     public float checkY;
     public float checkZ;
+    public int coins = 0; // Thêm biến lưu số Vàng (Coin) của người chơi
 
     // ÂM THANH
     public float audioMasterVolume = 10f; // 1-10

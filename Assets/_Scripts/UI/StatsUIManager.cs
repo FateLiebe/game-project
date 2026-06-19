@@ -78,6 +78,13 @@ public class StatsUIManager : MonoBehaviour
                 }
                 return;
             }
+
+            if (ShopManager.Instance != null && ShopManager.Instance.isShopOpen)
+            {
+                ShopManager.Instance.CloseShop();
+                return;
+            }
+
             ToggleUI();
         }
 
@@ -93,6 +100,14 @@ public class StatsUIManager : MonoBehaviour
             {
                 UpdateUI();
                 AudioManager.Instance?.PlayInventoryOpen(); // [AUDIO]
+                
+                // Hiển thị số lượng vàng ở trạng thái Inventory bình thường
+                if (ShopManager.Instance != null && !ShopManager.Instance.isShopOpen)
+                {
+                    ShopManager.Instance.UpdateCoinDisplay();
+                    if (ShopManager.Instance.btnSellBuy != null) ShopManager.Instance.btnSellBuy.gameObject.SetActive(false);
+                    if (ShopManager.Instance.txtGoldInventory != null) ShopManager.Instance.txtGoldInventory.gameObject.SetActive(true);
+                }
             }
             else
             {

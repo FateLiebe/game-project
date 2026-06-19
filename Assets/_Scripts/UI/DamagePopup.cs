@@ -76,6 +76,22 @@ public class DamagePopup : MonoBehaviour
     }
 
     // ==========================================
+    // CÀI ĐẶT POPUP VÀNG (COIN)
+    // ==========================================
+    public void SetupCoin(int amount)
+    {
+        isLevelUp = false;
+        // Text hiển thị +100 [icon sprite=1] (giả sử icon vàng là sprite=1)
+        textMesh.text = $"+{amount} <sprite name=\"Coin_0\">";
+        textMesh.fontSize = 5f;
+        textColor = new Color(1f, 0.84f, 0f); // Màu vàng Gold
+        textMesh.color = textColor;
+        
+        disappearTimer = 1f;
+        moveYSpeed = 2f; 
+    }
+
+    // ==========================================
     // 3. CÀI ĐẶT POPUP LEVEL UP
     // ==========================================
     public void SetupLevelUp()

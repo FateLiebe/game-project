@@ -516,6 +516,15 @@ public partial class PlayerController
         
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         this.enabled = false; 
+
+        // [FIX] Lưu lại chỉ số, level, đồ đạc hiện tại vào file ngay lúc chết 
+        // để khi Reload Save Point thì chỉ phục hồi vị trí nhưng giữ nguyên cấp độ/đồ
+        if (SaveDataManager.Instance != null && InventoryManager.Instance != null)
+        {
+            SaveDataManager.Instance.CollectDataFromGame(this, InventoryManager.Instance, false);
+            SaveDataManager.Instance.SaveGameToFile();
+        }
+
         if (GameManager.Instance != null) GameManager.Instance.GameOver();
         Debug.Log("<color=red>GAME OVER!</color>");
     }
@@ -528,6 +537,11 @@ public partial class PlayerController
         anim.SetBool("isDead", false);
         isDead = false;
         this.enabled = true; // Nhận nút bấm trở lại
+        
+        lastCombatTime = -999f; // [FIX] Xóa trạng thái combat khi hồi sinh
+
+        // [FIX] Khôi phục trọng lượng bị tắt bởi DeathZone
+        if (rb != null) rb.gravityScale = originalGravity;
 
         anim.Rebind();
         anim.Update(0f);

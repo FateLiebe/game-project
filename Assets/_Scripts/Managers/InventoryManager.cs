@@ -179,10 +179,10 @@ public class InventoryManager : MonoBehaviour
         if (ConsumableUI.Instance != null) ConsumableUI.Instance.UpdateUI(firstConsumable, count);
     }
 
-    public void ShowTooltip(ItemSO item)
+    public void ShowTooltip(ItemSO item, int customPrice = -1)
     {
         selectedItem = item; 
-        if (tooltipUI != null) tooltipUI.ShowTooltip(item);
+        if (tooltipUI != null) tooltipUI.ShowTooltip(item, customPrice);
     }
 
     #endregion
@@ -237,6 +237,23 @@ public class InventoryManager : MonoBehaviour
         {
             EquipItem(selectedItem);
         }
+    }
+
+    public ItemSO GetSelectedItem()
+    {
+        return selectedItem;
+    }
+
+    public void RemoveItem(ItemSO itemToRemove, int count = 1)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            if (inventoryList.Contains(itemToRemove))
+            {
+                inventoryList.Remove(itemToRemove);
+            }
+        }
+        UpdateUI();
     }
 
     private void EquipItem(ItemSO itemToEquip)

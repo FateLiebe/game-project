@@ -62,6 +62,9 @@ public partial class PlayerController : BaseEntity
     private float supportSkillCDTimer = 0f;
     public int currentSupportSkillUses = 0; // Số lần dùng còn lại
     private bool isSupportSkillInitialized = false;
+
+    [Header("--- CURRENCY ---")]
+    public int coins = 0; // Vàng của người chơi
     
     // [LOCK TARGET] Enemy được khóa mục tiêu trong 45s
     private Transform lockedTarget;

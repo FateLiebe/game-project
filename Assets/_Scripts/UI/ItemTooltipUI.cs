@@ -12,6 +12,7 @@ public class ItemTooltipUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI txtItemName;
     [SerializeField] private TextMeshProUGUI txtItemType;
     [SerializeField] private TextMeshProUGUI txtStats;
+    [SerializeField] private TextMeshProUGUI txtItemPrice; // [FIX] Sử dụng Txt_ItemPrice có sẵn
 
     private RectTransform rectTransform;
     private RectTransform parentRect;
@@ -42,6 +43,13 @@ public class ItemTooltipUI : MonoBehaviour
 
                 // Cache parentRect ngay tu dau
                 parentRect = rectTransform.parent as RectTransform;
+            }
+
+            // [FIX] Tự động tìm TXT_ItemPrice nếu bạn quên kéo thả trên Inspector
+            if (txtItemPrice == null)
+            {
+                Transform priceTrans = tooltipPanel.transform.Find("TXT_ItemPrice");
+                if (priceTrans != null) txtItemPrice = priceTrans.GetComponent<TextMeshProUGUI>();
             }
         }
 
@@ -94,7 +102,7 @@ public class ItemTooltipUI : MonoBehaviour
         }
     }
 
-    public void ShowTooltip(ItemSO item)
+    public void ShowTooltip(ItemSO item, int customPrice = -1)
     {
         if (item == null || tooltipPanel == null)
             return;
@@ -152,6 +160,14 @@ public class ItemTooltipUI : MonoBehaviour
             }
 
             txtStats.text = finalContent;
+        }
+
+        // ===== ITEM PRICE =====
+        if (txtItemPrice != null)
+        {
+            int displayPrice = customPrice >= 0 ? customPrice : GetBasePrice(item.rarity);
+            txtItemPrice.text = displayPrice.ToString();
+            txtItemPrice.gameObject.SetActive(true); // [FIX] Bật chính txtItemPrice
         }
 
         // ===== BAT TOOLTIP =====
@@ -245,6 +261,18 @@ public class ItemTooltipUI : MonoBehaviour
             case 2: return new Color(0.6f, 0.2f, 0.8f); // Epic: Tím
             case 3: return new Color(1f, 0.6f, 0f);     // Legendary: Vàng Cam
             default: return Color.white;
+        }
+    }
+
+    private int GetBasePrice(ItemRarity rarity)
+    {
+        switch (rarity)
+        {
+            case ItemRarity.Common: return 25;
+            case ItemRarity.Rare: return 50;
+            case ItemRarity.Epic: return 100;
+            case ItemRarity.Legendary: return 150;
+            default: return 25;
         }
     }
 }

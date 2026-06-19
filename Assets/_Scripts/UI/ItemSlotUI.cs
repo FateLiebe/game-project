@@ -68,8 +68,13 @@ public class ItemSlotUI : MonoBehaviour
 
         if (timeSinceLastClick <= doubleClickThreshold)
         {
-            // TRƯỜNG HỢP: DOUBLE CLICK (Mặc đồ / Bơm máu)
-            if (InventoryManager.Instance != null)
+            // DOUBLE CLICK
+            if (ShopManager.Instance != null && ShopManager.Instance.isShopOpen)
+            {
+                ShopManager.Instance.SelectInventoryItemToSell();
+                ShopManager.Instance.SellItem(currentItem);
+            }
+            else if (InventoryManager.Instance != null)
             {
                 InventoryManager.Instance.ShowTooltip(currentItem);
                 InventoryManager.Instance.UseItem(); 
@@ -79,8 +84,13 @@ public class ItemSlotUI : MonoBehaviour
         }
         else
         {
-            // TRƯỜNG HỢP: SINGLE CLICK (Xem thông tin)
-            if (InventoryManager.Instance != null) 
+            // SINGLE CLICK
+            if (ShopManager.Instance != null && ShopManager.Instance.isShopOpen)
+            {
+                if (InventoryManager.Instance != null) InventoryManager.Instance.ShowTooltip(currentItem);
+                ShopManager.Instance.SelectInventoryItemToSell();
+            }
+            else if (InventoryManager.Instance != null) 
             {
                 InventoryManager.Instance.ShowTooltip(currentItem);
             }
