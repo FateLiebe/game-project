@@ -3,6 +3,10 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
+/// <summary>
+/// Quản lý bật/tắt các Menu UI toàn cục (Pause, GameOver, Victory).
+/// Xử lý các sự kiện click chuột như Resume, Save, Quit to Menu.
+/// </summary>
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
@@ -87,6 +91,10 @@ public class UIManager : MonoBehaviour
         // Cách đơn giản nhất: block input trong Update của StatsUIManager (đã làm bên dưới)
     }
 
+    /// <summary>
+    /// Tự động lắng nghe sự kiện từ GameManager để bật/tắt các màn hình tương ứng.
+    /// Đảm bảo UI luôn đồng bộ tuyệt đối với logic của Game.
+    /// </summary>
     private void HandleGameStateChanged(GameManager.GameState newState)
     {
         if (pauseScreen != null) pauseScreen.SetActive(newState == GameManager.GameState.Paused);
@@ -116,7 +124,7 @@ public class UIManager : MonoBehaviour
 
     private void PerformSave()
     {
-        PlayerController player = FindFirstObjectByType<PlayerController>();
+        PlayerController player = FindAnyObjectByType<PlayerController>();
         if (player != null && InventoryManager.Instance != null && SaveDataManager.Instance != null)
         {
             SaveDataManager.Instance.CollectDataFromGame(player, InventoryManager.Instance);
@@ -179,7 +187,7 @@ public class UIManager : MonoBehaviour
             Scene s = SceneManager.GetSceneAt(i);
             if (s.name != "Core_Gameplay" && s.isLoaded) yield return SceneManager.UnloadSceneAsync(s);
         }
-        GameLoader loader = FindFirstObjectByType<GameLoader>();
+        GameLoader loader = FindAnyObjectByType<GameLoader>();
         if (loader != null) loader.StartLoad();
     }
 

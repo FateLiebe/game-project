@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Hiệu ứng viền (Outline).
+/// Tự động copy và đồng bộ hình ảnh (Sprite) cũng như trạng thái lật chiều (FlipX/Y) từ Sprite gốc của nhân vật/quái sang một Sprite phụ họa nằm phía sau.
+/// </summary>
 public class OutlineFollower : MonoBehaviour
 {
     public SpriteRenderer mainRenderer;

@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// EnemyBase — Lớp cha của mọi Enemy. Quản lý: Stats, CD skill, Kinematic movement, Gravity thủ công, Knockback an toàn.
+/// Lớp cha của mọi Enemy. Quản lý: Chỉ số cơ bản, Thời gian hồi chiêu (CD), Di chuyển Kinematic.
+/// Cung cấp hàm Đẩy Lùi (Knockback) và Trọng lực (Gravity) giả lập để xử lý vật lý an toàn hơn Rigidbody2D.
 /// </summary>
 public class EnemyBase : BaseEntity 
 {
@@ -104,7 +105,10 @@ public class EnemyBase : BaseEntity
     #region KINEMATIC GRAVITY
     // ==========================================
 
-    /// <summary>Trọng lực thủ công cho Kinematic body. Gọi mỗi frame từ Update.</summary>
+    /// <summary>
+    /// Giả lập trọng lực thủ công cho Kinematic Body bằng Raycast.
+    /// Giúp quái rơi từ từ xuống đất mượt mà thay vì dùng Rigidbody2D.Dynamic gây giật lag.
+    /// </summary>
     protected void ApplyGravity()
     {
         if (isFlying || isKnockedBack || rb == null) return;
@@ -135,11 +139,9 @@ public class EnemyBase : BaseEntity
     // ==========================================
 
     /// <summary>
-    /// Gọi từ ApplyDamage hoặc EnemyController sau StopAllCoroutines.
-    /// Kiểm tra tường và mép vực PHÍA SAU LƯNG trước mỗi bước.
+    /// Xử lý lực đẩy lùi (Knockback) an toàn bằng Coroutine.
+    /// Tự động kiểm tra hẻm vực/tường phía sau để chặn lại, tránh tình trạng quái bị văng ra khỏi bản đồ.
     /// </summary>
-    private Coroutine knockbackCoroutine;
-
     public void StartKnockback(Vector2 force)
     {
         if (rb == null) return;

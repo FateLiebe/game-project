@@ -1,6 +1,10 @@
 using UnityEngine;
 using System.Collections; // BẮT BUỘC phải có dòng này để chạy thời gian (Coroutine)
 
+/// <summary>
+/// Cấu hình và quản lý vật phẩm rơi trên mặt đất.
+/// Xử lý việc chống nhặt ngay lập tức khi vừa văng ra, và tự động mờ dần rồi biến mất để dọn rác.
+/// </summary>
 public class ItemPickup : MonoBehaviour
 {
     public ItemSO itemData;
@@ -35,6 +39,10 @@ public class ItemPickup : MonoBehaviour
         StartCoroutine(SetupCoroutine(lockPickup)); // Bắt đầu Coroutine để tạm thời vô hiệu hóa nhặt đồ
     }
 
+    /// <summary>
+    /// Vô hiệu hóa Collider 1 giây khi vật phẩm vừa sinh ra. 
+    /// Tạo cảm giác vật phẩm văng ra chạm đất rồi người chơi mới lụm được.
+    /// </summary>
     private IEnumerator SetupCoroutine(bool lockPickup)
     {
         canPickUp = false; // Tắt cảm biến nhặt ngay khi setup
@@ -84,6 +92,9 @@ public class ItemPickup : MonoBehaviour
             ReturnOrDestroy();
     }
 
+    /// <summary>
+    /// Tự động đếm ngược thời gian (despawnTime). Khi gần hết giờ (còn 5 giây), vật phẩm sẽ nhấp nháy/mờ dần rồi bị hủy để chống Memory Leak.
+    /// </summary>
     private IEnumerator DespawnRoutine()
     {
         float waitTime = Mathf.Max(0f, despawnTime - FADE_DURATION);

@@ -2,6 +2,10 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Hệ thống Sinh Sản Quái Vật (Spawner). 
+/// Quản lý chu kỳ respawn tại các điểm (Node) tĩnh, tự động kiểm soát tỷ lệ quái Elite tránh làm game quá khó.
+/// </summary>
 public class EnemySpawner : MonoBehaviour
 {
     [Header("--- CÀI ĐẶT QUÁI VẬT ---")]
@@ -78,6 +82,10 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Luồng đếm giờ tự động hồi sinh quái. 
+    /// Chỉ đẻ quái ở ngoài tầm nhìn màn hình (minDistanceFromPlayer) để người chơi không thấy quái xuất hiện đột ngột.
+    /// </summary>
     private IEnumerator RespawnRoutine()
     {
         WaitForSeconds checkInterval = new WaitForSeconds(0.5f);
@@ -156,6 +164,9 @@ public class EnemySpawner : MonoBehaviour
     // ============================================================
     // SPAWN
     // ============================================================
+    /// <summary>
+    /// Xử lý sinh quái. Giới hạn tự động: Nếu đã có quá 30% quái Elite trên bản đồ thì ép buộc sinh quái thường để tránh game quá tải.
+    /// </summary>
     private void SpawnEnemyAtNode(int nodeIndex, int level)
     {
         Transform selectedNode = spawnNodes[nodeIndex];

@@ -1,6 +1,10 @@
 using UnityEngine;
 using System; 
 
+/// <summary>
+/// Class nền tảng (Base) cho mọi thực thể sống trong game (Player, Boss, Quái). 
+/// Quản lý Máu, Level, EXP, Chỉ số cơ bản và nhận sát thương.
+/// </summary>
 public class BaseEntity : MonoBehaviour
 {
     [Header("Data Configuration")]
@@ -71,6 +75,10 @@ public class BaseEntity : MonoBehaviour
         buffDefense = 0;
     }
 
+    /// <summary>
+    /// Tính toán trừ máu. Trừ đi giáp, hiển thị con số sát thương nảy lên (Damage Popup).
+    /// Xử lý luôn logic chết và rơi tiền/EXP nếu đối tượng này là Quái vật.
+    /// </summary>
     public virtual void ApplyDamage(DamageInfo info)
     {
         // [FIX #4]: Chặn đứng mọi sát thương/EXP cộng dồn nếu đã chết
@@ -209,6 +217,10 @@ public class BaseEntity : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Xử lý lên cấp. 
+    /// Reset EXP, cộng điểm tiềm năng, bơm đầy máu và khuếch đại yêu cầu EXP cho cấp tiếp theo.
+    /// </summary>
     protected virtual void LevelUp()
     {
         currentEXP -= expToNextLevel; 

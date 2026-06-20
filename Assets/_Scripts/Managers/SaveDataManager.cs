@@ -3,6 +3,10 @@ using System.IO;
 using System;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Trái tim của hệ thống Lưu/Tải (Save/Load).
+/// Gói toàn bộ dữ liệu trạng thái hiện tại thành chuỗi JSON và ghi xuống ổ cứng.
+/// </summary>
 public class SaveDataManager : MonoBehaviour
 {
     public static SaveDataManager Instance { get; private set; }
@@ -28,6 +32,10 @@ public class SaveDataManager : MonoBehaviour
         else { NewGame(); }
     }
 
+    /// <summary>
+    /// Quét vòng quanh người chơi và túi đồ để thu thập toàn bộ: Máu, Level, Vàng, Đồ mặc, Đồ trong túi, Vị trí.
+    /// Hàm này được gọi ngay trước khi Save xuống ổ cứng.
+    /// </summary>
     public void CollectDataFromGame(PlayerController player, InventoryManager inv, bool savePosition = true)
     {
         if (currentData == null) return;
@@ -120,6 +128,10 @@ public class SaveDataManager : MonoBehaviour
         SaveGameToFile();
     }
 
+    /// <summary>
+    /// Đọc dữ liệu từ ổ cứng lên và "tiêm" (inject) vào Player.
+    /// Phân luồng đặc biệt: Nếu vừa chết xong thì Bơm Đầy Máu và Ném về trạm lưu (Checkpoint).
+    /// </summary>
     public void ApplyLoadedDataToPlayer(PlayerController player, InventoryManager inv)
     {
         if (currentData == null || itemDatabase == null) return;

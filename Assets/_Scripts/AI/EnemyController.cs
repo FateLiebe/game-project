@@ -1,6 +1,10 @@
 using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Trí tuệ nhân tạo cơ bản cho Quái vật thường và Quái tinh anh (Elite). 
+/// Sử dụng State Machine (Tuần tra, Rượt đuổi, Tấn công) thay vì Behavior Tree của Boss.
+/// </summary>
 public class EnemyController : EnemyBase
 {
     public enum EnemyState { Idle, Patrol, Chase, Attack, Hurt, Dead }
@@ -94,7 +98,7 @@ public class EnemyController : EnemyBase
         _prevPosition = rb.position;
     }
 
-    protected virtual void OnEnable()
+    protected override void OnEnable()
     {
         // Reset state for pooling
         if (anim != null)
@@ -142,7 +146,7 @@ public class EnemyController : EnemyBase
     // ==========================================
 
     /// <summary>
-    /// Di chuyển ngang an toàn: kiểm tra player chặn, tường, mép vực TRƯỚC KHI MovePosition.
+    /// Di chuyển ngang an toàn bằng Kinematic. Tự động dừng lại nếu phía trước là vực thẳm hoặc tường, tránh lỗi lọt map.
     /// </summary>
     private void MoveHorizontal(float speed, int moveDir)
     {
@@ -218,6 +222,9 @@ public class EnemyController : EnemyBase
         if (DetectPlayer()) SwitchState(EnemyState.Chase);
     }
 
+    /// <summary>
+    /// Đuổi theo người chơi. Đặc biệt quái Elite biết lùi lại để giữ khoảng cách ném chưởng (Ranged Attack).
+    /// </summary>
     private void UpdateChase()
     {
         if (playerTarget == null) { SwitchState(EnemyState.Idle); return; }
@@ -333,8 +340,8 @@ public class EnemyController : EnemyBase
     #region ANIMATION EVENTS
     // ==========================================
 
-    public void EnableHitbox()        { if (attackHitbox       != null) attackHitbox.SetActive(true); }
-    public void DisableHitbox()       { if (attackHitbox       != null) attackHitbox.SetActive(false); }
+    public new void EnableHitbox()        { if (attackHitbox       != null) attackHitbox.SetActive(true); }
+    public new void DisableHitbox()       { if (attackHitbox       != null) attackHitbox.SetActive(false); }
     public void EnableRangedHitbox()  { if (rangedAttackHitbox != null) rangedAttackHitbox.SetActive(true); }
     public void DisableRangedHitbox() { if (rangedAttackHitbox != null) rangedAttackHitbox.SetActive(false); }
 

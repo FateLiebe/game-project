@@ -3,6 +3,10 @@ using UnityEngine.Tilemaps;
 #if UNITY_EDITOR
 using UnityEditor;
 
+/// <summary>
+/// Công cụ hỗ trợ trên Editor (Không chạy trong Game).
+/// Chuyển đổi và gom (Merge) toàn bộ gạch (Tile) từ lớp Tilemap này sang Tilemap khác chỉ bằng 1 nút bấm.
+/// </summary>
 public class CopyTilemap : EditorWindow
 {
     Tilemap source;

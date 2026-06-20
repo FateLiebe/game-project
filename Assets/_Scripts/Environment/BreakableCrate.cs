@@ -17,6 +17,10 @@ public class TypeWeight
     public float weight = 10f;
 }
 
+/// <summary>
+/// Hòm vật phẩm có thể đánh vỡ. 
+/// Quản lý cơ chế Roll gacha: Xoay ngẫu nhiên Trọng số Loại đồ (Type Weight) và Độ hiếm (Rarity Weight) để quyết định rớt ra đồ gì.
+/// </summary>
 public class BreakableCrate : BaseEntity
 {
     [Header("Crate Settings")]
@@ -80,6 +84,12 @@ public class BreakableCrate : BaseEntity
         DropLoot();
     }
 
+    /// <summary>
+    /// Thuật toán quay số (Gacha) vật phẩm:
+    /// B1: Quay Loại (Vũ khí, Bình máu...) theo Tỷ lệ.
+    /// B2: Quay Độ hiếm (Common, Epic...) theo Tỷ lệ.
+    /// B3: Bốc ngẫu nhiên một vật phẩm khớp cả 2 tiêu chí trên từ Kho đồ gốc để văng ra.
+    /// </summary>
     private void DropLoot()
     {
         if (droppedItemPrefab == null || itemPool.Count == 0) return;

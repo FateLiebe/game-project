@@ -20,6 +20,10 @@ public enum ItemRarity
     Legendary   // Huyền Thoại (Vàng)
 }
 
+/// <summary>
+/// Thẻ Dữ Liệu Tĩnh (ScriptableObject) định nghĩa chi tiết một Vật phẩm.
+/// Bao gồm hình ảnh, chỉ số buff, âm thanh sử dụng và cơ chế kỹ năng hỗ trợ (Support Skill).
+/// </summary>
 [CreateAssetMenu(fileName = "NewItem", menuName = "Data/Item")]
 public class ItemSO : ScriptableObject
 {

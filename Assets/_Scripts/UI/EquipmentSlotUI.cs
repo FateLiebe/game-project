@@ -1,6 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Ô Trang bị đang mặc.
+/// Cho phép Nhấp 1 lần (Single-click) để xem thông tin, Nhấp đúp (Double-click) để cởi đồ bỏ lại vào Túi.
+/// </summary>
 public class EquipmentSlotUI : MonoBehaviour
 {
     [Header("Quy định loại trang bị")]

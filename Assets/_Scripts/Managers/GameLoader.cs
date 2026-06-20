@@ -2,6 +2,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
+/// <summary>
+/// Xử lý quá trình chuyển cảnh (Load Map). 
+/// Đóng vai trò dọn dẹp bộ nhớ (Unload map cũ, diệt EventSystem dư thừa) và đồng bộ tọa độ/dữ liệu cho Player ngay khi vừa load xong.
+/// </summary>
 public class GameLoader : MonoBehaviour
 {
     public string firstMapName = "Map_1";
@@ -13,6 +17,10 @@ public class GameLoader : MonoBehaviour
     private IEnumerator Start() { yield return StartCoroutine(LoadRoutine()); }
     public void StartLoad() { StartCoroutine(LoadRoutine()); }
 
+    /// <summary>
+    /// Luồng xử lý nạp không gian: Tự động phân luồng theo Save/Load hoặc Checkpoint.
+    /// Dọn sạch EventSystem rác khi dùng Additive Load để tránh lỗi dội âm thanh/UI.
+    /// </summary>
     private IEnumerator LoadRoutine()
     {
         string mapToLoad = firstMapName;
@@ -38,12 +46,23 @@ public class GameLoader : MonoBehaviour
         yield return loadOp;
         yield return null;
 
+        // [FIX] DỌN DẸP EVENT SYSTEM TRÙNG LẶP (Ngăn chặn 702 cảnh báo vàng)
+        UnityEngine.EventSystems.EventSystem[] eventSystems = FindObjectsByType<UnityEngine.EventSystems.EventSystem>(FindObjectsInactive.Include);
+        foreach (var es in eventSystems)
+        {
+            // Chỉ giữ lại EventSystem của Core_Gameplay, xóa các EventSystem lọt vào từ Map hoặc Main Menu
+            if (es.gameObject.scene.name != "Core_Gameplay" && es.gameObject.scene.name != "DontDestroyOnLoad")
+            {
+                Destroy(es.gameObject);
+            }
+        }
+
         AudioManager.Instance?.RestartAmbientCycle();
 
         // 4. ÁP DỤNG DỮ LIỆU HOẶC SPAWN TÂN THỦ
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         PlayerController player = playerObj != null ? playerObj.GetComponent<PlayerController>() : null;
-        InventoryManager inv = FindFirstObjectByType<InventoryManager>();
+        InventoryManager inv = FindAnyObjectByType<InventoryManager>();
 
         if (player != null)
         {
@@ -54,7 +73,7 @@ public class GameLoader : MonoBehaviour
             }
             else
             {
-                MapSpawnPoint spawnPoint = FindFirstObjectByType<MapSpawnPoint>();
+                MapSpawnPoint spawnPoint = FindAnyObjectByType<MapSpawnPoint>();
                 if (spawnPoint != null) player.transform.position = spawnPoint.transform.position;
             }
         }

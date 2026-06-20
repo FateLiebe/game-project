@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Quản lý vật thể bay (Đạn, Tia chưởng). 
+/// Tích hợp cơ chế tự ngắm (Homing) bám theo mục tiêu trong một khoảng thời gian đầu, tự động trả về Object Pool khi chạm hoặc hết giờ.
+/// </summary>
 public class Projectile : MonoBehaviour
 {
     [Header("Cài đặt Đạn")]

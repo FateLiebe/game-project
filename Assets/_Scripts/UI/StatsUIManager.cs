@@ -2,6 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// Quản lý giao diện Bảng Chỉ Số (Panel Mở bằng phím B hoặc nút trong Inventory).
+/// Bao gồm hiển thị Level, EXP, và cộng điểm (Stats).
+/// </summary>
 public class StatsUIManager : MonoBehaviour
 {
     // [MỚI THÊM] Singleton để các script khác dễ dàng gọi tới
@@ -51,6 +55,10 @@ public class StatsUIManager : MonoBehaviour
         if (uiPanel != null) uiPanel.SetActive(false);
     }
 
+    /// <summary>
+    /// Lắng nghe input phím B để mở Túi đồ.
+    /// Nếu Player đang trong vùng giao tranh (InCombat), KHÔNG cho phép mở để tránh lạm dụng bơm máu/đổi vũ khí giữa chừng.
+    /// </summary>
     private void Update()
     {
         // [CHẶN] Không xử lý input khi game đang Paused/GameOver/Victory

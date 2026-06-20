@@ -2,6 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// Quản lý giao diện bình máu (Consumable) trên HUD.
+/// Tự động cập nhật số lượng và ẩn đi nếu hết bình máu trong túi.
+/// </summary>
 public class ConsumableUI : MonoBehaviour
 {
     public static ConsumableUI Instance;

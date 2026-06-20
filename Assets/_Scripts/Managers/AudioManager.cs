@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// AudioManager — Singleton quản lý TOÀN BỘ âm thanh game.
-/// Gắn vào GameObject "AudioManager" trong scene Core_Gameplay.
+/// AudioManager — Singleton quản lý TOÀN BỘ âm thanh game. 
+/// Xử lý logic chia tách âm thanh: SFX của quái và môi trường bị bóp méo khi Time Stop, trong khi SFX của Player thì không.
 /// </summary>
 public class AudioManager : MonoBehaviour
 {
@@ -123,7 +123,7 @@ public class AudioManager : MonoBehaviour
 
     // Time Stop — pitch của srcWorld và bossWingSource bị bóp
     private float normalPitch = 1f;
-    private bool isTimeStopActive = false;
+    //private bool isTimeStopActive = false;
 
     // ============================================================
     // KHỞI TẠO
@@ -406,6 +406,10 @@ public class AudioManager : MonoBehaviour
     // ============================================================
     public bool IsTimeStopActive { get; private set; } // [MỞ PUBLIC] Để các VFX Sound tự đồng bộ Pitch
 
+    /// <summary>
+    /// Hiệu ứng bóp méo âm thanh (Giảm Pitch xuống 0.5) dành riêng cho Time Stop.
+    /// Tạo cảm giác thời gian trôi chậm lại (Slow-motion).
+    /// </summary>
     public void ApplyTimeStop(float slowFactor)
     {
         if (IsTimeStopActive) return;

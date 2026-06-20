@@ -4,15 +4,21 @@ using System.Collections.Generic;
 
 public partial class PlayerController
 {
-    #region DODGE & PERFECT DODGE
+    // ==========================================
+    // DODGE & PERFECT DODGE
     // ==========================================
 
+    /// <summary>
+    /// Phát hiện xem có đòn tấn công nào đang lao tới từ phía sau lưng người chơi hay không.
+    /// Thuật toán quét vùng hình tròn xung quanh, kiểm tra xem kẻ địch có hitbox đang bật hoặc đang bật hoạt ảnh Attack không.
+    /// Dùng để kích hoạt "Né mù" (Blind Dodge) nếu người chơi lướt đúng lúc.
+    /// </summary>
     private bool CheckIncomingAttackFromBehind(out float dirToThreat)
     {
         dirToThreat = 0f;
         float facingDir = transform.localScale.x >= 0 ? 1f : -1f;
         
-        int hitCount = Physics2D.OverlapCircleNonAlloc(transform.position, 5f, threatColliders);
+        int hitCount = Physics2D.OverlapCircle(transform.position, 5f, new ContactFilter2D().NoFilter(), threatColliders);
         
         for (int i = 0; i < hitCount; i++)
         {
@@ -58,11 +64,15 @@ public partial class PlayerController
         return new Vector2(h, v).normalized; 
     }
 
+    /// <summary>
+    /// Chủ động quét xem người chơi có đang "lao đầu" vào đòn tấn công của quái vật hay không.
+    /// Gọi ngay khi vừa bấm Dash. Nếu quái đang đánh mà mình Dash tới trúng khung hình -> Perfect Dodge ngay lập tức.
+    /// </summary>
     private void TryProactivePerfectDodge()
     {
         if (perfectDodgeTimer > 0f) return; 
 
-        int hitCount = Physics2D.OverlapCircleNonAlloc(transform.position, 3.5f, threatColliders);
+        int hitCount = Physics2D.OverlapCircle(transform.position, 3.5f, new ContactFilter2D().NoFilter(), threatColliders);
         
         for (int i = 0; i < hitCount; i++)
         {
@@ -96,6 +106,11 @@ public partial class PlayerController
         if (hurtbox != null) hurtbox.isPerfectDodging = false;
     }
 
+    /// <summary>
+    /// Luồng xử lý kỹ năng Lướt (Dash).
+    /// Tạm thời tắt Hitbox, loại bỏ trọng lực, truyền lực đẩy mạnh về phía trước/sau.
+    /// Đồng thời kích hoạt khung thời gian vô địch (I-Frames) ở đầu đòn lướt.
+    /// </summary>
     private IEnumerator PerformDash(Vector2 direction, bool isBackdash)
     {
         PlayerState previousState = currentState;
@@ -159,6 +174,12 @@ public partial class PlayerController
         anim.SetBool("isDashingUpward", false);
     }
 
+    /// <summary>
+    /// Xử lý logic khi kích hoạt Perfect Dodge thành công.
+    /// - Gọi Ngưng đọng thời gian (Time Stop).
+    /// - Cấp cho kẻ địch vừa bị né một "kim bài miễn tử" ngược: Player sẽ không bị nhận sát thương từ chính kẻ này trong vài giây.
+    /// - Cho phép Player đi xuyên qua kẻ địch đó (Phasing) để lướt ra sau lưng chúng.
+    /// </summary>
     public void OnPerfectDodgeSuccess(BaseEntity attacker)
     {
         if (isPhasingThrough) return;
@@ -258,6 +279,9 @@ public partial class PlayerController
     // Biến cờ đánh dấu đòn đánh là Counter Attack
     private bool isCounterAttacking = false;
 
+    /// <summary>
+    /// Ghi đè hàm nhận sát thương của BaseEntity để tích hợp logic Phản Đòn (Counter) và Kháng sát thương (I-frames).
+    /// </summary>
     public override void ApplyDamage(DamageInfo info)
     {
         // [COUNTER ATTACK CHECK]
@@ -369,6 +393,10 @@ public partial class PlayerController
         attackCoroutine = StartCoroutine(PerformCounterAttackRoutine());
     }
 
+    /// <summary>
+    /// Chuỗi combo chém phản công (Counter Attack). 
+    /// Miễn nhiễm sát thương trong lúc chém và tung ra đòn chém mạnh nhất (Combo step 3).
+    /// </summary>
     private IEnumerator PerformCounterAttackRoutine()
     {
         // KHÔNG đổi currentState thành Attacking để tránh kẹt logic di chuyển
@@ -493,12 +521,17 @@ public partial class PlayerController
     public void EnableHitbox() { if (attackHitbox != null) attackHitbox.SetActive(true); }
     public void DisableHitbox() { if (attackHitbox != null) attackHitbox.SetActive(false); }
 
+    /// <summary>
+    /// Gọi khi máu rơi xuống 0.
+    /// Đưa nhân vật vào trạng thái bất động, xóa toàn bộ hoạt ảnh dư thừa.
+    /// [QUAN TRỌNG]: Lưu game ngay lập tức lúc chết, để khi "Reload Checkpoint" thì giữ nguyên chỉ số, đồ đạc, chỉ trả lại vị trí cũ.
+    /// </summary>
     protected override void Die()
     {
         // Reset sạch tất cả params trước
         anim.SetFloat("speed", 0f);
         anim.SetBool("isGrounded", false);
-        anim.SetBool("isJumping", false);
+        //anim.SetBool("isJumping", false);
         anim.SetBool("isFalling", false);
         anim.SetBool("isAttacking", false);
         anim.SetBool("isDashingUpward", false);
@@ -529,7 +562,10 @@ public partial class PlayerController
         Debug.Log("<color=red>GAME OVER!</color>");
     }
 
-    // Đánh thức nhân vật
+    /// <summary>
+    /// Gọi bởi Checkpoint khi người chơi nhấn "Reload Save Point".
+    /// Dọn dẹp trạng thái Dead, trả lại Layer vật lý, khôi phục trọng lực (nếu chết do rớt vực).
+    /// </summary>
     public void Revive()
     {
         if (hurtbox != null) hurtbox.gameObject.SetActive(true);

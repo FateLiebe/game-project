@@ -1,7 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// PlayerAudio — Gắn lên Player. Lắng nghe trạng thái và gọi AudioManager.
+/// Cầu nối (Bridge) giữa Player và AudioManager. 
+/// Tự động lắng nghe các trạng thái vật lý (Chạy, Rơi, Chạm đất) để kích hoạt âm thanh lặp (Loop) phù hợp mà không làm rác file PlayerController.
 /// </summary>
 [RequireComponent(typeof(PlayerController))]
 public class PlayerAudio : MonoBehaviour

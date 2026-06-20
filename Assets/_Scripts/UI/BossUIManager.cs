@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// [PHASE 3] Subscribe vào PlayerController.OnBossDetected / OnBossLost.
+/// Quản lý thanh máu và khiên của Boss trên UI.
+/// Lắng nghe sự kiện OnBossDetected / OnBossLost từ PlayerController để tự động bật tắt thanh máu và thay đổi nhạc nền.
 /// </summary>
 public class BossUIManager : MonoBehaviour
 {

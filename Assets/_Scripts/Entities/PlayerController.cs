@@ -3,6 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Trung tâm điều khiển mọi hành vi của Player (Được chia nhỏ thành Combat, Movement bằng partial class).
+/// Script này chứa StateMachine (Trạng thái), bộ đếm giờ (Timer) và các tín hiệu Sự Kiện (Events) để giao tiếp với UI.
+/// </summary>
 public partial class PlayerController : BaseEntity
 {
     public enum PlayerState { Grounded, Airborne, Dashing, DashStalling, Attacking, Countering }
@@ -72,7 +76,7 @@ public partial class PlayerController : BaseEntity
     private const float LOCK_DURATION = 45f;
 
     // [COMBAT POPUP] chống spam
-    private float lastCombatWarningTime = -99f;
+    //private float lastCombatWarningTime = -99f;
     private const float COMBAT_WARNING_COOLDOWN = 2f;
     
     private Animator anim;
@@ -89,7 +93,7 @@ public partial class PlayerController : BaseEntity
     private float verticalInput;
     private float originalGravity;
 
-    private float lastGroundedTime = 0f;
+    //private float lastGroundedTime = 0f;
     private const float COYOTE_TIME = 0.12f;
 
     // Thêm vào phần khai báo biến
@@ -144,6 +148,10 @@ public partial class PlayerController : BaseEntity
         if (baseData != null) currentDashCharges = baseData.maxDashes;
     }
 
+    /// <summary>
+    /// Vòng lặp chính. 
+    /// Ngăn chặn di chuyển/ra đòn nếu đang mở Túi Đồ hoặc Game đang Pause.
+    /// </summary>
     private void Update()
     {
         // [FIX CHẶN INPUT]: Dừng mọi tương tác nếu game không ở trạng thái Gameplay

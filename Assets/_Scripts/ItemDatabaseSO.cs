@@ -1,6 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// Thư viện Vật Phẩm Trung Tâm (Database).
+/// Lưu trữ toàn bộ các mẫu ItemSO trong game. Khi Load Game bằng chuỗi ID chữ (VD: wp_sword_1), hệ thống sẽ đối chiếu vào đây để lấy ra đúng vật phẩm vật lý.
+/// </summary>
 [CreateAssetMenu(fileName = "ItemDatabase", menuName = "Data/Item Database")]
 public class ItemDatabaseSO : ScriptableObject
 {

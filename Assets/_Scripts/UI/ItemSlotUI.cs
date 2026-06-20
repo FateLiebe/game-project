@@ -1,7 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Đã thêm thư viện TextMeshPro
+using TMPro;
 
+/// <summary>
+/// Ô chứa vật phẩm bên trong lưới Inventory.
+/// Xử lý cộng dồn số lượng, logic Nhấp 1 lần (Xem Tooltip / Chọn để bán), Nhấp đúp (Sử dụng / Bán ngay lập tức).
+/// </summary>
 public class ItemSlotUI : MonoBehaviour
 {
     private Image slotImage; 

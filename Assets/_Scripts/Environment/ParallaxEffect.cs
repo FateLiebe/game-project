@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Tạo hiệu ứng thị sai (Parallax) cho phông nền (Background). 
+/// Tính toán khoảng cách chênh lệch giữa Camera và vị trí gốc của ảnh để dịch chuyển ảnh theo một Tỷ lệ (Multiplier), tạo cảm giác chiều sâu 3D.
+/// </summary>
 public class ParallaxEffect : MonoBehaviour
 {
     [Header("Tỷ lệ dịch chuyển (0 = Gắn chặt vào Map, 1 = Đi theo Camera)")]

@@ -1,6 +1,9 @@
 using UnityEngine;
 
-// Giao diện này dùng cho bất cứ thứ gì có thể bị đánh mất máu
+/// <summary>
+/// Giao diện (Interface) chung dành cho mọi vật thể có thể bị phá hủy hoặc mất máu (Quái, Người, Hòm đồ).
+/// Ép buộc các class kế thừa phải định nghĩa cách xử lý TakeDamage.
+/// </summary>
 public interface IDamageable
 {
     // Bắt buộc phải có hàm nhận sát thương

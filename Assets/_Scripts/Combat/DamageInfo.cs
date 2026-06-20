@@ -3,7 +3,11 @@ using UnityEngine;
 // Phân loại đòn đánh để xử lý Counter hoặc Kháng phép
 public enum DamageType { Normal, Heavy, Skill, Pierce, Environmental }
 
-public struct DamageInfo // (Hoặc public class tùy code cũ của bạn)
+/// <summary>
+/// Gói Dữ Liệu Sát Thương (Struct).
+/// Mang theo lượng sát thương, lực đẩy, cờ chí mạng (Crit) và vết Hitbox gốc (để truy vết và kích hoạt Phản đòn - Parry).
+/// </summary>
+public struct DamageInfo
 {
     public float damage;
     public Vector2 knockbackForce;

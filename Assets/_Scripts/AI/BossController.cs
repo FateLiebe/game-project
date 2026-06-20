@@ -2,6 +2,9 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Trí tuệ nhân tạo (AI) dành riêng cho Boss. Boss có khả năng bay lượn, xài khiên, nổi điên (Phase 2), và sử dụng 7 loại skill khác nhau dựa trên khoảng cách.
+/// </summary>
 public class BossController : EnemyBase
 {
     [Header("--- RANGES & GIZMOS ---")]
@@ -153,6 +156,10 @@ public class BossController : EnemyBase
         }
     }
 
+    /// <summary>
+    /// Cây hành vi cốt lõi (Behavior Tree). 
+    /// Quyết định chọn skill dựa vào khoảng cách tới người chơi, máu còn lại, và tránh xài trùng skill liên tiếp.
+    /// </summary>
     private IEnumerator EvaluateBehavior()
     {
         isActing = true;
@@ -397,6 +404,9 @@ public class BossController : EnemyBase
     // ==========================================
     // LOGIC ÁP DỤNG SÁT THƯƠNG & TRỪ KHIÊN
     // ==========================================
+    /// <summary>
+    /// Ghi đè hàm sát thương cơ bản để tích hợp cơ chế Khiên Năng Lượng và bay lên trời nếu bị dồn dame quá nhanh (anti-burst).
+    /// </summary>
     public override void ApplyDamage(DamageInfo info)
     {
         if (currentHealth <= 0f || isDead) return;

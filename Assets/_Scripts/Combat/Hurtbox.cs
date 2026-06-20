@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Vùng nhận sát thương (Hurtbox). Gắn trên Player hoặc Quái.
+/// Là điểm tiếp xúc đầu tiên nhận gói sát thương (DamageInfo) từ Hitbox. Xử lý cơ chế Né Hoàn Hảo (Perfect Dodge) trước khi trừ máu thực sự.
+/// </summary>
 public class Hurtbox : MonoBehaviour, IDamageable
 {
     [SerializeField] private BaseEntity owner;

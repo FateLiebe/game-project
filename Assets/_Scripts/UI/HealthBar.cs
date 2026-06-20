@@ -1,7 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Bắt buộc phải có để hiển thị số Level
+using TMPro;
 
+/// <summary>
+/// Giao diện Thanh Máu, EXP và Level của Thực thể (Player, Quái).
+/// Tích hợp cơ chế bù trừ Scale: Ngăn chặn thanh máu bị lật ngược chữ khi Entity quay đầu.
+/// </summary>
 public class HealthBar : MonoBehaviour
 {
     [Tooltip("Kéo đối tượng chứa BaseEntity (Player hoặc Slime) vào đây")]

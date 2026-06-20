@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// Tự động gắn lên pooled objects bởi ObjectPoolManager.
-/// Cho phép object tự biết cách trả về pool mà không cần tham chiếu prefab.
+/// Định danh Object Pool. Tự động được ObjectPoolManager gắn lên các vật thể ném vào kho.
+/// Giúp vật thể nhớ được ID nguồn gốc của mình và tự biết cách quay về đúng ngăn chứa khi gọi hàm ReturnToPool.
 /// </summary>
 [DisallowMultipleComponent]
 public class PooledObject : MonoBehaviour

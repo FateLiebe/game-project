@@ -3,7 +3,8 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// [PHASE 3] Subscribe vào PlayerController.OnSupportSkillUpdated thay vì bị gọi trực tiếp.
+/// Giao diện Kỹ Năng Hỗ Trợ (Support Skill) trên màn hình chính (HUD).
+/// Lắng nghe sự kiện OnSupportSkillUpdated từ PlayerController để cập nhật thanh Cooldown (Overlay) và số lượt dùng còn lại.
 /// </summary>
 public class SupportSkillUI : MonoBehaviour
 {

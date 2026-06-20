@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Thẻ Dữ Liệu Tĩnh (ScriptableObject) lưu trữ toàn bộ cấu hình gốc của Nhân vật.
+/// Bao gồm thông số Di chuyển (Tốc độ, Bước nhảy, Lướt) và Hệ số Tăng trưởng (Growth) khi lên cấp.
+/// </summary>
 [CreateAssetMenu(fileName = "NewCharacterData", menuName = "Data/Character Data")]
 public class CharacterDataSO : ScriptableObject
 {

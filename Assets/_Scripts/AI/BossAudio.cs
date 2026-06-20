@@ -1,9 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// BossAudio — Gắn vào GameObject Boss.
-/// Tự động bật tiếng vỗ cánh khi boss sống, tắt khi boss chết.
-/// Âm thanh tấn công được phát qua VFX_SoundTrigger trên từng VFX prefab.
+/// Quản lý hiệu ứng âm thanh vòng lặp (Loop) đặc trưng của Boss.
+/// Hiện tại dùng để phát âm thanh vỗ cánh liên tục từ lúc Boss xuất hiện cho đến lúc bị tiêu diệt. 
+/// Các kỹ năng đòn đánh khác được xử lý riêng bên VFX_SoundTrigger.
 /// </summary>
 [RequireComponent(typeof(BossController))]
 public class BossAudio : MonoBehaviour

@@ -2,13 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// BreathDOT — Gắn lên prefab Breath (skill 0) và Breath Fire (skill 1).
-/// Dùng BoxCollider2D có sẵn trên prefab để xác định vùng sát thương.
-///
-/// CÁCH DÙNG:
-/// 1. Xóa (hoặc disable) UniversalHitbox trên prefab Breath/BreathFire
-/// 2. Add Component → BreathDOT (BoxCollider2D đã có sẵn → không cần thêm)
-/// 3. Điền totalDuration, damageScaleTotal, tickCount
+/// Quản lý kỹ năng Khạc Lửa (Breath DOT - Damage Over Time) của Boss.
+/// Không dùng va chạm vật lý thông thường mà dùng hàm quét OverlapBox liên tục theo chu kỳ (Tick) để rỉa máu Player liên tục khi đứng trong luồng lửa.
 /// </summary>
 [RequireComponent(typeof(BoxCollider2D))]
 public class BreathDOT : MonoBehaviour

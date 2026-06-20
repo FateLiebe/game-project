@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Cấu trúc dữ liệu dùng để nén (Serialize) và ghi ra file JSON.
+/// Lưu trữ toàn bộ thông tin về chỉ số, tọa độ hiện tại, trang bị đang mặc và danh sách vật phẩm trong túi đồ.
+/// </summary>
 [System.Serializable]
 public class InventorySlotData
 {

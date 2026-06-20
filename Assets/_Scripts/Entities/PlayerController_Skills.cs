@@ -1,13 +1,22 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Quản lý Hệ thống Kỹ năng hỗ trợ (Bùa/Phép) và cơ chế Khóa mục tiêu (Lock Target) của Player.
+/// Bao gồm quét quái tự động (Auto-aim) bằng OverlapCircle, ném đạn (Projectile) hoặc đánh thẳng mục tiêu (Sét).
+/// Đồng thời phụ trách phát hiện Boss để báo hiệu cho UI.
+/// </summary>
 public partial class PlayerController
 {
     #region BOSS DETECTION
     // ==========================================
 
+    /// <summary>
+    /// Radar quét Boss: Tự động chạy mỗi frame trong Update (thuộc PlayerController gốc).
+    /// Bắn ra một vòng tròn quét tìm Layer Boss, nếu phát hiện sẽ bắn Event gọi BossUIManager hiện thanh máu.
+    /// </summary>
     private void HandleBossDetection()
     {
         // Quét 1 vòng tròn quanh Player để tìm Layer của Boss
@@ -38,6 +47,10 @@ public partial class PlayerController
     // ==========================================
     #region SUPPORT SKILLS
     // ==========================================
+    /// <summary>
+    /// Vòng lặp chính xử lý Bùa chú (Support Skill). 
+    /// Tính toán thời gian hồi chiêu, tự động gửi dữ liệu cho UI và nhận nút E để xuất chiêu.
+    /// </summary>
     private void HandleSupportSkill()
     {
         if (equippedSupportSkill == null) return;
@@ -104,7 +117,7 @@ public partial class PlayerController
 
         float facingDir = transform.localScale.x >= 0 ? 1f : -1f;
         // [PHASE 2] NonAlloc: tái sử dụng _enemyScanBuffer, không cấp phát array mới
-        int count = Physics2D.OverlapCircleNonAlloc(transform.position, radius, _enemyScanBuffer);
+        int count = Physics2D.OverlapCircle(transform.position, radius, new ContactFilter2D().NoFilter(), _enemyScanBuffer);
         Transform nearest = null;
         float minDist = Mathf.Infinity;
 
@@ -130,6 +143,12 @@ public partial class PlayerController
         return nearest;
     }
 
+    /// <summary>
+    /// Hàm Xử Lý Bắn Bùa.
+    /// Tính toán sát thương tổng (Crit + Modifier). Nhận diện loại Kỹ năng: 
+    /// - Nếu là Đạn Lửa (Projectile): Bắn từ tay Player bay tới địch.
+    /// - Nếu là Sét: Giáng thẳng xuống đầu vị trí của kẻ địch.
+    /// </summary>
     private void UseSupportSkill()
     {
         if (equippedSupportSkill == null || equippedSupportSkill.skillPrefab == null) return;

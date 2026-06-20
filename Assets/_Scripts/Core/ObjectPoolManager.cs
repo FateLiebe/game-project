@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Object Pool tổng quát — tái sử dụng GameObject thay vì Instantiate/Destroy.
+/// Hệ thống tối ưu hóa bộ nhớ (Object Pool) cốt lõi. 
+/// Thay vì dùng Instantiate/Destroy liên tục gây rác bộ nhớ (Garbage Collection giật lag), hệ thống này "tái chế" các GameObject (như tia chưởng, số dame) bằng cách bật/tắt (SetActive).
+/// 
 /// Cách dùng: ObjectPoolManager.Instance.Get(prefab, pos, rot)
 /// Trả lại:   GetComponent&lt;PooledObject&gt;().ReturnToPool()
 /// </summary>
@@ -24,12 +26,12 @@ public class ObjectPoolManager : MonoBehaviour
     // ==========================================
 
     /// <summary>
-    /// Lấy một instance từ pool (hoặc tạo mới nếu pool trống).
-    /// PooledObject component được tự động gắn vào lần đầu tiên.
+    /// Lấy một Object từ kho (hoặc tạo mới nếu kho đã rỗng).
+    /// PooledObject component được tự động gắn vào để Object "nhớ" mình thuộc kho nào.
     /// </summary>
     public GameObject Get(GameObject prefab, Vector3 position, Quaternion rotation)
     {
-        int id = prefab.GetInstanceID();
+        int id = prefab.GetHashCode(); // Sửa lỗi obsolete thay cho GetInstanceID()
         EnsurePool(id);
 
         GameObject obj;
@@ -63,7 +65,7 @@ public class ObjectPoolManager : MonoBehaviour
     /// <summary>Khởi tạo sẵn N bản trong pool để tránh giật ở frame đầu tiên.</summary>
     public void Prewarm(GameObject prefab, int count)
     {
-        int id = prefab.GetInstanceID();
+        int id = prefab.GetHashCode(); // Sửa lỗi obsolete thay cho GetInstanceID()
         EnsurePool(id);
         for (int i = 0; i < count; i++)
         {

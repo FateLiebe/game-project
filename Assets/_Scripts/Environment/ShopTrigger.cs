@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Điểm tương tác với NPC Bán Hàng (Thương nhân).
+/// Quản lý vùng kích hoạt: Hiện nút bấm (Prompt) khi lại gần, lắng nghe phím R để bật/tắt giao diện ShopManager và tự động đóng khi rời đi xa.
+/// </summary>
 public class ShopTrigger : MonoBehaviour
 {
     [SerializeField] private GameObject interactPrompt;

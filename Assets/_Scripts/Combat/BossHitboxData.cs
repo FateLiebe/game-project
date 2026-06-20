@@ -1,6 +1,9 @@
 using UnityEngine;
 
-// Gắn script này lên từng VFX prefab của Boss trong Inspector
+/// <summary>
+/// Chứa dữ liệu động gắn trên từng loại VFX của Boss.
+/// Cho phép tính toán sát thương uyển chuyển dựa trên Loại Kỹ Năng và Khoảng Cách bay của đạn (Ví dụ: Cầu lửa FireBall bay càng xa nổ càng đau).
+/// </summary>
 public class BossHitboxData : MonoBehaviour
 {
     public enum BossSkillType 

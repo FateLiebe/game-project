@@ -2,6 +2,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
+/// <summary>
+/// Xử lý điểm dịch chuyển (Cổng không gian) giữa các Map. 
+/// Đóng băng Player, load Map mới bất đồng bộ (Additive) rồi di chuyển Player tới tọa độ an toàn của cổng đích.
+/// </summary>
 public class MapPortal : MonoBehaviour
 {
     [Header("--- THÔNG TIN CỔNG ---")]
@@ -27,6 +31,13 @@ public class MapPortal : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Chuỗi quy trình chuyển không gian: 
+    /// 1. Đóng băng (Freeze) Player.
+    /// 2. Tải Map mới lên đè vào (Additive).
+    /// 3. Định vị tọa độ cổng tương ứng và vứt Player sang đó.
+    /// 4. Hủy (Unload) Map cũ và Rã đông Player.
+    /// </summary>
     private IEnumerator TransitionMapRoutine(GameObject playerObj, Scene currentMap)
     {
         Debug.Log($"<color=yellow>Đang tải không gian: {nextMapName}...</color>");
@@ -53,7 +64,7 @@ public class MapPortal : MonoBehaviour
         yield return loadOp; 
 
         // 3. ĐỊNH VỊ CỔNG ĐÍCH & DI CHUYỂN PLAYER
-        MapPortal[] allPortals = FindObjectsByType<MapPortal>(FindObjectsSortMode.None);
+        MapPortal[] allPortals = FindObjectsByType<MapPortal>();
         foreach (var portal in allPortals)
         {
             if (portal.gameObject.scene != currentMap &&

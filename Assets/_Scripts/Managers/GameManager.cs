@@ -1,6 +1,10 @@
 using UnityEngine;
 using System;
 
+/// <summary>
+/// Quản lý vòng đời và các trạng thái cốt lõi của trò chơi (Menu, Đang chơi, Tạm dừng, Chết).
+/// Sử dụng mô hình Singleton và sống xuyên suốt các Scene (DontDestroyOnLoad).
+/// </summary>
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -34,6 +38,9 @@ public class GameManager : MonoBehaviour
     // ==========================================
     // HÀM CHUYỂN TRẠNG THÁI TRUNG TÂM
     // ==========================================
+    /// <summary>
+    /// Chuyển đổi trạng thái game. Kèm theo đó là can thiệp vào Time.timeScale (Đóng băng thời gian khi Pause/Victory, Làm chậm khi chết).
+    /// </summary>
     public void ChangeState(GameState newState)
     {
         if (CurrentState == newState) return;

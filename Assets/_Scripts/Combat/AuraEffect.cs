@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Hiệu ứng hào quang/Bùa lợi (Buff/Shield).
+/// Bám theo Thực thể (Owner) và cường hóa chỉ số (Tấn công, Phòng thủ, Khiên chắn) trong một khoảng thời gian nhất định rồi tự tiêu biến.
+/// </summary>
 public class AuraEffect : MonoBehaviour
 {
     private BaseEntity ownerEntity;

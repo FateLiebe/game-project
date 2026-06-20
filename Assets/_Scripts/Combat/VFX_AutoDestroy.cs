@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Gắn lên các Hiệu ứng hình ảnh (VFX). 
+/// Tự động đọc độ dài của Animator (hoặc mặc định 1s) để tự đưa bản thân về Object Pool khi chạy xong, tránh rác bộ nhớ.
+/// </summary>
 public class VFX_AutoDestroy : MonoBehaviour
 {
     private void OnEnable()

@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.UI; 
 using System.Collections.Generic;
 
+/// <summary>
+/// Hệ thống túi đồ trung tâm. Quản lý danh sách vật phẩm, trang bị, logic sử dụng (bom, máu) và cập nhật giao diện lưới đồ.
+/// </summary>
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance { get; private set; }
@@ -84,6 +87,11 @@ public class InventoryManager : MonoBehaviour
         return occupied;
     }
 
+    /// <summary>
+    /// Thêm vật phẩm vào túi.
+    /// Đối với đồ tiêu hao (Máu, Bom), nếu đã có thì cộng dồn (Stack) không chiếm ô mới.
+    /// Nếu túi đầy (vượt maxSlots) thì báo đỏ và từ chối nhặt.
+    /// </summary>
     public bool AddItem(ItemSO itemToAdd)
     {
         int occupied = GetOccupiedSlots();
@@ -256,6 +264,10 @@ public class InventoryManager : MonoBehaviour
         UpdateUI();
     }
 
+    /// <summary>
+    /// Trang bị vật phẩm.
+    /// Tự động dò tìm đúng khe cắm (Vũ khí, Mũ, Giáp...). Đẩy đồ đang mặc hiện tại xuống lại túi đồ và áp dụng chỉ số mới.
+    /// </summary>
     private void EquipItem(ItemSO itemToEquip)
     {
         foreach (EquipmentSlotUI slot in equipSlots)

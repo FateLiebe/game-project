@@ -1,10 +1,14 @@
 using UnityEngine;
 
+/// <summary>
+/// Quản lý khu vực vực thẳm (DeathZone) phía dưới đáy bản đồ.
+/// Giết bất kỳ sinh vật nào rơi xuống và dọn dẹp vật phẩm rơi ra ngoài để tránh lag.
+/// </summary>
 public class DeathZone : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Xử lý các Entity (Player, Boss, Enemy)
+        // 1. Xử lý các Entity (Player, Boss, Enemy)
         BaseEntity entity = collision.GetComponentInParent<BaseEntity>();
         if (entity != null && entity.currentHealth > 0)
         {
@@ -17,7 +21,7 @@ public class DeathZone : MonoBehaviour
             };
             entity.ApplyDamage(instantDeath);
 
-            // Tắt trọng lực để xác không bị rơi mãi mãi (tuỳ chọn)
+            // Tắt trọng lực để xác không bị rơi mãi mãi qua lớp Collider (tránh lỗi lọt bản đồ)
             Rigidbody2D rb = entity.GetComponent<Rigidbody2D>();
             if (rb != null)
             {
@@ -27,8 +31,8 @@ public class DeathZone : MonoBehaviour
             return;
         }
 
-        // Dọn dẹp rác, vật phẩm rơi vãi hoặc đạn bay ra khỏi map để chống rò rỉ bộ nhớ
-        if (collision.CompareTag("ItemDrop") || collision.GetComponent<Projectile>() != null)
+        // 2. Dọn dẹp rác, vật phẩm rơi vãi hoặc đạn bay ra khỏi map để chống rò rỉ bộ nhớ (Memory Leak)
+        if (collision.GetComponent<ItemPickup>() != null || collision.GetComponent<Projectile>() != null)
         {
             PooledObject pooledObj = collision.GetComponent<PooledObject>();
             if (pooledObj != null)

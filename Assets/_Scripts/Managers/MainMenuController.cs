@@ -3,6 +3,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.IO;
 
+/// <summary>
+/// Trình điều khiển giao diện Menu chính (Main Menu).
+/// Kiểm tra xem file Save có tồn tại hay không để bật/tắt nút "Continue", đồng thời thiết lập cờ LoadMode cho GameLoader.
+/// </summary>
 public class MainMenuController : MonoBehaviour
 {
     [Header("UI Buttons")]

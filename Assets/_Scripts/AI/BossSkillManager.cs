@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Trạm điều phối kỹ năng (VFX) của Boss. 
+/// Phân luồng hiệu ứng: Chỉnh sửa hướng lật ảnh (Facing), gắn bùa lợi (Aura/Shield) theo người Boss, hoặc gọi bão sét giáng thẳng xuống đầu Player.
+/// </summary>
 public class BossSkillManager : MonoBehaviour
 {
     [Header("--- KHO VFX (7 KỸ NĂNG) ---")]
@@ -25,6 +29,10 @@ public class BossSkillManager : MonoBehaviour
         bossEntity = GetComponent<BaseEntity>();
     }
 
+    /// <summary>
+    /// Nơi "đúc" ra kỹ năng dựa trên Index từ Behavior Tree.
+    /// Xử lý định vị động (Sét đánh theo vị trí Player hiện tại) hoặc gán sát thương duy trì (Breath DOT).
+    /// </summary>
     public void SpawnVFXInstant(int skillIndex, int facingDir)
     {
         GameObject vfxToSpawn = null;

@@ -1,11 +1,17 @@
 using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Quản lý phần di chuyển (Movement), nhảy (Jump), lướt (Dash), và nhận diện mặt đất (Grounded) của Player.
+/// </summary>
 public partial class PlayerController
 {
     #region INPUT & MOVEMENT
     // ==========================================
 
+    /// <summary>
+    /// Nhận diện phím bấm và chặn tương tác khi đang phản đòn (Counter) hoặc lướt (Dash).
+    /// </summary>
     private void HandleInput()
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -225,6 +231,10 @@ public partial class PlayerController
         anim.SetBool("isFalling",  falling);
     }
 
+    /// <summary>
+    /// Cơ chế kiểm tra mặt đất siêu an toàn bằng Raycast.
+    /// Đòi hỏi nhân vật phải chạm đất liên tục 3 frame để chống hiện tượng giật lag bay trên không.
+    /// </summary>
     private void CheckGrounded()
     {
         if (currentState == PlayerState.Dashing || currentState == PlayerState.DashStalling) return;

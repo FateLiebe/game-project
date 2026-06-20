@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Vùng gây sát thương (Hitbox) đa dụng gắn trên Vũ khí hoặc Đạn.
+/// Chịu trách nhiệm phát hiện va chạm với Hurtbox, lọc chống "tự sát thương" (Friendly Fire) và truyền DamageInfo cho nạn nhân.
+/// </summary>
 public class UniversalHitbox : MonoBehaviour 
 {
     [Header("Damage Settings")]
@@ -11,6 +15,10 @@ public class UniversalHitbox : MonoBehaviour
     [Header("Hitbox Owner")]
     public GameObject owner;
 
+    /// <summary>
+    /// Xử lý va chạm và truyền sát thương. Lọc cẩn thận để quái không đánh trúng quái, Player không đánh trúng Player.
+    /// Tính toán cả hệ số đòn đánh chí mạng (Crit) và chiều đẩy lùi (Knockback).
+    /// </summary>
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Hurtbox targetHurtbox = collision.GetComponent<Hurtbox>();
