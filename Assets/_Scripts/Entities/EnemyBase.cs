@@ -142,6 +142,8 @@ public class EnemyBase : BaseEntity
     /// Xử lý lực đẩy lùi (Knockback) an toàn bằng Coroutine.
     /// Tự động kiểm tra hẻm vực/tường phía sau để chặn lại, tránh tình trạng quái bị văng ra khỏi bản đồ.
     /// </summary>
+    private Coroutine knockbackCoroutine;
+
     public void StartKnockback(Vector2 force)
     {
         if (rb == null) return;

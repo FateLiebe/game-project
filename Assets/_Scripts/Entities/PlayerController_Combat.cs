@@ -4,8 +4,7 @@ using System.Collections.Generic;
 
 public partial class PlayerController
 {
-    // ==========================================
-    // DODGE & PERFECT DODGE
+    #region DODGE & PERFECT DODGE
     // ==========================================
 
     /// <summary>
@@ -18,7 +17,7 @@ public partial class PlayerController
         dirToThreat = 0f;
         float facingDir = transform.localScale.x >= 0 ? 1f : -1f;
         
-        int hitCount = Physics2D.OverlapCircle(transform.position, 5f, new ContactFilter2D().NoFilter(), threatColliders);
+        int hitCount = Physics2D.OverlapCircle(transform.position, 5f, ContactFilter2D.noFilter, threatColliders);
         
         for (int i = 0; i < hitCount; i++)
         {
@@ -72,7 +71,7 @@ public partial class PlayerController
     {
         if (perfectDodgeTimer > 0f) return; 
 
-        int hitCount = Physics2D.OverlapCircle(transform.position, 3.5f, new ContactFilter2D().NoFilter(), threatColliders);
+        int hitCount = Physics2D.OverlapCircle(transform.position, 3.5f, ContactFilter2D.noFilter, threatColliders);
         
         for (int i = 0; i < hitCount; i++)
         {

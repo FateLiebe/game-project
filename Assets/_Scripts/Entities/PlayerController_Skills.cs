@@ -117,7 +117,7 @@ public partial class PlayerController
 
         float facingDir = transform.localScale.x >= 0 ? 1f : -1f;
         // [PHASE 2] NonAlloc: tái sử dụng _enemyScanBuffer, không cấp phát array mới
-        int count = Physics2D.OverlapCircle(transform.position, radius, new ContactFilter2D().NoFilter(), _enemyScanBuffer);
+        int count = Physics2D.OverlapCircle(transform.position, radius, ContactFilter2D.noFilter, _enemyScanBuffer);
         Transform nearest = null;
         float minDist = Mathf.Infinity;
 
