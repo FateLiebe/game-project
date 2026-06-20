@@ -1,37 +1,10 @@
 fileFormatVersion: 2
-guid: 4252f2f250890d0408a5ed6c7414a1a6
+guid: 6df5a1d7e182bca4e8b7ad7f1338aff7
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1679102353093197692
-    second: speed (1)_0
-  - first:
-      213: 6852383243355312443
-    second: speed (1)_1
-  - first:
-      213: 5934486807190438180
-    second: speed (1)_2
-  - first:
-      213: -6616795403130614586
-    second: speed (1)_3
-  - first:
-      213: -454845974100459034
-    second: speed (1)_4
-  - first:
-      213: -970369684734206874
-    second: speed (1)_5
-  - first:
-      213: -9020721575802355823
-    second: speed (1)_6
-  - first:
-      213: -3395310995808130685
-    second: speed (1)_7
-  - first:
-      213: 1090958064132838326
-    second: speed (1)_8
-  - first:
-      213: 3141597857528832171
-    second: speed (1)_9
+      213: 7253652341725546674
+    second: space_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -78,7 +51,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 512
+  spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -140,23 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: speed (1)_0
+      name: space_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 512
-        height: 512
+        x: 41
+        y: 191
+        width: 430
+        height: 130
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c7f74a1a1be5d4710800000000000000
-      internalID: 1679102353093197692
+      spriteID: 2b84bb09f562aa460800000000000000
+      internalID: 7253652341725546674
       vertices: []
       indices: 
       edges: []
@@ -165,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: b4212090c087c0b48810bcfed4551e77
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -173,11 +146,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries:
-      - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":512.0,"y":512.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+      entries: []
     nameFileIdTable:
-      speed (1)_0: 1679102353093197692
+      space_0: 7253652341725546674
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

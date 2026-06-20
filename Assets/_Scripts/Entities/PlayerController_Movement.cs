@@ -51,13 +51,14 @@ public partial class PlayerController
             }
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return))
         {
             lastAttackInputTime = Time.time;
         }
 
-        if ((Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1)))
+        if ((Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1) || uiDashRequested))
         {
+            uiDashRequested = false;
             if (CanDash())
             {
                 CancelAttack();
@@ -319,4 +320,37 @@ public partial class PlayerController
     #endregion
 
     // ==========================================
+    #region UI BUTTON HANDLERS
+    // ==========================================
+    public void UIButton_Attack()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay) return;
+        lastAttackInputTime = Time.time;
+    }
+
+    public void UIButton_Jump()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay) return;
+        if (jumpsLeft > 0)
+        {
+            if (currentState == PlayerState.Grounded)
+            {
+                Jump();
+            }
+            else if (currentState == PlayerState.Airborne || currentState == PlayerState.DashStalling)
+            {
+                if (dashCoroutine != null) StopCoroutine(dashCoroutine); 
+                dashResetByJump = true; 
+                Jump();
+            }
+        }
+    }
+
+    private bool uiDashRequested = false;
+    public void UIButton_Dash()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay) return;
+        uiDashRequested = true;
+    }
+    #endregion
 }

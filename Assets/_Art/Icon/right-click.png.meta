@@ -1,37 +1,19 @@
 fileFormatVersion: 2
-guid: 4252f2f250890d0408a5ed6c7414a1a6
+guid: ddbb1cf0ea7ea9341b041d77e4b55d06
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1679102353093197692
-    second: speed (1)_0
+      213: 8293076287072798907
+    second: right-click_0
   - first:
-      213: 6852383243355312443
-    second: speed (1)_1
+      213: 1793740781937203095
+    second: right-click_1
   - first:
-      213: 5934486807190438180
-    second: speed (1)_2
+      213: 5033142183076474973
+    second: right-click_2
   - first:
-      213: -6616795403130614586
-    second: speed (1)_3
-  - first:
-      213: -454845974100459034
-    second: speed (1)_4
-  - first:
-      213: -970369684734206874
-    second: speed (1)_5
-  - first:
-      213: -9020721575802355823
-    second: speed (1)_6
-  - first:
-      213: -3395310995808130685
-    second: speed (1)_7
-  - first:
-      213: 1090958064132838326
-    second: speed (1)_8
-  - first:
-      213: 3141597857528832171
-    second: speed (1)_9
+      213: 3476290697858234071
+    second: right-click_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -140,7 +122,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: speed (1)_0
+      name: right-click_0
       rect:
         serializedVersion: 2
         x: 0
@@ -155,8 +137,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c7f74a1a1be5d4710800000000000000
-      internalID: 1679102353093197692
+      spriteID: bb8803ac1fce61370800000000000000
+      internalID: 8293076287072798907
       vertices: []
       indices: 
       edges: []
@@ -165,7 +147,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: b4212090c087c0b48810bcfed4551e77
+    spriteID: 945b5f3c4298dde4583a66e2fb4ea71d
     internalID: 0
     vertices: []
     indices: 
@@ -177,7 +159,7 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":512.0,"y":512.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      speed (1)_0: 1679102353093197692
+      right-click_0: 8293076287072798907
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
