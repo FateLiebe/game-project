@@ -19,7 +19,10 @@ public partial class PlayerController
 
         if (counterCooldownTimer > 0f) counterCooldownTimer -= Time.deltaTime;
 
-        if (Input.GetKeyDown(KeyCode.F) && counterCooldownTimer <= 0f)
+        bool counterInput = Input.GetKeyDown(KeyCode.F) || uiCounterRequested;
+        uiCounterRequested = false; // Đặt lại cờ sau khi đã ghi nhận
+
+        if (counterInput && counterCooldownTimer <= 0f)
         {
             if (currentState == PlayerState.Grounded || currentState == PlayerState.Airborne)
             {
@@ -379,6 +382,13 @@ public partial class PlayerController
     {
         if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay) return;
         uiDashRequested = true;
+    }
+
+    private bool uiCounterRequested = false;
+    public void UIButton_CounterAttack()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay) return;
+        uiCounterRequested = true;
     }
     #endregion
 }
