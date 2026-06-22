@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5a0712c07d5164498e71fd8cd2c3224, type: 3}
-  m_Name: Mutant_Data
+  m_Name: Ogre_Elite_Data
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDataSO
   moveSpeed: 0
   jumpForce: 0
@@ -24,9 +24,9 @@ MonoBehaviour:
   maxAirDashes: 0
   comboResetTime: 0
   doubleTapThreshold: 0
-  baseMaxHealth: 28
-  baseAttack: 12
-  baseDefense: 4
+  baseMaxHealth: 36
+  baseAttack: 10
+  baseDefense: 5
   baseCritRate: 5
   critDamageMultiplier: 1.7
   healthGrowth: 10

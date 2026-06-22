@@ -1026,7 +1026,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fda17dbee08d1fb44898198f7645822f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  baseData: {fileID: 11400000, guid: 2965f3d13ed18fb4182f4f8ade6af7e4, type: 2}
+  baseData: {fileID: 11400000, guid: bb37489635a237141a270ad85b51dc79, type: 2}
   damagePopupPrefab: {fileID: 4376294689076033710, guid: 44f05228ddad8ca4c88eeac3e598a23e, type: 3}
   currentHealth: 0
   timeMultiplier: 1

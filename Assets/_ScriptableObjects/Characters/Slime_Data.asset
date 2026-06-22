@@ -33,4 +33,4 @@ MonoBehaviour:
   attackGrowth: 5
   defenseGrowth: 3
   critRateGrowth: 0.5
-  statPointsPerLevel: 3
+  statPointsPerLevel: 0

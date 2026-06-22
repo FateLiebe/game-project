@@ -450,9 +450,25 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 424852354401867451, guid: 2ae9fb93a00db48468bb1a9ad84637e1, type: 3}
+      propertyPath: levelUpClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 53fadcb35f33c9946b18e0a723fb25b9, type: 3}
+    - target: {fileID: 424852354401867451, guid: 2ae9fb93a00db48468bb1a9ad84637e1, type: 3}
       propertyPath: musicVolume
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 424852354401867451, guid: 2ae9fb93a00db48468bb1a9ad84637e1, type: 3}
+      propertyPath: counterAttackClip
+      value: 
+      objectReference: {fileID: 8300000, guid: f272beb90798f8940b5f32671363494c, type: 3}
+    - target: {fileID: 424852354401867451, guid: 2ae9fb93a00db48468bb1a9ad84637e1, type: 3}
+      propertyPath: counterAttackVolume
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 424852354401867451, guid: 2ae9fb93a00db48468bb1a9ad84637e1, type: 3}
+      propertyPath: 'vfxClips.Array.data[6]'
+      value: 
+      objectReference: {fileID: 8300000, guid: e6262a37c09b8d7449d2adc4530fd64c, type: 3}
     - target: {fileID: 1853981316373757806, guid: 2ae9fb93a00db48468bb1a9ad84637e1, type: 3}
       propertyPath: m_LocalPosition.x
       value: -86.19525

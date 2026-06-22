@@ -12,25 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a0712c07d5164498e71fd8cd2c3224, type: 3}
   m_Name: Ghost_Data
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDataSO
-  moveSpeed: 8
-  jumpForce: 12.5
-  fastFallSpeed: 18
-  maxJumps: 2
-  dashForce: 24
-  dashTime: 0.18
-  dashStallTime: 0.22
-  dashRechargeTime: 1.5
-  maxDashes: 2
-  maxAirDashes: 2
-  comboResetTime: 0.6
-  doubleTapThreshold: 0.25
-  baseMaxHealth: 30
-  baseAttack: 10
-  baseDefense: 4
+  moveSpeed: 0
+  jumpForce: 0
+  fastFallSpeed: 0
+  maxJumps: 0
+  dashForce: 0
+  dashTime: 0
+  dashStallTime: 0
+  dashRechargeTime: 0
+  maxDashes: 0
+  maxAirDashes: 0
+  comboResetTime: 0
+  doubleTapThreshold: 0
+  baseMaxHealth: 27
+  baseAttack: 11
+  baseDefense: 3
   baseCritRate: 5
   critDamageMultiplier: 1.7
   healthGrowth: 10
   attackGrowth: 5
   defenseGrowth: 3
   critRateGrowth: 0.5
-  statPointsPerLevel: 3
+  statPointsPerLevel: 0

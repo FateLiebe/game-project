@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 1039774341361193826}
   - component: {fileID: 4829028823382400606}
   - component: {fileID: 6192117882873603828}
+  - component: {fileID: 2774010049184118321}
   - component: {fileID: 2495288816190379921}
   - component: {fileID: 6287053421100623968}
   - component: {fileID: 259003522531114190}
-  - component: {fileID: 2774010049184118321}
   - component: {fileID: 1704326107059936956}
   m_Layer: 12
   m_Name: Boss_Demon
@@ -122,6 +122,43 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!70 &2774010049184118321
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 489847095588347529}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: -0.060840607, y: -0.8613052}
+  m_Size: {x: 2.7710953, y: 4.8435917}
+  m_Direction: 0
 --- !u!50 &2495288816190379921
 Rigidbody2D:
   serializedVersion: 5
@@ -252,43 +289,6 @@ MonoBehaviour:
   mouthSpawnPoint: {fileID: 5411609221870134086}
   centerSpawnPoint: {fileID: 5676239734773764475}
   isVfxFacingLeftDefault: 1
---- !u!70 &2774010049184118321
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 489847095588347529}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: -0.060840607, y: -0.8613052}
-  m_Size: {x: 2.7710953, y: 4.8435917}
-  m_Direction: 0
 --- !u!114 &1704326107059936956
 MonoBehaviour:
   m_ObjectHideFlags: 0

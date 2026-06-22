@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a0712c07d5164498e71fd8cd2c3224, type: 3}
   m_Name: Slime_Elite_Data
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDataSO
-  moveSpeed: 8.5
+  moveSpeed: 0
   jumpForce: 0
   fastFallSpeed: 0
   maxJumps: 0
@@ -33,4 +33,4 @@ MonoBehaviour:
   attackGrowth: 5
   defenseGrowth: 3
   critRateGrowth: 0.5
-  statPointsPerLevel: 3
+  statPointsPerLevel: 0
