@@ -8,7 +8,7 @@ using TMPro;
 /// </summary>
 public class StatsUIManager : MonoBehaviour
 {
-    // [MỚI THÊM] Singleton để các script khác dễ dàng gọi tới
+    // Khởi tạo biến cục bộ (Singleton) để các script khác dễ dàng gọi tới cập nhật UI
     public static StatsUIManager Instance { get; private set; } 
     public bool IsOpen => uiPanel != null && uiPanel.activeSelf;
 
@@ -36,7 +36,7 @@ public class StatsUIManager : MonoBehaviour
     [SerializeField] private Button btnAddDEF;
     [SerializeField] private Button btnAddCRIT;
 
-    // [COMBAT WARNING] anti-spam
+    // Biến phụ trợ chống spam hiển thị thông báo khi đang trong giao tranh
     private float lastCombatWarningTime = -99f;
     private const float COMBAT_WARNING_COOLDOWN = 2f;
 
@@ -61,7 +61,7 @@ public class StatsUIManager : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        // [CHẶN] Không xử lý input khi game đang Paused/GameOver/Victory
+        // Vô hiệu hóa thao tác bật/tắt túi đồ khi game đang bị Tạm dừng hoặc đã Kết thúc
         if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay)
             return;
 
@@ -69,7 +69,7 @@ public class StatsUIManager : MonoBehaviour
         {
             if (!IsOpen && player != null && player.IsInCombat)
             {
-                // [POPUP] Hiển thị cảnh báo bằng DamagePopup, chống spam 2s
+                // Hiển thị cảnh báo trực quan bằng popup sát thương (màu cam đỏ) để nhắc nhở người chơi
                 if (Time.time - lastCombatWarningTime >= COMBAT_WARNING_COOLDOWN)
                 {
                     lastCombatWarningTime = Time.time;
@@ -107,7 +107,7 @@ public class StatsUIManager : MonoBehaviour
             if (uiPanel.activeSelf)
             {
                 UpdateUI();
-                AudioManager.Instance?.PlayInventoryOpen(); // [AUDIO]
+                AudioManager.Instance?.PlayInventoryOpen(); 
                 
                 // Hiển thị số lượng vàng ở trạng thái Inventory bình thường
                 if (ShopManager.Instance != null && !ShopManager.Instance.isShopOpen)
@@ -119,19 +119,19 @@ public class StatsUIManager : MonoBehaviour
             }
             else
             {
-                AudioManager.Instance?.PlayInventoryClose(); // [AUDIO]
+                AudioManager.Instance?.PlayInventoryClose(); 
                 if (ItemTooltipUI.Instance != null) ItemTooltipUI.Instance.HideTooltip();
             }
         }
     }
 
-    // [MỚI THÊM] Hàm dùng để gọi khi click ra ngoài UI
+    // Hàm công khai dùng để đóng bảng UI (Thường gọi từ sự kiện Click vùng ngoài)
     public void CloseUI()
     {
         if (uiPanel != null && uiPanel.activeSelf)
         {
             uiPanel.SetActive(false);
-            AudioManager.Instance?.PlayInventoryClose(); // [AUDIO]
+            AudioManager.Instance?.PlayInventoryClose();
         }
         if (ItemTooltipUI.Instance != null) ItemTooltipUI.Instance.HideTooltip();
     }

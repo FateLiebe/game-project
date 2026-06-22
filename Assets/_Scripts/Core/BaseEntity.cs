@@ -17,7 +17,7 @@ public class BaseEntity : MonoBehaviour
     public float currentHealth;
 
     [HideInInspector] public float timeMultiplier = 1f;
-    [HideInInspector] public bool isDead = false; // [FIX #4]: Cờ trạng thái sống chết
+    [HideInInspector] public bool isDead = false; // Cờ theo dõi trạng thái sống chết, ngăn nhận thêm sát thương khi đã gục ngã
 
     public event Action<float, float> OnHealthChanged;
     public event Action<int> OnLevelChanged;
@@ -81,7 +81,7 @@ public class BaseEntity : MonoBehaviour
     /// </summary>
     public virtual void ApplyDamage(DamageInfo info)
     {
-        // [FIX #4]: Chặn đứng mọi sát thương/EXP cộng dồn nếu đã chết
+        // Chặn đứng mọi lượng sát thương hoặc hiệu ứng tiếp theo nếu thực thể đã bị tiêu diệt
         if (isDead || currentHealth <= 0) return; 
 
         lastCombatTime = Time.time; 
@@ -94,7 +94,7 @@ public class BaseEntity : MonoBehaviour
 
         float finalDamage = Mathf.Max(1f, info.damage - Defense);
 
-        // --- ĐOẠN CODE THÊM MỚI: CHẶN SÁT THƯƠNG BẰNG KHIÊN ---
+        // Logic Khiên (Shield): Hấp thụ sát thương trước khi trừ trực tiếp vào máu thật
         if (currentShield > 0)
         {
             if (currentShield >= finalDamage)

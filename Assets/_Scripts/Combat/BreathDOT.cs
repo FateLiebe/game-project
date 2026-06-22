@@ -37,6 +37,10 @@ public class BreathDOT : MonoBehaviour
         box.enabled   = false; // Tắt collider vật lý — BreathDOT tự check thủ công
     }
 
+    /// <summary>
+    /// Kích hoạt chuỗi sát thương theo thời gian.
+    /// Gắn vị trí của đạn/tia sáng bám theo miệng Boss nếu được thiết lập.
+    /// </summary>
     private void OnEnable()
     {
         StartCoroutine(DOTRoutine());
@@ -48,12 +52,19 @@ public class BreathDOT : MonoBehaviour
         spawnTransform = null;
     }
 
+    /// <summary>
+    /// Đồng bộ hóa vị trí của VFX bám theo miệng Boss trong quá trình duy trì.
+    /// </summary>
     private void Update()
     {
         if (followSpawnPoint && spawnTransform != null)
             transform.position = spawnTransform.position;
     }
 
+    /// <summary>
+    /// Vòng lặp chia nhỏ sát thương thành nhiều lần (Ticks) dựa trên tổng thời gian và tổng tỷ lệ sát thương.
+    /// Hỗ trợ chịu ảnh hưởng bởi ngưng đọng thời gian (timeMultiplier).
+    /// </summary>
     private IEnumerator DOTRoutine()
     {
         yield return null; // Chờ 1 frame để BossSkillManager gán owner
@@ -85,6 +96,10 @@ public class BreathDOT : MonoBehaviour
         return entity != null ? entity.Attack : 10f;
     }
 
+    /// <summary>
+    /// Quét BoxCollider để tìm tất cả các mục tiêu nằm trong luồng sát thương và tiến hành trừ máu.
+    /// </summary>
+    /// <param name="damage">Sát thương mỗi lần quét (Tick Damage)</param>
     private void DealDamageInBox(float damage)
     {
         // Lấy thông số box trong world space
@@ -122,6 +137,9 @@ public class BreathDOT : MonoBehaviour
         Gizmos.DrawWireCube(box.offset, box.size);
     }
 
+    /// <summary>
+    /// Trả Prefab về lại Object Pool để tái sử dụng.
+    /// </summary>
     private void ReturnOrDestroy()
     {
         PooledObject po = GetComponent<PooledObject>();

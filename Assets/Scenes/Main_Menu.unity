@@ -458,6 +458,10 @@ PrefabInstance:
       value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 424852354401867451, guid: 2ae9fb93a00db48468bb1a9ad84637e1, type: 3}
+      propertyPath: levelUpVolume
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 424852354401867451, guid: 2ae9fb93a00db48468bb1a9ad84637e1, type: 3}
       propertyPath: counterAttackClip
       value: 
       objectReference: {fileID: 8300000, guid: f272beb90798f8940b5f32671363494c, type: 3}

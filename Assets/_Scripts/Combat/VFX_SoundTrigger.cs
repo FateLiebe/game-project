@@ -56,7 +56,7 @@ public class VFX_SoundTrigger : MonoBehaviour
         }
         else
         {
-            // Phát thả ga (OneShot) như cũ, phù hợp cho Electro-shock
+            // Phát thả ga (OneShot), phù hợp cho Electro-shock
             if (directClip != null)
                 AudioManager.Instance.PlayDirectClip(directClip, volume);
             else

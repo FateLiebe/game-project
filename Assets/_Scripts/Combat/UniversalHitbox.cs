@@ -10,7 +10,7 @@ public class UniversalHitbox : MonoBehaviour
     public Vector2 baseKnockback = new Vector2(5f, 2f);
     
     public float damageOverride = 0f; 
-    public bool isCriticalOverride = false; // [MỚI THÊM]: Cờ lưu trạng thái bạo kích của đạn
+    public bool isCriticalOverride = false; // Lưu trạng thái bạo kích của đạn/kỹ năng tầm xa
 
     [Header("Hitbox Owner")]
     public GameObject owner;
@@ -45,7 +45,7 @@ public class UniversalHitbox : MonoBehaviour
             if (damageOverride > 0f)
             {
                 finalDamage = damageOverride;
-                isCriticalHit = isCriticalOverride; // [ĐÃ SỬA]: Ép cờ bạo kích từ Player vào
+                isCriticalHit = isCriticalOverride; // Ghi đè cờ bạo kích đã tính toán từ trước (đối với kỹ năng đạn bay)
             }
             else if (owner != null)
             {
@@ -81,7 +81,7 @@ public class UniversalHitbox : MonoBehaviour
 
             targetHurtbox.TakeDamage(info);
 
-            // [LOCK TARGET] Làm mới timer nếu skill của Player chạm trúng locked target
+            // Làm mới thời gian khóa mục tiêu nếu kỹ năng của Player đánh trúng kẻ địch đang bị khóa
             if (owner != null && owner.CompareTag("Player"))
             {
                 PlayerController pc = owner.GetComponent<PlayerController>();

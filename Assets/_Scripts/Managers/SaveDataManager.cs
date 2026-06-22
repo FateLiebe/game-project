@@ -16,8 +16,14 @@ public class SaveDataManager : MonoBehaviour
 
     private void Awake() { if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); } else Destroy(gameObject); }
 
+    /// <summary>
+    /// Khởi tạo dữ liệu mới hoàn toàn và ghi đè lên file save hiện tại.
+    /// </summary>
     public void NewGame() { currentData = new GameData(); SaveGameToFile(); }
 
+    /// <summary>
+    /// Ghi dữ liệu từ bộ nhớ đệm (currentData) xuống ổ cứng theo định dạng JSON.
+    /// </summary>
     public void SaveGameToFile()
     {
         if (currentData == null) return;
@@ -25,6 +31,9 @@ public class SaveDataManager : MonoBehaviour
         catch (Exception e) { Debug.LogError("Lỗi Save: " + e.Message); }
     }
 
+    /// <summary>
+    /// Đọc dữ liệu từ file JSON trên ổ cứng. Nếu file không tồn tại, tự động tạo mới.
+    /// </summary>
     public void LoadGameFromFile()
     {
         string path = Path.Combine(Application.persistentDataPath, saveFileName);
@@ -105,7 +114,10 @@ public class SaveDataManager : MonoBehaviour
         }
     }
 
-    // Dành riêng cho việc chạm vào Trạm Lưu (Auto-Save)
+    /// <summary>
+    /// Lưu trò chơi tại một Trạm lưu (Checkpoint).
+    /// Khác với Save tay, hàm này ghi nhớ riêng biệt vị trí hồi sinh để ném Player về đây khi chết.
+    /// </summary>
     public void SaveAtCheckpoint(PlayerController player, InventoryManager inv, Transform cpTransform)
     {
         if (currentData == null) return;

@@ -221,6 +221,7 @@ MonoBehaviour:
   currentShield: 0
   buffAttack: 0
   buffDefense: 0
+  enemyData: {fileID: 11400000, guid: bdf44fca6f77c964b81ddf01d6e37b0d, type: 2}
   rank: 0
   expMultiplier: 10
   attackCooldowns:
@@ -232,14 +233,8 @@ MonoBehaviour:
   attackHitbox: {fileID: 2236896081292046355}
   rangedAttackHitbox: {fileID: 0}
   currentState: 0
-  patrolSpeed: 2
-  chaseSpeed: 3.5
-  lineOfSight: 6
-  attackRange: 1.8
-  idleDuration: 1.5
   spriteFacesLeft: 0
   isVfxFacingLeftDefault: 1
-  rangedAttackRange: 6
   eliteOutlineMaterial: {fileID: 0}
   meleeVFXPrefab: {fileID: 0}
   meleeSpawnPoint: {fileID: 0}

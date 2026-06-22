@@ -47,7 +47,7 @@ public class InventoryManager : MonoBehaviour
 
     private void Update()
     {
-        // [CHẶN] Không xử lý bàn phím khi Pause/GameOver/Victory
+        // Vô hiệu hóa tương tác phím bấm khi đang ở màn hình Pause, GameOver hoặc Victory
         if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay)
             return;
 
@@ -180,7 +180,8 @@ public class InventoryManager : MonoBehaviour
             if (item.itemType == ItemType.Consumable)
             {
                 if (firstConsumable == null) firstConsumable = item;
-                if (item.itemID == firstConsumable.itemID) count++; // [FIX] dùng itemID
+                // Đếm số lượng vật phẩm cùng ID trong túi đồ
+                if (item.itemID == firstConsumable.itemID) count++; 
             }
         }
 
@@ -220,7 +221,7 @@ public class InventoryManager : MonoBehaviour
             if (player != null) 
             {
                 player.Heal(itemToUse.healAmount);
-                // [AUDIO] Phát âm thanh của item (nếu có), fallback sang srcSFX chung
+                // Phát âm thanh riêng của vật phẩm (nếu có cấu hình), nếu không thì dùng âm thanh mặc định (srcSFX)
                 if (itemToUse.useSound != null)
                     AudioManager.Instance?.PlayDirectClip(itemToUse.useSound);
             }
@@ -236,7 +237,7 @@ public class InventoryManager : MonoBehaviour
         if (selectedItem.itemType == ItemType.Consumable)
         {
             if (player != null) player.Heal(selectedItem.healAmount);
-            // [AUDIO] Phát âm thanh của item
+            // Phát âm thanh nhặt vật phẩm
             if (selectedItem.useSound != null)
                 AudioManager.Instance?.PlayDirectClip(selectedItem.useSound);
             RemoveSelectedItem();
@@ -285,7 +286,7 @@ public class InventoryManager : MonoBehaviour
                 if (tooltipUI != null) tooltipUI.HideTooltip();
                 UpdateUI();
                 RecalculatePlayerStats();
-                AudioManager.Instance?.PlayEquip(); // [AUDIO]
+                AudioManager.Instance?.PlayEquip(); 
 
                 if (itemToEquip.itemType == ItemType.SupportSkill && player is PlayerController pc)
                 {
@@ -294,6 +295,59 @@ public class InventoryManager : MonoBehaviour
 
                 Debug.Log($"<color=cyan>Đã mặc: {itemToEquip.itemName}</color>");
                 return; 
+            }
+        }
+    }
+
+    /// <summary>
+    /// Tự động dò tìm và trang bị lại bùa cùng loại (hoặc loại khác) khi bùa hiện tại hết lượt sử dụng.
+    /// </summary>
+    public void AutoEquipSupportSkill(ItemSO oldSkill)
+    {
+        if (oldSkill == null) return;
+        
+        ItemSO skillToEquip = null;
+        
+        // 1. Ưu tiên tìm bùa giống hệt
+        foreach (ItemSO item in inventoryList)
+        {
+            if (item.itemType == ItemType.SupportSkill && item.itemName == oldSkill.itemName)
+            {
+                skillToEquip = item;
+                break;
+            }
+        }
+
+        // 2. Nếu không có bùa giống hệt, lấy đại một Support Skill bất kỳ
+        if (skillToEquip == null)
+        {
+            foreach (ItemSO item in inventoryList)
+            {
+                if (item.itemType == ItemType.SupportSkill)
+                {
+                    skillToEquip = item;
+                    break;
+                }
+            }
+        }
+
+        // 3. Nếu tìm thấy, tự động mặc vào
+        if (skillToEquip != null)
+        {
+            EquipItem(skillToEquip);
+            if (player is PlayerController pc) pc.PutSupportSkillOnCooldown();
+            
+            // Nếu tìm thấy ObjectPool, lấy từ Pool để tối ưu hiệu năng, ngược lại Instantiate mới.
+            if (player != null && player.damagePopupPrefab != null)
+            {
+                GameObject popup;
+                if (ObjectPoolManager.Instance != null) 
+                    popup = ObjectPoolManager.Instance.Get(player.damagePopupPrefab, player.transform.position + new Vector3(0, 1.8f, 0), Quaternion.identity);
+                else 
+                    popup = Instantiate(player.damagePopupPrefab, player.transform.position + new Vector3(0, 1.8f, 0), Quaternion.identity);
+                
+                DamagePopup ps = popup.GetComponent<DamagePopup>();
+                if (ps != null) ps.SetupNotification($"Đã trang bị: {skillToEquip.itemName}");
             }
         }
     }
@@ -371,7 +425,7 @@ public class InventoryManager : MonoBehaviour
         }
 
         inventoryList.Add(slot.equippedItem);
-        AudioManager.Instance?.PlayUnequip(); // [AUDIO]
+        AudioManager.Instance?.PlayUnequip(); 
         
         if (slot.allowedItemType == ItemType.SupportSkill && player is PlayerController pc)
         {

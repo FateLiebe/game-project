@@ -17,11 +17,12 @@ public class EnemyController : EnemyBase
     public EnemyState currentState = EnemyState.Idle;
 
     [Header("Movement & Vision Settings")]
-    [SerializeField] private float patrolSpeed    = 2f;
-    [SerializeField] private float chaseSpeed     = 3.5f;
-    [SerializeField] private float lineOfSight    = 6f;
-    [SerializeField] private float attackRange    = 1.8f;
-    [SerializeField] private float idleDuration   = 1.5f;
+    [Tooltip("Sử dụng chỉ số từ EnemyDataSO ở EnemyBase")]
+    private float patrolSpeed    => enemyData != null ? enemyData.patrolSpeed : 2f;
+    private float chaseSpeed     => enemyData != null ? enemyData.chaseSpeed : 3.5f;
+    private float lineOfSight    => enemyData != null ? enemyData.lineOfSight : 6f;
+    private float attackRange    => enemyData != null ? enemyData.attackRange : 1.8f;
+    private float idleDuration   => enemyData != null ? enemyData.idleDuration : 1.5f;
 
     [Tooltip("Tích vào nếu ảnh gốc của quái đang quay sang Trái")]
     [SerializeField] private bool spriteFacesLeft = false;
@@ -31,7 +32,7 @@ public class EnemyController : EnemyBase
     public bool isVfxFacingLeftDefault = true;
 
     [Header("--- ELITE EXTRA SETTINGS ---")]
-    [SerializeField] private float rangedAttackRange  = 6f;
+    private float rangedAttackRange  => enemyData != null ? enemyData.rangedAttackRange : 6f;
     [SerializeField] private Material eliteOutlineMaterial;
 
     [Header("Đòn Gần — VFX Prefab (nếu có, ưu tiên hơn hitbox)")]
@@ -62,7 +63,7 @@ public class EnemyController : EnemyBase
     private bool  isAttackVFXAllowed = false;
     private Vector2 _prevPosition;   // Dùng để tính tốc độ thực tế cho Animator
 
-    // [ELITE] Vị trí snapshot khi quyết định lùi ra đánh xa
+    /// <summary>Vị trí ghi nhớ của quái Tinh Anh (Elite) khi quyết định lùi ra xa để sử dụng kỹ năng tầm xa.</summary>
     private Vector2 rangedRepositionTargetPos;
     private bool    isRepositioning = false;
 
@@ -98,6 +99,10 @@ public class EnemyController : EnemyBase
         _prevPosition = rb.position;
     }
 
+    /// <summary>
+    /// Ghi đè hàm OnEnable để thiết lập lại các giá trị mặc định khi Quái được lấy ra từ Object Pool.
+    /// Giúp quái không bị lưu lại trạng thái đã chết từ lần spawn trước.
+    /// </summary>
     protected override void OnEnable()
     {
         // Reset state for pooling
@@ -122,6 +127,9 @@ public class EnemyController : EnemyBase
         }
     }
 
+    /// <summary>
+    /// Vòng lặp chính của AI. Đóng băng tư duy nếu đang dính hiệu ứng (Hurt/Dead) hoặc bị Time Stop.
+    /// </summary>
     protected override void Update()
     {
         base.Update(); // CD countdown + ApplyGravity
@@ -154,19 +162,19 @@ public class EnemyController : EnemyBase
 
         float step = speed * timeMultiplier * Time.deltaTime;
 
-        // [1] Player đang chặn đường?
+        // 1. Kiểm tra va chạm với Player: Tránh việc quái vật đẩy lùi Player (Overlap)
         if (IsPlayerBlockingPath(moveDir, step + 0.35f))
         {
             HandleBlockedByPlayer();
             return;
         }
 
-        // [2] Tường phía di chuyển?
+        // 2. Kiểm tra vách tường phía trước bằng Raycast
         if (wallCheck != null &&
             Physics2D.Raycast(wallCheck.position, Vector2.right * moveDir, 0.2f, groundLayerMask))
             return;
 
-        // [3] Mép vực phía di chuyển? (không áp dụng quái bay)
+        // 3. Kiểm tra mép vực: Đảm bảo quái (không bay) không tự rơi xuống vực
         if (!isFlying && ledgeCheck != null &&
             !Physics2D.Raycast(ledgeCheck.position, Vector2.down, 0.5f, groundLayerMask))
             return;
@@ -201,6 +209,10 @@ public class EnemyController : EnemyBase
     #region AI STATES
     // ==========================================
 
+    /// <summary>
+    /// Trạng thái Đứng yên (Idle): Quái quan sát xung quanh trong một khoảng thời gian trước khi quay đầu tuần tra tiếp.
+    /// Nếu phát hiện Player trong lúc này, lập tức chuyển sang Rượt đuổi hoặc Tấn công.
+    /// </summary>
     private void UpdateIdle()
     {
         // Kinematic: không cần clear velocity, chỉ không gọi MoveHorizontal
@@ -215,6 +227,10 @@ public class EnemyController : EnemyBase
         if (stateTimer <= 0) { Flip(); SwitchState(EnemyState.Patrol); }
     }
 
+    /// <summary>
+    /// Trạng thái Tuần tra (Patrol): Quái di chuyển đều đặn về phía trước.
+    /// Nếu đụng tường hoặc sắp rơi xuống vực, nó sẽ dừng lại (Idle) rồi quay đầu.
+    /// </summary>
     private void UpdatePatrol()
     {
         if (CheckWall() || !CheckLedge()) { SwitchState(EnemyState.Idle); return; }
@@ -240,7 +256,7 @@ public class EnemyController : EnemyBase
         float distToPlayer = Vector2.Distance(transform.position, playerTarget.position);
         if (distToPlayer > lineOfSight * 1.5f) { playerTarget = null; isRepositioning = false; SwitchState(EnemyState.Idle); return; }
 
-        // ELITE: ưu tiên đánh gần
+        // Hành vi ưu tiên của quái Tinh Anh (Elite): Tấn công cận chiến nếu mục tiêu nằm trong tầm gần
         if (rank == EnemyRank.Elite && distToPlayer <= attackRange && CanAttack(0))
         {
             isRepositioning = false;
@@ -249,7 +265,7 @@ public class EnemyController : EnemyBase
             return;
         }
 
-        // ELITE: quyết định lùi ra để đánh xa
+        // Hành vi Rút lui chiến thuật của quái Tinh Anh (Elite): Lùi ra để sử dụng kỹ năng đánh xa (Ranged Attack)
         if (rank == EnemyRank.Elite && !isRepositioning
             && distToPlayer > attackRange && !CanAttack(0) && CanAttack(1))
         {
@@ -257,7 +273,7 @@ public class EnemyController : EnemyBase
             isRepositioning = true;
         }
 
-        // ELITE đang lùi ra
+        // Thực thi quá trình lùi ra xa (Tactical Retreat) của quái Tinh Anh
         if (rank == EnemyRank.Elite && isRepositioning)
         {
             float distToSnapshot = Vector2.Distance(transform.position, rangedRepositionTargetPos);
@@ -275,9 +291,7 @@ public class EnemyController : EnemyBase
             {
                 FacePlayer();
                 int retreatDir = (rangedRepositionTargetPos.x > transform.position.x) ? -1 : 1;
-                // Lùi ra: dùng MoveHorizontal theo retreatDir
-                // wall/ledge check vẫn xài wallCheck/ledgeCheck (hướng facingDir)
-                // nên nếu bị chặn sẽ tự ngắt
+                // Lùi ra an toàn: Cố gắng duy trì khoảng cách nhưng sẽ dừng lại nếu đụng tường hoặc mép vực
                 if (!CheckLedge() || CheckWall())
                     isRepositioning = false;
                 else
@@ -286,7 +300,7 @@ public class EnemyController : EnemyBase
             }
         }
 
-        // Chase thường
+        // Chế độ Rượt đuổi (Chase) thông thường dành cho mọi cấp bậc quái
         if (CanUseAnyAttack(distToPlayer, out int attackToUse))
         {
             currentAttackIndex = attackToUse;
@@ -316,6 +330,9 @@ public class EnemyController : EnemyBase
     #region ATTACK
     // ==========================================
 
+    /// <summary>
+    /// Tiến hành thực thi đòn tấn công. Khóa di chuyển và chuyển sang trạng thái chờ Animation.
+    /// </summary>
     private IEnumerator PerformAttack()
     {
         canAction = false;
@@ -389,6 +406,10 @@ public class EnemyController : EnemyBase
     #region DAMAGE & DEATH
     // ==========================================
 
+    /// <summary>
+    /// Kích hoạt khi quái nhận sát thương.
+    /// Cập nhật mục tiêu là kẻ vừa đánh mình (Player) và có tỷ lệ bị khựng lại (Hurt Stagger) nếu bị đánh trúng điểm yếu.
+    /// </summary>
     public override void ApplyDamage(DamageInfo info)
     {
         // Lưu knockback trước khi base có thể start coroutine
@@ -412,6 +433,9 @@ public class EnemyController : EnemyBase
         }
     }
 
+    /// <summary>
+    /// Thời gian bị choáng/khựng lại khi nhận sát thương chí mạng hoặc bị dồn sát thương lớn.
+    /// </summary>
     private IEnumerator RecoverFromHurt()
     {
         canAction = false;
@@ -421,6 +445,9 @@ public class EnemyController : EnemyBase
         SwitchState(EnemyState.Chase);
     }
 
+    /// <summary>
+    /// Quái chết. Ngắt toàn bộ Coroutine, vô hiệu hóa Hitbox vật lý để Player không kẹt, và tiến hành dọn dẹp.
+    /// </summary>
     protected override void Die()
     {
         CancelCurrentAttackHitbox();
@@ -459,6 +486,10 @@ public class EnemyController : EnemyBase
     #region HELPERS & DETECTION
     // ==========================================
 
+    /// <summary>
+    /// Quản lý việc chuyển đổi giữa các State AI (Idle -> Patrol -> Chase -> Attack).
+    /// Hỗ trợ reset các biến liên quan đến hoạt ảnh và di chuyển để tránh kẹt trạng thái.
+    /// </summary>
     private void SwitchState(EnemyState newState)
     {
         currentState = newState;

@@ -11,9 +11,8 @@ public class EnemyBase : BaseEntity
 
     // ==========================================
     #region CONFIGURATION
-    // ==========================================
-
     [Header("--- ENEMY CONFIG ---")]
+    public EnemyDataSO enemyData;
     public EnemyRank rank = EnemyRank.Normal;
 
     [Header("EXP Reward")]
@@ -49,14 +48,9 @@ public class EnemyBase : BaseEntity
     // Knockback state — protected agar EnemyController có thể đọc
     protected bool isKnockedBack = false;
 
-    // Base stats (scale theo level)
-    private const float BASE_HP  = 150f;
-    private const float BASE_ATK =  12f;
-    private const float BASE_DEF =   3f;
-
-    public override float MaxHealth => BASE_HP  + ((currentLevel - 1) * 30f);
-    public override float Attack    => BASE_ATK + ((currentLevel - 1) *  4f);
-    public override float Defense   => BASE_DEF + ((currentLevel - 1) *  1f);
+    public override float MaxHealth => enemyData != null ? enemyData.baseMaxHealth + ((currentLevel - 1) * enemyData.healthGrowth) : 150f + ((currentLevel - 1) * 30f);
+    public override float Attack    => (enemyData != null ? enemyData.baseAttack + ((currentLevel - 1) * enemyData.attackGrowth) : 12f + ((currentLevel - 1) * 4f)) + buffAttack;
+    public override float Defense   => (enemyData != null ? enemyData.baseDefense + ((currentLevel - 1) * enemyData.defenseGrowth) : 3f + ((currentLevel - 1) * 1f)) + buffDefense;
 
     #endregion
 

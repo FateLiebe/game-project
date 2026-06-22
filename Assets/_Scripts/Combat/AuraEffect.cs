@@ -11,6 +11,10 @@ public class AuraEffect : MonoBehaviour
     private float activeDefenseBuff;
 
     // Boss hoặc Player sẽ gọi hàm này và truyền chỉ số cụ thể vào
+    /// <summary>
+    /// Khởi tạo và thiết lập các chỉ số buff cho Aura.
+    /// Tự động cộng các chỉ số tương ứng vào chủ thể.
+    /// </summary>
     public void SetupAura(BaseEntity owner, float duration, float attackBuff, float defenseBuff, float shieldAmt)
     {
         ownerEntity = owner;
@@ -26,19 +30,10 @@ public class AuraEffect : MonoBehaviour
         Invoke(nameof(RemoveAura), duration);
     }
 
-    // private void Update()
-    // {
-    //     // Bám dính lấy chủ nhân khi di chuyển
-    //     if (ownerEntity != null)
-    //     {
-    //         transform.position = ownerEntity.centerSpawnPoint.position;
-    //     }
-    //     else
-    //     {
-    //         Destroy(gameObject); 
-    //     }
-    // }
-
+    /// <summary>
+    /// Theo dõi và đếm ngược thời gian duy trì Aura.
+    /// Có hỗ trợ ảnh hưởng bởi tính năng ngưng đọng thời gian (timeMultiplier).
+    /// </summary>
     private void Update()
     {
         if (ownerEntity == null)
@@ -47,11 +42,17 @@ public class AuraEffect : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Đảm bảo buff được xóa sạch kể cả khi GameObject bị vô hiệu hóa đột ngột.
+    /// </summary>
     private void OnDisable()
     {
         ownerEntity = null;
     }
 
+    /// <summary>
+    /// Hủy bỏ hiệu ứng buff khỏi chủ thể và dọn dẹp các trạng thái.
+    /// </summary>
     private void RemoveAura()
     {
         if (ownerEntity != null)
@@ -64,6 +65,9 @@ public class AuraEffect : MonoBehaviour
         ReturnOrDestroy();
     }
 
+    /// <summary>
+    /// Hủy GameObject hoặc trả về Object Pool để tái sử dụng.
+    /// </summary>
     private void ReturnOrDestroy()
     {
         PooledObject po = GetComponent<PooledObject>();

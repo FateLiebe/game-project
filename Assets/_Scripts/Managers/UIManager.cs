@@ -46,7 +46,7 @@ public class UIManager : MonoBehaviour
         }
         SyncAudioUI();
 
-        // [PHASE 3] Subscribe vào event Player — không cần Player gọi UIManager trực tiếp nữa
+        // Đăng ký (Subscribe) lắng nghe sự kiện từ Player để cập nhật UI, thay vì bắt Player phải gọi trực tiếp UIManager
         if (PlayerController.Instance != null)
             PlayerController.Instance.OnDodgeCooldownChanged += UpdateDodgeCD;
     }
@@ -56,7 +56,7 @@ public class UIManager : MonoBehaviour
         if (GameManager.Instance != null)
             GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
 
-        // [PHASE 3] Unsubscribe để tránh memory leak
+        // Hủy đăng ký (Unsubscribe) khi UIManager bị tắt để tránh tình trạng rò rỉ bộ nhớ (Memory Leak)
         if (PlayerController.Instance != null)
             PlayerController.Instance.OnDodgeCooldownChanged -= UpdateDodgeCD;
     }
@@ -86,7 +86,7 @@ public class UIManager : MonoBehaviour
             GameManager.Instance.TogglePause();
         }
 
-        // [CHẶN BÀN PHÍM] Khi PauseScreen đang mở, không để các phím B/E/Q... lọt qua
+        // [CHẶN BÀN PHÍM]: Khóa tín hiệu bàn phím (B/E/Q...) từ màn hình In-game trong lúc Menu Pause đang mở
         // Các script khác nên check GameManager.CurrentState == Paused trước khi xử lý input
         // Cách đơn giản nhất: block input trong Update của StatsUIManager (đã làm bên dưới)
     }
@@ -105,7 +105,7 @@ public class UIManager : MonoBehaviour
             AudioManager.Instance?.PlayGameOver();
     }
 
-    // [PHASE 3] Handler nhận tín hiệu từ Player event — private, không còn cần public
+    // Hàm Callback (Handler) kích hoạt khi nhận được sự kiện (Event) cập nhật thanh máu từ Player
     private void UpdateDodgeCD(float currentTimer, float maxCooldown)
     {
         if (perfectDodgeCDBorder != null)

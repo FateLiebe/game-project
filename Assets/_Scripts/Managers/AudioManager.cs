@@ -404,7 +404,7 @@ public class AudioManager : MonoBehaviour
     // TIME STOP — Bóp pitch của srcWorld & bossWingSource
     // srcSFX (player) KHÔNG bị ảnh hưởng
     // ============================================================
-    public bool IsTimeStopActive { get; private set; } // [MỞ PUBLIC] Để các VFX Sound tự đồng bộ Pitch
+    public bool IsTimeStopActive { get; private set; } // Cho phép các VFX Sound đọc trạng thái để tự động ép độ vặn tiếng (Pitch)
 
     /// <summary>
     /// Hiệu ứng bóp méo âm thanh (Giảm Pitch xuống 0.5) dành riêng cho Time Stop.

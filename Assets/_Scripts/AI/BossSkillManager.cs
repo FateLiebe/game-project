@@ -40,13 +40,13 @@ public class BossSkillManager : MonoBehaviour
         bool isAura = false;
         bool isProjectile = false; 
         bool attachToBoss = false;
-        bool spawnAtPlayer = false; // [MỚI]: Cơ chế định vị mục tiêu
+        bool spawnAtPlayer = false; // Đánh dấu kỹ năng có khả năng định vị mục tiêu (như sét đánh)
 
         switch (skillIndex)
         {
             case 0: vfxToSpawn = breathPrefab; spawnPoint = mouthSpawnPoint; break;
             case 1: vfxToSpawn = breathFirePrefab; spawnPoint = mouthSpawnPoint; break;
-            case 2: vfxToSpawn = electroShockPrefab; spawnAtPlayer = true; break; // [ĐÃ SỬA]: Sét đánh thẳng vào Player
+            case 2: vfxToSpawn = electroShockPrefab; spawnAtPlayer = true; break; // Skill 2 giáng thẳng sét xuống đầu Player
             case 3: vfxToSpawn = energyShieldPrefab; spawnPoint = centerSpawnPoint; isAura = true; attachToBoss = true; break;
             case 4: vfxToSpawn = energySmackPrefab; spawnPoint = centerSpawnPoint; isAura = true; attachToBoss = true; break;
             case 5: vfxToSpawn = fireBallPrefab; spawnPoint = mouthSpawnPoint; isProjectile = true; break;
@@ -57,7 +57,7 @@ public class BossSkillManager : MonoBehaviour
         {
             Vector3 finalSpawnPos = spawnPoint != null ? spawnPoint.position : transform.position;
 
-            // [XỬ LÝ ĐẶC BIỆT]: NẾU LÀ SÉT, TÌM CHÂN PLAYER ĐỂ ĐÁNH XUỐNG
+            // Đối với các kỹ năng định vị, tự động tìm và dò gốc tọa độ của Player để đánh xuống (Sét)
             if (spawnAtPlayer)
             {
                 GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -80,7 +80,7 @@ public class BossSkillManager : MonoBehaviour
             if (ObjectPoolManager.Instance != null) vfx = ObjectPoolManager.Instance.Get(vfxToSpawn, finalSpawnPos, Quaternion.identity);
             else vfx = Instantiate(vfxToSpawn, finalSpawnPos, Quaternion.identity);
 
-            // XỬ LÝ LẬT ẢNH CHO ĐÒN ĐÁNH TĨNH VÀ KHÔNG PHẢI SÉT
+            // Xử lý hướng lật ảnh (Facing) cho các đòn đánh tĩnh (Không phải luồng đạn và không phải sấm sét)
             if (!isAura && !isProjectile && !spawnAtPlayer)
             {
                 Vector3 scale = vfx.transform.localScale;
@@ -111,7 +111,14 @@ public class BossSkillManager : MonoBehaviour
                     }
                          
                     else if (skillIndex == 4) 
-                        aura.SetupAura(bossEntity, 15f, bossEntity.Attack * 0.5f, bossEntity.Defense * 0.5f, 0);
+                    {
+                        BossController boss = bossEntity as BossController;
+                        if (boss != null)
+                        {
+                            boss.ActivateSmackBuff();
+                            aura.SetupAura(bossEntity, 7f, 0, 0, 0);
+                        }
+                    }
                 }
             }
             else
@@ -119,7 +126,7 @@ public class BossSkillManager : MonoBehaviour
                 UniversalHitbox hitbox = vfx.GetComponent<UniversalHitbox>();
                 if (hitbox != null) hitbox.owner = this.gameObject;
 
-                // [BREATH DOT] Gán owner cho BreathDOT (skill 0 & 1)
+                // Truyền tham chiếu Owner cho hệ thống sát thương duy trì (Damage over Time) của Breath (skill 0 & 1)
                 BreathDOT dot = vfx.GetComponent<BreathDOT>();
                 if (dot != null) dot.owner = this.gameObject;
 

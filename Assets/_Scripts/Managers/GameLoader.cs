@@ -46,7 +46,7 @@ public class GameLoader : MonoBehaviour
         yield return loadOp;
         yield return null;
 
-        // [FIX] DỌN DẸP EVENT SYSTEM TRÙNG LẶP (Ngăn chặn 702 cảnh báo vàng)
+        // Dọn dẹp các EventSystem lọt vào qua quá trình LoadSceneAdditive để tránh cảnh báo.
         UnityEngine.EventSystems.EventSystem[] eventSystems = FindObjectsByType<UnityEngine.EventSystems.EventSystem>(FindObjectsInactive.Include);
         foreach (var es in eventSystems)
         {
@@ -75,6 +75,14 @@ public class GameLoader : MonoBehaviour
             {
                 MapSpawnPoint spawnPoint = FindAnyObjectByType<MapSpawnPoint>();
                 if (spawnPoint != null) player.transform.position = spawnPoint.transform.position;
+            }
+            
+            // Yêu cầu tất cả Boss trong cảnh đồng bộ lại cấp độ với Player vừa được load
+            // (Ngăn chặn tình trạng Boss lấy cấp độ khởi điểm lv1 do Start() chạy trước khi Player được ốp dữ liệu save).
+            BossController[] bosses = FindObjectsByType<BossController>(FindObjectsSortMode.None);
+            foreach (var boss in bosses)
+            {
+                boss.SyncLevelWithPlayer();
             }
         }
 

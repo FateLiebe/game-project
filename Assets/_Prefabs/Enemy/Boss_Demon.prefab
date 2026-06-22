@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 1704326107059936956}
   m_Layer: 12
   m_Name: Boss_Demon
-  m_TagString: Enemy
+  m_TagString: Boss
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -221,6 +221,7 @@ MonoBehaviour:
   currentShield: 0
   buffAttack: 0
   buffDefense: 0
+  enemyData: {fileID: 11400000, guid: 60a078256df4ef5469c85cc34fe56cd4, type: 2}
   rank: 2
   expMultiplier: 30
   attackCooldowns:
@@ -265,6 +266,7 @@ MonoBehaviour:
   damageToFlyUp: 30
   timeAtMaxHeight: 4
   moveSpeed: 9
+  bossData: {fileID: 0}
   isPhase2: 0
   maxShield: 0
 --- !u!114 &259003522531114190

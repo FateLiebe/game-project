@@ -2,15 +2,15 @@ using UnityEngine;
 using TMPro; 
 
 /// <summary>
-/// Quản lý hiệu ứng Text nổi lên trên đầu nhân vật (Damage, EXP, Coin, Level Up, Cảnh báo).
-/// Script này thường được gắn vào một Prefab và được sinh ra liên tục thông qua Object Pool.
+/// Hệ thống hiển thị Popup sát thương, kinh nghiệm, vàng và các thông báo trên đầu nhân vật.
+/// Class này được thiết kế để kết hợp với Object Pool, tái sử dụng để tối ưu hiệu năng.
 /// </summary>
 public class DamagePopup : MonoBehaviour
 {
-    private TextMeshPro textMesh;           // Thành phần Text 3D để hiển thị chữ
-    private float disappearTimer;           // Bộ đếm thời gian trước khi Text bắt đầu mờ dần
-    private Color textColor;                // Màu chủ đạo của Text
-    private float moveYSpeed = 2f;          // Tốc độ bay lơ lửng lên trên
+    private TextMeshPro textMesh;           // Text 3D hiển thị nội dung
+    private float disappearTimer;           // Thời gian chờ trước khi chữ bắt đầu mờ đi
+    private Color textColor;                // Màu sắc của nội dung
+    private float moveYSpeed = 2f;          // Tốc độ bay nổi lên trên màn hình
 
     // --- BIẾN DÀNH RIÊNG CHO HIỆU ỨNG LEVEL UP ---
     private bool isLevelUp;                 // Cờ đánh dấu xem Text này có phải là chữ Level Up không
@@ -37,9 +37,12 @@ public class DamagePopup : MonoBehaviour
         colorOrange.a   = 1f;
     }
 
-    // ==========================================
-    // 1. CÀI ĐẶT POPUP SÁT THƯƠNG
-    // ==========================================
+    /// <summary>
+    /// Thiết lập thông số hiển thị cho Popup Sát thương (Combat).
+    /// </summary>
+    /// <param name="damageAmount">Lượng sát thương thực tế</param>
+    /// <param name="isCrit">Có phải sát thương chí mạng không</param>
+    /// <param name="isPlayer">Là sát thương gây ra lên Player (màu đỏ) hay lên quái (màu trắng)</param>
     public void SetupDamage(float damageAmount, bool isCrit, bool isPlayer)
     {
         isLevelUp = false;
@@ -66,9 +69,10 @@ public class DamagePopup : MonoBehaviour
         disappearTimer = 0.8f; // Sau 0.8s thì bắt đầu bay hơi
     }
 
-    // ==========================================
-    // 2. CÀI ĐẶT POPUP KINH NGHIỆM (EXP)
-    // ==========================================
+    /// <summary>
+    /// Thiết lập thông số hiển thị cho Popup Kinh nghiệm (EXP).
+    /// Mặc định sẽ có màu xanh lá và bay chậm hơn sát thương.
+    /// </summary>
     public void SetupEXP(float expAmount)
     {
         isLevelUp = false;
@@ -83,9 +87,10 @@ public class DamagePopup : MonoBehaviour
         moveYSpeed = 2f; 
     }
 
-    // ==========================================
-    // 3. CÀI ĐẶT POPUP VÀNG (COIN)
-    // ==========================================
+    /// <summary>
+    /// Thiết lập thông số hiển thị cho Popup Tiền Vàng (Coin).
+    /// Có tích hợp kèm thẻ <sprite> để vẽ icon đồng xu.
+    /// </summary>
     public void SetupCoin(int amount)
     {
         isLevelUp = false;
@@ -99,9 +104,10 @@ public class DamagePopup : MonoBehaviour
         moveYSpeed = 2f; 
     }
 
-    // ==========================================
-    // 4. CÀI ĐẶT POPUP LEVEL UP
-    // ==========================================
+    /// <summary>
+    /// Thiết lập thông số hiển thị khi nhân vật Thăng cấp.
+    /// Áp dụng hiệu ứng nhấp nháy đèn Neon trong hàm Update.
+    /// </summary>
     public void SetupLevelUp()
     {
         isLevelUp = true; // Bật cờ để Update biết đường chạy hiệu ứng nhấp nháy
@@ -111,9 +117,10 @@ public class DamagePopup : MonoBehaviour
         moveYSpeed = 1.5f;     // Bay lên rất chậm rãi
     }
 
-    // ==========================================
-    // 5. POPUP CẢNH BÁO TỰ DO
-    // ==========================================
+    /// <summary>
+    /// Hiển thị các thông báo cảnh báo (VD: Hết Mana, Hết Đạn, Khóa kỹ năng).
+    /// Mặc định dùng màu đỏ gắt.
+    /// </summary>
     public void SetupWarning(string message)
     {
         isLevelUp = false;
@@ -125,23 +132,37 @@ public class DamagePopup : MonoBehaviour
         moveYSpeed = 1.5f;
     }
 
+    /// <summary>
+    /// Hiển thị thông báo thân thiện cho các hoạt động hệ thống (VD: Tự động trang bị Bùa).
+    /// Mặc định dùng màu xanh ngọc (Cyan).
+    /// </summary>
+    public void SetupNotification(string message)
+    {
+        isLevelUp = false;
+        textMesh.text = message;
+        textMesh.fontSize = 4f;
+        textColor = Color.cyan; 
+        textMesh.color = textColor;
+        disappearTimer = 1.5f;
+        moveYSpeed = 1.2f;
+    }
+
     private void Update()
     {
-        // 1. DI CHUYỂN: Cứ mỗi khung hình lại nhích lên một chút theo trục Y
+        // 1. Di chuyển văn bản nhích dần lên trên theo trục Y
         transform.position += new Vector3(0, moveYSpeed) * Time.deltaTime;
 
-        // 2. HIỆU ỨNG NHẤP NHÁY (Chỉ áp dụng cho chữ LEVEL UP)
+        // 2. Xử lý hiệu ứng nhấp nháy đặc biệt (Chỉ dành cho Level Up)
         if (isLevelUp)
         {
-            // Trộn (Lerp) qua lại liên tục giữa Vàng và Cam tạo hiệu ứng nhấp nháy đèn Neon
             textMesh.color = Color.Lerp(colorYellow, colorOrange, Mathf.PingPong(Time.time * blinkSpeed, 1f));
         }
 
-        // 3. XỬ LÝ MỜ DẦN VÀ TỰ HỦY
+        // 3. Bắt đầu quá trình mờ dần và thu hồi khi hết thời gian chờ
         disappearTimer -= Time.deltaTime;
-        if (disappearTimer < 0) // Hết thời gian chờ -> Bắt đầu bay hơi
+        if (disappearTimer < 0) 
         {
-            float disappearSpeed = 3f; // Tốc độ tụt Alpha
+            float disappearSpeed = 3f;
             if (!isLevelUp)
             {
                 // Giảm dần giá trị Alpha (Độ đục) của màu sắc

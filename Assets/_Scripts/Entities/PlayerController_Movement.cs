@@ -142,6 +142,10 @@ public partial class PlayerController
         return true;
     }
 
+    /// <summary>
+    /// Xử lý quá trình phục hồi (Recharge) số lần lướt (Dash Charge) theo thời gian.
+    /// Giới hạn số charge tối đa theo baseData.maxDashes.
+    /// </summary>
     private void HandleDashRecharge()
     {
         if (currentDashCharges < baseData.maxDashes)
@@ -155,6 +159,10 @@ public partial class PlayerController
         }
     }
 
+    /// <summary>
+    /// Xử lý logic Nhảy (Jump). Áp dụng lực nhảy dựa trên thông số nhân vật và gọi sự kiện âm thanh.
+    /// Cho phép hủy hoạt ảnh đang diễn ra để phản ứng ngay lập tức.
+    /// </summary>
     private void Jump()
     {
         lastJumpTime = Time.time;
@@ -166,9 +174,13 @@ public partial class PlayerController
         currentState = PlayerState.Airborne;
 
         anim.SetTrigger("Jump");
-        playerAudio?.NotifyJump(); // [AUDIO]
+        playerAudio?.NotifyJump();
     }
 
+    /// <summary>
+    /// Kích hoạt cơ chế rơi nhanh (Fast Fall) khi người chơi ấn mũi tên xuống trong lúc đang ở trên không.
+    /// Tăng giới hạn tốc độ rơi để đáp đất nhanh hơn.
+    /// </summary>
     private void HandleFastFall()
     {
         if ((currentState == PlayerState.Airborne || currentState == PlayerState.DashStalling) && Input.GetKeyDown(KeyCode.S))
@@ -188,6 +200,10 @@ public partial class PlayerController
         }
     }
 
+    /// <summary>
+    /// Khôi phục trạng thái Mặt đất (Grounded). 
+    /// Reset các cờ lướt trên không, số lần nhảy và dừng các hoạt ảnh hạ cánh.
+    /// </summary>
     private void BecomeGrounded()
     {
         currentState = PlayerState.Grounded;
@@ -198,6 +214,9 @@ public partial class PlayerController
         rb.gravityScale = originalGravity;
     }
 
+    /// <summary>
+    /// Lật sprite của nhân vật theo hướng di chuyển hiện tại.
+    /// </summary>
     private void Flip()
     {
         if (currentState == PlayerState.Dashing || currentState == PlayerState.DashStalling) return;
@@ -235,6 +254,10 @@ public partial class PlayerController
     /// <summary>
     /// Cơ chế kiểm tra mặt đất siêu an toàn bằng Raycast.
     /// Đòi hỏi nhân vật phải chạm đất liên tục 3 frame để chống hiện tượng giật lag bay trên không.
+    /// </summary>
+    /// <summary>
+    /// Bắn Raycast xuống dưới chân để xác định xem Player có đang đứng trên mặt đất không.
+    /// Cập nhật trạng thái Grounded/Airborne tương ứng.
     /// </summary>
     private void CheckGrounded()
     {
@@ -278,6 +301,10 @@ public partial class PlayerController
         }
     }
 
+    /// <summary>
+    /// Trả về lượng sát thương cận chiến hiện tại, đã bao gồm các hệ số nhân từ Combo, Buff, và Chí mạng.
+    /// </summary>
+    /// <param name="isCrit">Trạng thái (out) báo hiệu cú đánh này có phải là chí mạng hay không</param>
     public float GetCurrentMeleeDamage(out bool isCrit)
     {
         isCrit = false;
@@ -287,7 +314,8 @@ public partial class PlayerController
         
         if (isCounterAttacking) 
         {
-            multiplier = 2f; // [COUNTER ATTACK]: Hệ số x2 thay vì x1.3 của combo 3
+            // Khi ở trạng thái Counter Attack, sát thương đánh ra sẽ được cường hóa (Hệ số x2)
+            multiplier = 2f;
         }
         
         float finalDamage = Attack * multiplier;

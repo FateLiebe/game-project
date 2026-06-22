@@ -12,6 +12,6 @@ public struct DamageInfo
     public float damage;
     public Vector2 knockbackForce;
     public GameObject attacker;
-    public GameObject sourceHitbox; // [MỚI THÊM]: Lưu vết Hitbox để nhận diện Parry
-    public bool isCritical;  // [MỚI THÊM]: Cờ báo hiệu đòn đánh này có chí mạng không
+    public GameObject sourceHitbox; // Lưu vết Hitbox gốc sinh ra sát thương để nhận diện Phản đòn (Parry/Counter)
+    public bool isCritical;         // Cờ báo hiệu đòn đánh này có phải là chí mạng hay không
 }

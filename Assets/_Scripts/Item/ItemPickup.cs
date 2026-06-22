@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections; // BẮT BUỘC phải có dòng này để chạy thời gian (Coroutine)
+using System.Collections;
 
 /// <summary>
 /// Cấu hình và quản lý vật phẩm rơi trên mặt đất.
@@ -29,7 +29,10 @@ public class ItemPickup : MonoBehaviour
         if (despawnTime > 0f) StartCoroutine(DespawnRoutine());
     }
 
-    // Hàm này được gọi bởi InventoryManager khi bạn bấm nút "Vứt bỏ"
+    /// <summary>
+    /// Gắn dữ liệu vật phẩm (ItemSO) vào model rớt trên sàn.
+    /// Hàm này thường được gọi bởi InventoryManager hoặc DropManager khi vứt/rớt đồ.
+    /// </summary>
     public void Setup(ItemSO item, bool lockPickup = false)
     {
         itemData = item;
@@ -41,7 +44,7 @@ public class ItemPickup : MonoBehaviour
 
     /// <summary>
     /// Vô hiệu hóa Collider 1 giây khi vật phẩm vừa sinh ra. 
-    /// Tạo cảm giác vật phẩm văng ra chạm đất rồi người chơi mới lụm được.
+    /// Kích hoạt trạng thái khóa nhặt đồ trong thời gian ngắn để tạo cảm giác vật phẩm văng ra chạm đất rồi mới nhặt được.
     /// </summary>
     private IEnumerator SetupCoroutine(bool lockPickup)
     {

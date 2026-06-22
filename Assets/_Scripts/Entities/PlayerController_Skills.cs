@@ -17,6 +17,10 @@ public partial class PlayerController
     /// Radar quét Boss: Tự động chạy mỗi frame trong Update (thuộc PlayerController gốc).
     /// Bắn ra một vòng tròn quét tìm Layer Boss, nếu phát hiện sẽ bắn Event gọi BossUIManager hiện thanh máu.
     /// </summary>
+    /// <summary>
+    /// Kiểm tra xem người chơi có đang đứng trong khu vực đánh Boss hay không.
+    /// Kích hoạt event hiển thị thanh máu Boss nếu có.
+    /// </summary>
     private void HandleBossDetection()
     {
         // Quét 1 vòng tròn quanh Player để tìm Layer của Boss
@@ -51,6 +55,10 @@ public partial class PlayerController
     /// Vòng lặp chính xử lý Bùa chú (Support Skill). 
     /// Tính toán thời gian hồi chiêu, tự động gửi dữ liệu cho UI và nhận nút E để xuất chiêu.
     /// </summary>
+    /// <summary>
+    /// Xử lý logic nhấn phím sử dụng Kỹ năng Hỗ trợ (Support Skill - Phím Q).
+    /// Quản lý thời gian hồi chiêu và gửi sự kiện cập nhật lên UI.
+    /// </summary>
     private void HandleSupportSkill()
     {
         if (equippedSupportSkill == null) return;
@@ -78,6 +86,10 @@ public partial class PlayerController
     // ==========================================
     // LOCK TARGET
     // ==========================================
+    /// <summary>
+    /// Tự động dò tìm và khóa mục tiêu gần nhất.
+    /// Theo dõi và đếm ngược thời gian mất dấu (nếu kẻ địch ra khỏi tầm).
+    /// </summary>
     private void UpdateLockedTarget()
     {
         if (lockedTarget == null) return;
@@ -109,6 +121,10 @@ public partial class PlayerController
         if (lockedTarget != null) lockedTargetTimer = LOCK_DURATION;
     }
 
+    /// <summary>
+    /// Quét một vùng tròn quanh Player để tìm kẻ địch hoặc Boss gần nhất.
+    /// Dùng Physics2D.OverlapCircleNonAlloc để tối ưu hiệu năng (không tạo rác Garbage Collector).
+    /// </summary>
     private Transform FindNearestEnemy(float radius)
     {
         // Nếu đang có locked target hợp lệ → dùng nó (kể cả quay hướng khác)
@@ -116,7 +132,7 @@ public partial class PlayerController
         if (lockedTarget != null) return lockedTarget;
 
         float facingDir = transform.localScale.x >= 0 ? 1f : -1f;
-        // [PHASE 2] NonAlloc: tái sử dụng _enemyScanBuffer, không cấp phát array mới
+        // Tối ưu hóa bộ nhớ: Tái sử dụng mảng tĩnh _enemyScanBuffer thay vì cấp phát (Allocate) mảng mới mỗi lần gọi hàm
         int count = Physics2D.OverlapCircle(transform.position, radius, ContactFilter2D.noFilter, _enemyScanBuffer);
         Transform nearest = null;
         float minDist = Mathf.Infinity;
@@ -129,7 +145,7 @@ public partial class PlayerController
             if (hit.GetComponentInParent<BreakableCrate>() != null) continue;
 
             BaseEntity enemy = hit.GetComponentInParent<BaseEntity>();
-            if (enemy == null || enemy.currentHealth <= 0 || !enemy.CompareTag("Enemy")) continue;
+            if (enemy == null || enemy.currentHealth <= 0 || (!enemy.CompareTag("Enemy") && !enemy.CompareTag("Boss"))) continue;
 
             // Chỉ chọn enemy cùng hướng mặt
             float dx = enemy.transform.position.x - transform.position.x;
@@ -148,6 +164,10 @@ public partial class PlayerController
     /// Tính toán sát thương tổng (Crit + Modifier). Nhận diện loại Kỹ năng: 
     /// - Nếu là Đạn Lửa (Projectile): Bắn từ tay Player bay tới địch.
     /// - Nếu là Sét: Giáng thẳng xuống đầu vị trí của kẻ địch.
+    /// </summary>
+    /// <summary>
+    /// Triển khai sử dụng kỹ năng hỗ trợ: Trừ số lượt dùng, reset hồi chiêu, sinh ra VFX và định vị đòn đánh.
+    /// Hỗ trợ cả cơ chế tự động tìm mục tiêu (Auto Lock-on).
     /// </summary>
     private void UseSupportSkill()
     {
@@ -174,7 +194,7 @@ public partial class PlayerController
         
         Transform targetEnemy = FindNearestEnemy(15f); 
         
-        // [QUAN TRỌNG]: Nhận diện xem đây là Đạn bay (Fire Ball) hay Đánh thẳng (Sét)
+        // Nhận diện xem kỹ năng hỗ trợ có phải dạng đạn bay (Projectile) hay tấn công định vị (Sét giáng xuống)
         bool isProjectile = equippedSupportSkill.skillPrefab.GetComponent<Projectile>() != null;
 
         if (targetEnemy != null)
@@ -225,10 +245,15 @@ public partial class PlayerController
         if (currentSupportSkillUses <= 0)
         {
             Debug.Log("<color=yellow>Bùa đã hết số lần sử dụng! Tự động hủy.</color>");
+            ItemSO oldSkill = equippedSupportSkill;
             equippedSupportSkill = null; 
             
             OnSupportSkillUpdated?.Invoke(null, 0, 0); // [PHASE 3]
-            if (InventoryManager.Instance != null) InventoryManager.Instance.RemoveBrokenEquipment(ItemType.SupportSkill);
+            if (InventoryManager.Instance != null) 
+            {
+                InventoryManager.Instance.RemoveBrokenEquipment(ItemType.SupportSkill);
+                InventoryManager.Instance.AutoEquipSupportSkill(oldSkill);
+            }
         }
     }
 
@@ -240,6 +265,25 @@ public partial class PlayerController
         supportSkillCDTimer = 0f;
     }
 
+    /// <summary>
+    /// Buộc Kỹ năng hỗ trợ hiện tại lập tức bước vào thời gian hồi chiêu (Cooldown).
+    /// </summary>
+    /// <summary>
+    /// Đưa kỹ năng hỗ trợ hiện tại vào trạng thái hồi chiêu (Cooldown).
+    /// Thường được gọi sau khi Auto Equip (tự động gắn bùa mới) để tránh spam.
+    /// </summary>
+    public void PutSupportSkillOnCooldown()
+    {
+        if (equippedSupportSkill != null)
+        {
+            supportSkillCDTimer = equippedSupportSkill.skillCooldown;
+        }
+    }
+
+    /// <summary>
+    /// Tải lại kỹ năng hỗ trợ từ file Save (Ghi đè kỹ năng mặc định).
+    /// Ngăn không cho cơ chế khởi tạo ghi đè lại bằng cờ isSupportSkillInitialized.
+    /// </summary>
     public void LoadSupportSkillFromSave(ItemSO savedSkill, int savedUses)
     {
         equippedSupportSkill = savedSkill;

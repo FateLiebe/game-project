@@ -30,7 +30,7 @@ public partial class PlayerController
                 float direction = Mathf.Sign(enemyEntity.transform.position.x - transform.position.x);
                 if (direction != facingDir && direction != 0)
                 {
-                    // [FIX #8]: So sánh Component thay vì String
+                    // So sánh trực tiếp Component thay vì chuỗi String để tăng tốc độ xử lý
                     bool isHitbox = col.GetComponent<UniversalHitbox>() != null && col.enabled;
                     
                     bool isPlayingAttackAnim = false;
@@ -119,9 +119,10 @@ public partial class PlayerController
 
         if (isBackdash && previousState == PlayerState.Grounded) anim.SetTrigger("Backdash"); 
         else anim.SetTrigger("Dash"); 
-        playerAudio?.NotifyDash(); // [AUDIO]
-
-        perfectDodgeTriggered = false; // [FIX #3]: Reset cờ khi bắt đầu lướt mới
+        playerAudio?.NotifyDash();
+        
+        // Đặt lại cờ kích hoạt né hoàn hảo khi bắt đầu một chuỗi lướt mới
+        perfectDodgeTriggered = false;
 
         TryProactivePerfectDodge();
         StartCoroutine(PerfectDodgeWindowActive());
@@ -182,11 +183,13 @@ public partial class PlayerController
     public void OnPerfectDodgeSuccess(BaseEntity attacker)
     {
         if (isPhasingThrough) return;
-        if (perfectDodgeTriggered) return; // [FIX #3]: Chặn đúp trigger
+        // Chặn gọi đúp hàm kích hoạt khi lướt trúng nhiều đạn/hitbox cùng một lúc
+        if (perfectDodgeTriggered) return;
 
         if (perfectDodgeTimer <= 0f)
         {
-            perfectDodgeTriggered = true; // [FIX #3]: Đánh dấu đã trigger
+            // Đánh dấu để ngăn các hitbox khác tiếp tục kích hoạt né hoàn hảo trong lượt lướt này
+            perfectDodgeTriggered = true;
 
             Debug.Log("<color=cyan>PERFECT DODGE! NGƯNG ĐỌNG THỜI GIAN!</color>");
             if (TimeAnomalyManager.Instance != null) 
@@ -223,7 +226,9 @@ public partial class PlayerController
         }
     }
 
-    // [MỚI]: Hàm ghi nhớ kẻ địch bị né để chặn sát thương
+    /// <summary>
+    /// Ghi nhớ kẻ địch hoặc đòn tấn công vừa bị né để không tính sát thương trong khoảng thời gian nhất định (Kim bài miễn tử).
+    /// </summary>
     private IEnumerator IgnoreSpecificAttackerRoutine(BaseEntity enemyEntity, float duration)
     {
         if (enemyEntity == null) yield break;
@@ -256,7 +261,8 @@ public partial class PlayerController
         if (playerCol != null && enemyCols.Length > 0)
         {
             foreach (var col in enemyCols) 
-                if (col != null) Physics2D.IgnoreCollision(playerCol, col, false); // [FIX #7]: Check Null trước khi khôi phục
+                // Đảm bảo Collider vẫn tồn tại (kẻ địch chưa bị tiêu diệt) trước khi khôi phục va chạm
+                if (col != null) Physics2D.IgnoreCollision(playerCol, col, false);
         }
 
         isPhasingThrough = false;
@@ -283,7 +289,7 @@ public partial class PlayerController
     /// </summary>
     public override void ApplyDamage(DamageInfo info)
     {
-        // [COUNTER ATTACK CHECK]
+        // Kiểm tra phản đòn (Counter Attack)
         if (currentState == PlayerState.Countering)
         {
             if (info.sourceHitbox != null && 
@@ -399,12 +405,14 @@ public partial class PlayerController
     private IEnumerator PerformCounterAttackRoutine()
     {
         // KHÔNG đổi currentState thành Attacking để tránh kẹt logic di chuyển
+        currentState = PlayerState.Countering; // Bổ sung để khóa cứng trạng thái
         isAttacking = true;
         isCounterAttacking = true; 
         
         comboStep = 3;
         currentAttackDuration = attackDurations[2]; 
-        lastAttackTime = Time.time; // [FIX LỖI]: Phải cập nhật thời gian để HandleComboReset không lập tức huỷ đòn đánh!
+        // Cập nhật lại thời điểm tấn công để tránh bị HandleComboReset hủy lệnh ngay lập tức
+        lastAttackTime = Time.time;
         
         anim.SetBool("isAttacking", true);
         anim.SetInteger("comboStep", comboStep);
@@ -453,7 +461,7 @@ public partial class PlayerController
         anim.SetInteger("comboStep", comboStep);
         anim.SetTrigger("Attack");
         EnableHitbox(); // Bật hitbox cho đòn đánh thường
-        playerAudio?.NotifyAttack(comboStep); // [AUDIO]
+        playerAudio?.NotifyAttack(comboStep);
         
         lastAttackTime = Time.time;
 
@@ -486,12 +494,20 @@ public partial class PlayerController
         if (attackCoroutine != null) StopCoroutine(attackCoroutine);
         isAttacking = false;
         
-        // [FIX LỖI BẤT TỬ]: Phải reset các cờ này nếu bị ngắt ngang (ví dụ ấn Dash lúc đang chém)
+        // Xóa các cờ trạng thái khống chế (VD: khi ấn Dash để ngắt ngang hoạt ảnh chém)
+        bool wasCounter = isCounterAttacking;
         isCounterAttacking = false;
         
         // Tránh ghi đè isPhasingThrough nếu đang là do Perfect Dodge sinh ra
         if (currentState == PlayerState.Attacking || currentState == PlayerState.Countering) 
             isPhasingThrough = false; 
+
+        // [FIX TASK 1]: Thoát khỏi trạng thái kẹt Countering
+        if (wasCounter && currentState == PlayerState.Countering)
+        {
+            if (groundedFrameCount > 0) ForceGroundedState();
+            else currentState = PlayerState.Airborne;
+        }
 
         anim.SetBool("isAttacking", false);
         DisableHitbox(); 
@@ -523,7 +539,8 @@ public partial class PlayerController
     /// <summary>
     /// Gọi khi máu rơi xuống 0.
     /// Đưa nhân vật vào trạng thái bất động, xóa toàn bộ hoạt ảnh dư thừa.
-    /// [QUAN TRỌNG]: Lưu game ngay lập tức lúc chết, để khi "Reload Checkpoint" thì giữ nguyên chỉ số, đồ đạc, chỉ trả lại vị trí cũ.
+    /// Lưu trữ tự động (Auto-save) ngay khoảnh khắc nhân vật chết.
+    /// Giúp người chơi giữ lại kinh nghiệm và vật phẩm đã cày cuốc dù phải chơi lại tại điểm lưu cũ.
     /// </summary>
     protected override void Die()
     {
@@ -549,7 +566,7 @@ public partial class PlayerController
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         this.enabled = false; 
 
-        // [FIX] Lưu lại chỉ số, level, đồ đạc hiện tại vào file ngay lúc chết 
+        // Lưu trạng thái hiện tại (level, item) vào tệp trước khi nhân vật chết hẳn.
         // để khi Reload Save Point thì chỉ phục hồi vị trí nhưng giữ nguyên cấp độ/đồ
         if (SaveDataManager.Instance != null && InventoryManager.Instance != null)
         {
@@ -573,9 +590,12 @@ public partial class PlayerController
         isDead = false;
         this.enabled = true; // Nhận nút bấm trở lại
         
-        lastCombatTime = -999f; // [FIX] Xóa trạng thái combat khi hồi sinh
+        lastCombatTime = -999f; // Đảm bảo thoái lui khỏi trạng thái chiến đấu khi hồi sinh
 
-        // [FIX] Khôi phục trọng lượng bị tắt bởi DeathZone
+        lockedTarget = null; // Xóa bộ nhớ mục tiêu cũ tránh lỗi lock on vào vùng trống
+        activeBoss = null;   // Bỏ qua Boss cũ đã bị hủy khi map load lại
+
+        // Phục hồi lại tương tác vật lý (bị vô hiệu hóa nếu rơi xuống vực)
         if (rb != null) rb.gravityScale = originalGravity;
 
         anim.Rebind();

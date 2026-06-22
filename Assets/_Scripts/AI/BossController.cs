@@ -43,8 +43,12 @@ public class BossController : EnemyBase
 
     [Header("--- BOSS PHASES ---")]
     public bool isPhase2 = false;
-    // Boss HP = EnemyBase.MaxHealth × 8
-    public override float MaxHealth => (150f + ((currentLevel - 1) * 30f)) * 8f;
+
+    [Header("--- BOSS DATA ---")]
+    public BossDataSO bossData;
+
+    // Boss HP = EnemyBase.MaxHealth × 8 (hoặc hệ số từ bossData)
+    public override float MaxHealth => (enemyData != null ? enemyData.baseMaxHealth + ((currentLevel - 1) * enemyData.healthGrowth) : 150f + ((currentLevel - 1) * 30f)) * (bossData != null ? bossData.bossHealthMultiplier : 8f);
 
     [Header("--- BOSS SHIELD & BUFF ---")]
     //public float currentShield = 0f;
@@ -75,44 +79,55 @@ public class BossController : EnemyBase
 
     protected override void Start()
     {
-        // 1. Tìm Player và set level Boss = Player + 3
+        base.Start();
+        SyncLevelWithPlayer();
+
+        anim = GetComponent<Animator>();
+        skillManager = GetComponent<BossSkillManager>();
+
+        if (rb != null) rb.gravityScale = 0f;
+        
+        // Vô hiệu hóa trọng lực của EnemyBase do Boss có cơ chế bay độc lập
+        isFlying = true; 
+        currentTargetHeight = minFlightHeight;
+        
+        // Bắt đầu vòng lặp tư duy hành vi của AI
+        StartCoroutine(BehaviorTreeLoop());
+    }
+
+    /// <summary>
+    /// Đồng bộ cấp độ và chỉ số của Boss dựa trên cấp độ hiện tại của Player.
+    /// Hàm này xử lý linh động để đảm bảo Boss luôn mạnh hơn Player một khoảng cố định.
+    /// </summary>
+    public void SyncLevelWithPlayer()
+    {
+        // 1. Dò tìm Player và thiết lập mục tiêu
         GameObject p = GameObject.FindGameObjectWithTag("Player");
         if (p != null)
         {
             playerTarget = p.transform;
             BaseEntity playerEntity = p.GetComponent<BaseEntity>();
-            if (playerEntity != null)
+            if (playerEntity != null && playerEntity.currentLevel > 0)
+            {
+                // Boss luôn ở cấp độ cao hơn Player 3 cấp
                 this.currentLevel = playerEntity.currentLevel + 3;
+            }
         }
 
-        // 2. Gọi base.Start() để EnemyBase khởi tạo rb, sr, và cooldown arrays
-        base.Start();
+        // 2. Tính toán chỉ số cơ bản dựa trên dữ liệu EnemyBase và mức tăng trưởng
+        float enemyBaseATK = enemyData != null ? enemyData.baseAttack + ((currentLevel - 1) * enemyData.attackGrowth) : 12f + ((currentLevel - 1) * 4f);
+        float enemyBaseDEF = enemyData != null ? enemyData.baseDefense + ((currentLevel - 1) * enemyData.defenseGrowth) : 3f  + ((currentLevel - 1) * 1f);
 
-        // 3. Tính chỉ số boss dựa trên level (công thức EnemyBase)
-        float enemyBaseATK = 12f + ((currentLevel - 1) * 4f);
-        float enemyBaseDEF = 3f  + ((currentLevel - 1) * 1f);
+        // 3. Áp dụng hệ số nhân sức mạnh dành riêng cho Boss từ Data SO
+        buffAttack  = enemyBaseATK * (bossData != null ? bossData.bossAttackBuffMultiplier : 0.8f);
+        buffDefense = enemyBaseDEF * (bossData != null ? bossData.bossDefenseBuffMultiplier : 1.0f);
 
-        // buffAttack/buffDefense cộng thêm vào property Attack/Defense của BaseEntity
-        // Mục tiêu: Attack = EnemyBaseATK × 1.8 → buff thêm 0.8×
-        //           Defense = EnemyBaseDEF × 2.0 → buff thêm 1.0×
-        buffAttack  = enemyBaseATK * 0.8f;
-        buffDefense = enemyBaseDEF * 1.0f;
-
-        // HP đã được override qua MaxHealth property, chỉ cần bơm đầy
+        // 4. Cập nhật lượng máu tối đa và bơm đầy máu khi Boss xuất hiện
         currentHealth = MaxHealth;
 
-        // Lưu lại chỉ số gốc để SmackBuff tham chiếu
+        // Lưu trữ chỉ số gốc để phục vụ cho các kỹ năng tự buff (Smack Buff)
         originalAttack  = Attack;
         originalDefense = Defense;
-
-        // 4. Setup components
-        anim = GetComponent<Animator>();
-        skillManager = GetComponent<BossSkillManager>();
-
-        if (rb != null) rb.gravityScale = 0f;
-        isFlying = true; // [FIX]: Báo cho EnemyBase biết Boss đang bay để không áp dụng trọng lực
-        currentTargetHeight = minFlightHeight;
-        StartCoroutine(BehaviorTreeLoop());
     }
 
     protected override void Update()
@@ -134,6 +149,10 @@ public class BossController : EnemyBase
         }
     }
 
+    /// <summary>
+    /// Vòng lặp ra quyết định của Behavior Tree. 
+    /// Liên tục kiểm tra trạng thái và môi trường sau mỗi khoảng thời gian (decisionInterval) để quyết định hành động tiếp theo.
+    /// </summary>
     private IEnumerator BehaviorTreeLoop()
     {
         yield return new WaitForSeconds(1.5f);
@@ -216,6 +235,10 @@ public class BossController : EnemyBase
         isActing = false;
     }
 
+    /// <summary>
+    /// Thu thập và chọn lọc kỹ năng tốt nhất dựa trên khoảng cách tới mục tiêu.
+    /// Ưu tiên các đòn đánh gần (Melee) nếu mục tiêu ở gần, và đòn đánh xa (Ranged) nếu mục tiêu ở xa.
+    /// </summary>
     private int ChooseBestSkillByDistance(float dist)
     {
         List<int> candidates = new List<int>();
@@ -293,6 +316,12 @@ public class BossController : EnemyBase
         return candidates[Random.Range(0, candidates.Count)];
     }
 
+    /// <summary>
+    /// Thêm kỹ năng vào danh sách có thể sử dụng nếu thỏa mãn các điều kiện về HP, Phase, Cooldown, Khoảng cách và không bị trùng lặp.
+    /// </summary>
+    /// <param name="candidates">Danh sách ứng cử viên</param>
+    /// <param name="skillIndex">ID Kỹ năng cần kiểm tra</param>
+    /// <param name="dist">Khoảng cách hiện tại đến Player</param>
     private void AddIfAvailable(List<int> candidates, int skillIndex, float dist)
     {
         // Skill 4 chỉ dùng khi phase 2 (HP ≤ 50%)
@@ -321,6 +350,10 @@ public class BossController : EnemyBase
 
     private bool IsMeleeSkill(int skillIndex) { return skillIndex == 4 || skillIndex == 6; }
 
+    /// <summary>
+    /// Thực hiện di chuyển chiến thuật.
+    /// Boss có khả năng lùi lại (BackOff) nếu Player tiếp cận quá gần (Panic Distance), hoặc rà quanh (Strafe) để tạo khoảng cách an toàn.
+    /// </summary>
     private IEnumerator TacticalMovementRoutine(bool forceBackOff)
     {
         float moveTime = repositionDuration;
@@ -381,6 +414,9 @@ public class BossController : EnemyBase
         }
     }
 
+    /// <summary>
+    /// Phóng Raycast xuống dưới để tìm mặt đất, cập nhật cao độ hiện tại để Boss luôn bay song song với địa hình.
+    /// </summary>
     private void UpdateGroundLevel()
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 30f, groundLayer);
@@ -392,6 +428,10 @@ public class BossController : EnemyBase
         else isOverGround = false;
     }
 
+    /// <summary>
+    /// Kiểm tra xem phía trước có mặt đất không (chống đâm đầu vào vách núi hoặc bay ra ngoài vực).
+    /// </summary>
+    /// <param name="dirX">Hướng di chuyển dự kiến (-1 hoặc 1)</param>
     private bool HasGroundAhead(float dirX)
     {
         if (dirX == 0f) return true;
@@ -411,22 +451,7 @@ public class BossController : EnemyBase
     {
         if (currentHealth <= 0f || isDead) return;
 
-        // Xử lý Khiên chắn đòn trước (Skill 3)
-        // if (currentShield > 0f)
-        // {
-        //     currentShield -= info.damage;
-        //     if (currentShield < 0f) 
-        //     {
-        //         info.damage = Mathf.Abs(currentShield); // Lượng dame dư xuyên qua khiên
-        //         currentShield = 0f;
-        //     }
-        //     else
-        //     {
-        //         info.damage = 0f; // Khiên đỡ hết
-        //     }
-        // }
-
-        // Lượng dame còn lại truyền cho BaseEntity trừ máu
+        // Gọi hàm từ lớp cha (EnemyBase) để thực sự trừ máu và hiện Popup
         if (info.damage > 0f)
         {
             base.ApplyDamage(info); 
@@ -447,6 +472,12 @@ public class BossController : EnemyBase
         }
     }
 
+    /// <summary>
+    /// Thực thi quá trình vận chiêu của Boss. Đóng băng di chuyển và kích hoạt Animation tương ứng.
+    /// Khóa trạng thái Boss cho đến khi kỹ năng hoàn thành cast.
+    /// </summary>
+    /// <param name="skillIndex">ID của kỹ năng được chọn</param>
+    /// <param name="castTime">Thời gian vận chiêu thực tế (ảnh hưởng bởi Time Stop)</param>
     private IEnumerator ExecuteSkillState(int skillIndex, float castTime)
     {
         currentSelectedSkill = skillIndex;
@@ -464,6 +495,10 @@ public class BossController : EnemyBase
         }
     }
 
+    /// <summary>
+    /// Hàm này được gọi từ Animation Event để kích hoạt VFX/Hitbox ngay tại thời điểm vung vũ khí.
+    /// Chuyển quyền xử lý chiêu thức sang BossSkillManager.
+    /// </summary>
     public void TriggerVFXEvent()
     {
         if (skillManager != null && currentSelectedSkill != -1)
@@ -473,8 +508,13 @@ public class BossController : EnemyBase
     }
 
     // ==========================================
-    // CÁC HÀM BUFF CHO BOSS (Được gọi từ BossSkillManager)
+    #region BOSS BUFF & DEFENSIVE SKILLS
     // ==========================================
+
+    /// <summary>
+    /// Kích hoạt khiên năng lượng dựa trên lượng máu đã mất.
+    /// Khiên này hấp thụ toàn bộ sát thương của Player trước khi trừ vào máu thật.
+    /// </summary>
     public void ActivateEnergyShield()
     {
         float missingHP = MaxHealth - currentHealth;
@@ -485,8 +525,11 @@ public class BossController : EnemyBase
         if (shieldCoroutine != null) StopCoroutine(shieldCoroutine);
         shieldCoroutine = StartCoroutine(ShieldDurationRoutine());
     }
-    //private void DeactivateShield() { currentShield = 0f; maxShield = 0f; }
 
+    /// <summary>
+    /// Bộ đếm thời gian hiệu lực của Khiên năng lượng.
+    /// Hỗ trợ đóng băng thời gian (Time Stop) bằng cách dùng deltaTime * timeMultiplier.
+    /// </summary>
     private IEnumerator ShieldDurationRoutine()
     {
         float timer = 0f;
@@ -499,18 +542,24 @@ public class BossController : EnemyBase
         maxShield = 0f;
     }
 
+    /// <summary>
+    /// Kích hoạt trạng thái Nổi điên (Smack Buff). 
+    /// Gia tăng tạm thời cả sức mạnh tấn công lẫn phòng thủ dựa trên cấu hình trong BossDataSO.
+    /// </summary>
     public void ActivateSmackBuff()
     {
         if (buffCoroutine != null) StopCoroutine(buffCoroutine);
         buffCoroutine = StartCoroutine(SmackBuffRoutine());
     }
+    /// <summary>
+    /// Bộ đếm thời gian duy trì Smack Buff. 
+    /// Sau khi kết thúc thời gian hiệu lực (7s), tự động gỡ bỏ lượng buff đã cộng.
+    /// </summary>
     private IEnumerator SmackBuffRoutine()
     {
-        // Mục tiêu: ATK tạm thời = originalAttack × 1.5, DEF tạm thời = originalDefense × 1.7
-        // originalAttack/Defense đã là chỉ số boss (EnemyBase × 1.8/2.0)
-        // Chỉ cần cộng thêm delta vào buffAttack/buffDefense
-        float extraATK = originalAttack * 0.5f;   // 50% thêm vào
-        float extraDEF = originalDefense * 0.7f;  // 70% thêm vào
+        // Tính lượng buff dựa vào BossDataSO hoặc mặc định
+        float extraATK = originalAttack * (bossData != null ? bossData.smackAttackMultiplier : 0.5f);
+        float extraDEF = originalDefense * (bossData != null ? bossData.smackDefenseMultiplier : 0.7f);
 
         buffAttack  += extraATK;
         buffDefense += extraDEF;
@@ -527,6 +576,12 @@ public class BossController : EnemyBase
         buffDefense -= extraDEF;
     }
 
+    #endregion
+
+    /// <summary>
+    /// Cập nhật hướng mặt của Boss sao cho luôn nhìn về phía mục tiêu (Player).
+    /// </summary>
+    /// <param name="targetPos">Vị trí hiện tại của mục tiêu</param>
     private void FaceTarget(Vector2 targetPos)
     {
         float directionToTarget = Mathf.Sign(targetPos.x - transform.position.x);
@@ -540,6 +595,9 @@ public class BossController : EnemyBase
         }
     }
 
+    /// <summary>
+    /// Xử lý logic khi Boss tử vong: Dừng toàn bộ Coroutine, vô hiệu hóa Hitbox vật lý, rơi tự do và gọi Animation chết.
+    /// </summary>
     protected override void Die()
     {
         StopAllCoroutines();
@@ -559,10 +617,15 @@ public class BossController : EnemyBase
         Destroy(gameObject);
     }
 
+    /// <summary>
+    /// Ghi nhớ kỹ năng vừa sử dụng vào bộ nhớ tạm thời (Queue).
+    /// Boss sẽ không dùng lại các kỹ năng vừa xài gần nhất nhằm tạo sự đa dạng trong combat.
+    /// </summary>
+    /// <param name="skillIndex">ID của kỹ năng vừa tung ra</param>
     private void RegisterUsedSkill(int skillIndex)
     {
-        // Nếu skill đã có trong queue, xóa nó trước
-        // để tránh chiếm 2 slot — queue luôn chứa các skill KHÁC NHAU gần nhất
+        // Loại bỏ kỹ năng khỏi hàng chờ nếu nó đã tồn tại để tránh trùng lặp
+
         if (recentSkills.Contains(skillIndex))
         {
             Queue<int> temp = new Queue<int>();
@@ -579,9 +642,13 @@ public class BossController : EnemyBase
             recentSkills.Dequeue();
     }
 
+    /// <summary>
+    /// Sàng lọc và đưa một kỹ năng vào danh sách ứng cử viên có thể sử dụng (Candidates) 
+    /// nếu thỏa mãn các điều kiện về khoảng cách (Range) và Phase hiện tại.
+    /// </summary>
     private void ForceAdd(List<int> candidates, int skillIndex, float dist)
     {
-        // Skill 4 chỉ dùng khi phase 2 (HP ≤ 50%)
+        // Skill 4 chỉ được mở khóa khi Boss bước sang Phase 2 (Máu < 50%)
         if (skillIndex == 4 && !isPhase2) return;
 
         // Skill 3 chỉ dùng khi HP ≤ 75%
