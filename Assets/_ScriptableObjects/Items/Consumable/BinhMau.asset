@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: BinhMau
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: BinhMau
-  itemName: "B\xECnh M\xE1u"
-  description: "S\u1EED d\u1EE5ng s\u1EBD h\u1ED3i 50 HP\n "
+  itemName: Healing Potion
+  description: Using it will restore 50 health
   icon: {fileID: 189804300, guid: 3a6cac4ef058b5243a458056c66b05b7, type: 3}
   itemType: 0
   rarity: 0
@@ -25,7 +25,7 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 50
-  useSound: {fileID: 0}
+  useSound: {fileID: 8300000, guid: 4237d0360d78ee9489931878488d3fad, type: 3}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
   skillRange: 0

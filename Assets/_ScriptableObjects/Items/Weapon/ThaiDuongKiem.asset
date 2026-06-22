@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ThaiDuongKiem
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: ThaiDuongKiem
-  itemName: "Th\xE1i D\u01B0\u01A1ng Ki\u1EBFm"
+  itemName: Heroic Sword
   description: 
   icon: {fileID: -1559048198, guid: 7d39a3295c0f1fb4eb505da85561a208, type: 3}
   itemType: 2
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

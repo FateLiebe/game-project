@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Quan3
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: Quan3
-  itemName: "Qu\u1EA7n 3"
+  itemName: Ancient Pants
   description: 
   icon: {fileID: 1717557583, guid: f4fd30f67e290f540b0f90f8d6d42504, type: 3}
   itemType: 4
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

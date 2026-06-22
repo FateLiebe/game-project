@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Bua skill 1
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: BuaSkill1
-  itemName: "\xDD Ch\u1EC9 Th\u1EA7n S\u1EA5m"
-  description: "G\u1ECDi s\u1EA5m s\xE9t h\u1ED7 tr\u1EE3 g\xE2y s\xE1t th\u01B0\u01A1ng"
+  itemName: Will of Thunder
+  description: Calls lightning to assist in dealing damage
   icon: {fileID: 1210084849, guid: b435831bd28698245b39e1b4daee86e9, type: 3}
   itemType: 7
   rarity: 2

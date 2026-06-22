@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: KiemBachKim
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: KiemBachKim
-  itemName: "Ki\u1EBFm B\u1EA1ch Kim"
+  itemName: Platinum
   description: 
   icon: {fileID: -824955146, guid: 71f597b6677d7fb498297bccacdb2506, type: 3}
   itemType: 2
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

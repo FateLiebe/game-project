@@ -23,4 +23,4 @@ MonoBehaviour:
   lineOfSight: 6
   attackRange: 2.3
   idleDuration: 1.5
-  rangedAttackRange: 6
+  rangedAttackRange: 3

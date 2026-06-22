@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BaoVat2
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: BaoVat2
-  itemName: "B\u1EA3o V\u1EADt 2"
+  itemName: Fine Talisman
   description: 
   icon: {fileID: 2002317774, guid: 30e740e2f82654f47a87d62b27b7e306, type: 3}
   itemType: 6
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 10
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: BuaSkill2
   itemName: Fire Ball
-  description: "B\u1EAFn ra c\u1EA7u l\u1EEDa v\xE0o k\u1EBB \u0111\u1ECBch"
+  description: Shoots fireballs at enemies
   icon: {fileID: 1210084849, guid: b435831bd28698245b39e1b4daee86e9, type: 3}
   itemType: 7
   rarity: 2

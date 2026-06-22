@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Ao3
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: Ao3
-  itemName: "\xC1o 3"
+  itemName: Ancient Armor
   description: 
   icon: {fileID: -9511670, guid: 838e19fa25d474d47a5235735a397741, type: 3}
   itemType: 3
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

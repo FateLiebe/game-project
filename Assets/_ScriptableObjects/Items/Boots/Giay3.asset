@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Giay3
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: Giay3
-  itemName: "Gi\xE0y 3"
+  itemName: Ancient Boots
   description: 
   icon: {fileID: 386806952, guid: d5a96453bf4ad3c43ad6615f13f249a8, type: 3}
   itemType: 5
@@ -23,9 +23,11 @@ MonoBehaviour:
   defenseBonus: 3
   critRateBonus: 0
   critDamageBonus: 0
-  speedBonus: 0.5
+  speedBonus: 1
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

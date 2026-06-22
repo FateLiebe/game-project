@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BaoVat3
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: BaoVat3
-  itemName: "B\u1EA3o V\u1EADt 3"
+  itemName: Ancient Talisman
   description: 
   icon: {fileID: 1866985168, guid: 3004fc65676a97e469c78fa733b779c3, type: 3}
   itemType: 6
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 15
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

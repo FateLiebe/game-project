@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Mu2
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: Mu2
-  itemName: "M\u0169 2"
+  itemName: Reinforced Helmet
   description: 
   icon: {fileID: -1031820076, guid: 5534c8ecbece0d047b9660976712a50e, type: 3}
   itemType: 1
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

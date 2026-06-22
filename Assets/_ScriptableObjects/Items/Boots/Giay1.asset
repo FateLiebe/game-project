@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Giay1
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: Giay1
-  itemName: "Gi\xE0y 1"
+  itemName: Worn Boots
   description: 
   icon: {fileID: -854677643, guid: 27417b191d5f7934ea33d7f75a797e06, type: 3}
   itemType: 5
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0.2
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

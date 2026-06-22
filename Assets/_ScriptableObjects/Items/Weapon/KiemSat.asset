@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: KiemSat
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: KiemSat
-  itemName: "Ki\u1EBFm S\u1EAFt"
+  itemName: Iron Sword
   description: 
   icon: {fileID: 542669562, guid: 11226fc9433ed3f41bc6ef6423622aa9, type: 3}
   itemType: 2
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

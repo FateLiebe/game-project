@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Quan1
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: Quan1
-  itemName: "Qu\u1EA7n 1"
+  itemName: Worn Pants
   description: 
   icon: {fileID: 1321811599, guid: b530637434d051345a3bc0c5c50b9ba6, type: 3}
   itemType: 4
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

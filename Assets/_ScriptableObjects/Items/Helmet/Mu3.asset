@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Mu3
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: Mu3
-  itemName: "M\u0169 3"
+  itemName: Ancient Helmet
   description: 
   icon: {fileID: -503712964, guid: a2b051294ad22764792682afb6a584b8, type: 3}
   itemType: 1
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

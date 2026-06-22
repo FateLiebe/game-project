@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BaoVat1
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: BaoVat1
-  itemName: "B\u1EA3o V\u1EADt 1"
+  itemName: Worn Talisman
   description: 
   icon: {fileID: -1281729735, guid: a8a853e1c8a138644881460667c5c299, type: 3}
   itemType: 6
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

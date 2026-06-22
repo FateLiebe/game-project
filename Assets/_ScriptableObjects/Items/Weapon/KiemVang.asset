@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: KiemVang
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: KiemVang
-  itemName: "Ki\u1EBFm V\xE0ng"
+  itemName: Gold Sword
   description: 
   icon: {fileID: -330841079, guid: c30c47bfa18a31a49a0f7e5f23f3ecea, type: 3}
   itemType: 2
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

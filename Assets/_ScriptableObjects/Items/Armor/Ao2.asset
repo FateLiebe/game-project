@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Ao2
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: Ao2
-  itemName: "\xC1o 2"
+  itemName: Reinforced Armor
   description: 
   icon: {fileID: 1827349020, guid: 2affb7bde93f0e14cac136cb89006089, type: 3}
   itemType: 3
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

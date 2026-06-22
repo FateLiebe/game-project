@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: HacTuKiem
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: HacTuKiem
-  itemName: "H\u1EAFc T\u1EED Ki\u1EBFm"
+  itemName: Knight Sword
   description: 
   icon: {fileID: -663247455, guid: 062c80ba38fd82d4a987697f64d4c5a1, type: 3}
   itemType: 2
@@ -25,7 +25,9 @@ MonoBehaviour:
   critDamageBonus: 0
   speedBonus: 0
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3

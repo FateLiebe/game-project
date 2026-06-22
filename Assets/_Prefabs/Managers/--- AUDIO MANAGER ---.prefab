@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   mainMenuMusic: {fileID: 8300000, guid: 47c96f7f8f2d41a48b89192cf9a2b591, type: 3}
   bossMusic: {fileID: 8300000, guid: 67c9d5efe39264840854a9181483de2f, type: 3}
-  musicVolume: 0.5
+  musicVolume: 0.1
   ambientClips:
   - {fileID: 8300000, guid: 26bd41a11c825b2418a8d8d1bb7d7c2a, type: 3}
   - {fileID: 8300000, guid: 65a92c2b7445b8f4ea4e8c470d8ed696, type: 3}
@@ -86,17 +86,19 @@ MonoBehaviour:
   - {fileID: 8300000, guid: aec0240f2896efd43991aa408feb2f30, type: 3}
   - {fileID: 8300000, guid: b0352ca97d69e6d4c8994b2c71df44f8, type: 3}
   - {fileID: 8300000, guid: 2d617407cc24b8f439774de656fa77b9, type: 3}
-  - {fileID: 0}
-  vfxVolume: 1
+  - {fileID: 8300000, guid: e6262a37c09b8d7449d2adc4530fd64c, type: 3}
+  vfxVolume: 0.8
   bossWingFlapClip: {fileID: 8300000, guid: 977aefcaea481244fbff4d56dc0e1fbd, type: 3}
-  bossWingVolume: 1
+  bossWingVolume: 0.8
   perfectDodgeClip: {fileID: 8300000, guid: 96dc13dcf8e1fc5479b2d5e967500ea7, type: 3}
-  perfectDodgeVolume: 1
-  levelUpClip: {fileID: 8300000, guid: 4734f357a4d65c74da49a30a1db6f881, type: 3}
-  levelUpVolume: 0.4
+  perfectDodgeVolume: 0.5
+  counterAttackClip: {fileID: 8300000, guid: f272beb90798f8940b5f32671363494c, type: 3}
+  counterAttackVolume: 0.4
+  levelUpClip: {fileID: 8300000, guid: 53fadcb35f33c9946b18e0a723fb25b9, type: 3}
+  levelUpVolume: 0.3
   gameOverClip: {fileID: 8300000, guid: baaa4d9024a85bc4193a11a737b36eb5, type: 3}
-  gameOverVolume: 1
+  gameOverVolume: 0.8
   uiClickClip: {fileID: 8300000, guid: 6ef0629ffb1b4924aabc9a296066d3ef, type: 3}
-  uiClickVolume: 1
+  uiClickVolume: 0.8
   masterSliderValue: 10
   isMuted: 0

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Giay2
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemID: Giay2
-  itemName: "Gi\xE0y 2"
+  itemName: Reinforced Boots
   description: 
   icon: {fileID: 2142798264, guid: 932b45bb635c3dd46bf87cfc40c6f705, type: 3}
   itemType: 5
@@ -23,9 +23,11 @@ MonoBehaviour:
   defenseBonus: 2
   critRateBonus: 0
   critDamageBonus: 0
-  speedBonus: 0.3
+  speedBonus: 0.5
   healAmount: 0
+  useSound: {fileID: 0}
   skillPrefab: {fileID: 0}
   damageMultiplier: 1.5
+  skillRange: 0
   skillCooldown: 5
   maxUses: 3
