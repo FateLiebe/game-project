@@ -7,6 +7,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewCharacterData", menuName = "Data/Character Data")]
 public class CharacterDataSO : ScriptableObject
 {
+    #region VARIABLES & PROPERTIES
     [Header("Movement & Jump Stats")]
     public float moveSpeed = 8f;
     public float jumpForce = 12.5f;
@@ -40,4 +41,5 @@ public class CharacterDataSO : ScriptableObject
 
     [Header("--- RPG PROGRESSION ---")]
     public int statPointsPerLevel = 3; // [ĐÃ CHUẨN HOÁ]: Mỗi cấp được 3 điểm
+    #endregion
 }

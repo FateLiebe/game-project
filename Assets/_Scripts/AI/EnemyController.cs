@@ -7,11 +7,8 @@ using System.Collections;
 /// </summary>
 public class EnemyController : EnemyBase
 {
+    #region VARIABLES & PROPERTIES
     public enum EnemyState { Idle, Patrol, Chase, Attack, Hurt, Dead }
-
-    // ==========================================
-    #region CONFIGURATION
-    // ==========================================
 
     [Header("AI State")]
     public EnemyState currentState = EnemyState.Idle;
@@ -48,12 +45,6 @@ public class EnemyController : EnemyBase
     [SerializeField] private Transform ledgeCheck;
     [SerializeField] private LayerMask playerLayer;
 
-    #endregion
-
-    // ==========================================
-    #region INTERNAL STATE
-    // ==========================================
-
     private Animator anim;
     private Transform playerTarget;
     private float stateTimer;
@@ -66,13 +57,9 @@ public class EnemyController : EnemyBase
     /// <summary>Vị trí ghi nhớ của quái Tinh Anh (Elite) khi quyết định lùi ra xa để sử dụng kỹ năng tầm xa.</summary>
     private Vector2 rangedRepositionTargetPos;
     private bool    isRepositioning = false;
-
     #endregion
 
-    // ==========================================
     #region UNITY LIFECYCLE
-    // ==========================================
-
     protected override void Start()
     {
         base.Start();
@@ -146,13 +133,105 @@ public class EnemyController : EnemyBase
 
         UpdateAnimations();
     }
-
     #endregion
 
-    // ==========================================
-    #region MOVEMENT (KINEMATIC)
-    // ==========================================
+    #region OVERRIDES & INTERFACES
+    /// <summary>
+    /// Kích hoạt khi quái nhận sát thương.
+    /// Cập nhật mục tiêu là kẻ vừa đánh mình (Player) và có tỷ lệ bị khựng lại (Hurt Stagger) nếu bị đánh trúng điểm yếu.
+    /// </summary>
+    public override void ApplyDamage(DamageInfo info)
+    {
+        // Lưu knockback trước khi base có thể start coroutine
+        Vector2 knockbackForce = info.knockbackForce;
 
+        base.ApplyDamage(info); // → gọi EnemyBase.ApplyDamage → StartKnockback
+
+        if (currentHealth > 0)
+        {
+            isRepositioning = false;
+            CancelCurrentAttackHitbox();
+            StopAllCoroutines(); // Dừng tất cả kể cả KnockbackRoutine vừa start
+
+            // Restart knockback sau StopAll (không bị kill lần này)
+            StartKnockback(knockbackForce);
+
+            SwitchState(EnemyState.Hurt);
+            if (anim != null) { anim.ResetTrigger("Attack"); anim.SetTrigger("Hurt"); }
+            if (info.attacker != null) { playerTarget = info.attacker.transform; FacePlayer(); }
+            StartCoroutine(RecoverFromHurt());
+        }
+    }
+
+    /// <summary>
+    /// Quái chết. Ngắt toàn bộ Coroutine, vô hiệu hóa Hitbox vật lý để Player không kẹt, và tiến hành dọn dẹp.
+    /// </summary>
+    protected override void Die()
+    {
+        CancelCurrentAttackHitbox();
+        StopAllCoroutines();
+        SwitchState(EnemyState.Dead);
+        if (anim != null) anim.SetBool("isDead", true);
+
+        GetComponent<Collider2D>().enabled = false;
+
+        // Quái bay: chuyển về Dynamic để ngã xuống sau khi chết
+        if (isFlying && rb != null)
+        {
+            rb.bodyType    = RigidbodyType2D.Dynamic;
+            rb.gravityScale = 2f;
+        }
+
+        StartCoroutine(DeathRoutine());
+    }
+    #endregion
+
+    #region PUBLIC METHODS
+    public new void EnableHitbox()        { if (attackHitbox       != null) attackHitbox.SetActive(true); }
+    public new void DisableHitbox()       { if (attackHitbox       != null) attackHitbox.SetActive(false); }
+    public void EnableRangedHitbox()  { if (rangedAttackHitbox != null) rangedAttackHitbox.SetActive(true); }
+    public void DisableRangedHitbox() { if (rangedAttackHitbox != null) rangedAttackHitbox.SetActive(false); }
+
+    public void TriggerMeleeAttackVFX()
+    {
+        if (!isAttackVFXAllowed || meleeVFXPrefab == null) return;
+        Vector3 spawnPos = meleeSpawnPoint != null ? meleeSpawnPoint.transform.position : transform.position;
+        GameObject vfx;
+        if (ObjectPoolManager.Instance != null) vfx = ObjectPoolManager.Instance.Get(meleeVFXPrefab, spawnPos, Quaternion.identity);
+        else vfx = Instantiate(meleeVFXPrefab, spawnPos, Quaternion.identity);
+
+        float finalFacing = isVfxFacingLeftDefault ? -facingDir : facingDir;
+        Vector3 vfxScale  = vfx.transform.localScale;
+        vfxScale.x        = Mathf.Abs(vfxScale.x) * finalFacing;
+        vfx.transform.localScale = vfxScale;
+
+        UniversalHitbox hb = vfx.GetComponent<UniversalHitbox>();
+        if (hb != null) { hb.owner = this.gameObject; hb.damageOverride = Attack; }
+    }
+
+    public void TriggerRangedAttackVFX()
+    {
+        if (!isAttackVFXAllowed || rangedProjectilePrefab == null || playerTarget == null) return;
+        Vector3 spawnPos = rangedSpawnPoint != null ? rangedSpawnPoint.transform.position : transform.position;
+        GameObject vfx;
+        if (ObjectPoolManager.Instance != null) vfx = ObjectPoolManager.Instance.Get(rangedProjectilePrefab, spawnPos, Quaternion.identity);
+        else vfx = Instantiate(rangedProjectilePrefab, spawnPos, Quaternion.identity);
+
+        Projectile proj  = vfx.GetComponent<Projectile>();
+        if (proj != null) proj.SetTarget(playerTarget);
+
+        UniversalHitbox hb = vfx.GetComponent<UniversalHitbox>();
+        if (hb != null) { hb.owner = this.gameObject; hb.damageOverride = Attack; }
+    }
+
+    public void CancelCurrentAttackHitbox()
+    {
+        if (attackHitbox       != null) attackHitbox.SetActive(false);
+        if (rangedAttackHitbox != null) rangedAttackHitbox.SetActive(false);
+    }
+    #endregion
+
+    #region CORE LOGIC & PRIVATE METHODS
     /// <summary>
     /// Di chuyển ngang an toàn bằng Kinematic. Tự động dừng lại nếu phía trước là vực thẳm hoặc tường, tránh lỗi lọt map.
     /// </summary>
@@ -181,33 +260,6 @@ public class EnemyController : EnemyBase
 
         transform.position += Vector3.right * (step * moveDir);
     }
-
-    /// <summary>Raycast theo hướng moveDir để kiểm tra có Player không.</summary>
-    private bool IsPlayerBlockingPath(int moveDir, float distance)
-    {
-        return Physics2D.Raycast(
-            rb.position + Vector2.up * 0.5f,
-            Vector2.right * moveDir,
-            distance,
-            playerLayer);
-    }
-
-    /// <summary>Hành vi khi bị Player chặn: tấn công ngay nếu sẵn sàng, không thì đứng yên.</summary>
-    private void HandleBlockedByPlayer()
-    {
-        if (CanAttack(0))
-        {
-            currentAttackIndex = 0;
-            SwitchState(EnemyState.Attack);
-        }
-        // Nếu CD chưa xong: đứng yên, chờ (không đẩy player)
-    }
-
-    #endregion
-
-    // ==========================================
-    #region AI STATES
-    // ==========================================
 
     /// <summary>
     /// Trạng thái Đứng yên (Idle): Quái quan sát xung quanh trong một khoảng thời gian trước khi quay đầu tuần tra tiếp.
@@ -314,22 +366,15 @@ public class EnemyController : EnemyBase
         // Nếu trong tầm hoặc bị chặn địa hình: đứng yên (không gọi MoveHorizontal)
     }
 
-    private bool CanUseAnyAttack(float dist, out int attackToUse)
+    private void ReturnOrDestroy()
     {
-        attackToUse = -1;
-        if (dist <= attackRange && CanAttack(0)) { attackToUse = 0; return true; }
-        if (rank == EnemyRank.Elite && !isRepositioning
-            && dist > attackRange && dist <= rangedAttackRange && CanAttack(1))
-        { attackToUse = 1; return true; }
-        return false;
+        PooledObject po = GetComponent<PooledObject>();
+        if (po != null) po.ReturnToPool();
+        else Destroy(gameObject);
     }
-
     #endregion
 
-    // ==========================================
-    #region ATTACK
-    // ==========================================
-
+    #region COROUTINES
     /// <summary>
     /// Tiến hành thực thi đòn tấn công. Khóa di chuyển và chuyển sang trạng thái chờ Animation.
     /// </summary>
@@ -351,88 +396,6 @@ public class EnemyController : EnemyBase
         SwitchState(EnemyState.Chase);
     }
 
-    #endregion
-
-    // ==========================================
-    #region ANIMATION EVENTS
-    // ==========================================
-
-    public new void EnableHitbox()        { if (attackHitbox       != null) attackHitbox.SetActive(true); }
-    public new void DisableHitbox()       { if (attackHitbox       != null) attackHitbox.SetActive(false); }
-    public void EnableRangedHitbox()  { if (rangedAttackHitbox != null) rangedAttackHitbox.SetActive(true); }
-    public void DisableRangedHitbox() { if (rangedAttackHitbox != null) rangedAttackHitbox.SetActive(false); }
-
-    public void TriggerMeleeAttackVFX()
-    {
-        if (!isAttackVFXAllowed || meleeVFXPrefab == null) return;
-        Vector3 spawnPos = meleeSpawnPoint != null ? meleeSpawnPoint.transform.position : transform.position;
-        GameObject vfx;
-        if (ObjectPoolManager.Instance != null) vfx = ObjectPoolManager.Instance.Get(meleeVFXPrefab, spawnPos, Quaternion.identity);
-        else vfx = Instantiate(meleeVFXPrefab, spawnPos, Quaternion.identity);
-
-        float finalFacing = isVfxFacingLeftDefault ? -facingDir : facingDir;
-        Vector3 vfxScale  = vfx.transform.localScale;
-        vfxScale.x        = Mathf.Abs(vfxScale.x) * finalFacing;
-        vfx.transform.localScale = vfxScale;
-
-        UniversalHitbox hb = vfx.GetComponent<UniversalHitbox>();
-        if (hb != null) { hb.owner = this.gameObject; hb.damageOverride = Attack; }
-    }
-
-    public void TriggerRangedAttackVFX()
-    {
-        if (!isAttackVFXAllowed || rangedProjectilePrefab == null || playerTarget == null) return;
-        Vector3 spawnPos = rangedSpawnPoint != null ? rangedSpawnPoint.transform.position : transform.position;
-        GameObject vfx;
-        if (ObjectPoolManager.Instance != null) vfx = ObjectPoolManager.Instance.Get(rangedProjectilePrefab, spawnPos, Quaternion.identity);
-        else vfx = Instantiate(rangedProjectilePrefab, spawnPos, Quaternion.identity);
-
-        Projectile proj  = vfx.GetComponent<Projectile>();
-        if (proj != null) proj.SetTarget(playerTarget);
-
-        UniversalHitbox hb = vfx.GetComponent<UniversalHitbox>();
-        if (hb != null) { hb.owner = this.gameObject; hb.damageOverride = Attack; }
-    }
-
-    public void CancelCurrentAttackHitbox()
-    {
-        if (attackHitbox       != null) attackHitbox.SetActive(false);
-        if (rangedAttackHitbox != null) rangedAttackHitbox.SetActive(false);
-    }
-
-    #endregion
-
-    // ==========================================
-    #region DAMAGE & DEATH
-    // ==========================================
-
-    /// <summary>
-    /// Kích hoạt khi quái nhận sát thương.
-    /// Cập nhật mục tiêu là kẻ vừa đánh mình (Player) và có tỷ lệ bị khựng lại (Hurt Stagger) nếu bị đánh trúng điểm yếu.
-    /// </summary>
-    public override void ApplyDamage(DamageInfo info)
-    {
-        // Lưu knockback trước khi base có thể start coroutine
-        Vector2 knockbackForce = info.knockbackForce;
-
-        base.ApplyDamage(info); // → gọi EnemyBase.ApplyDamage → StartKnockback
-
-        if (currentHealth > 0)
-        {
-            isRepositioning = false;
-            CancelCurrentAttackHitbox();
-            StopAllCoroutines(); // Dừng tất cả kể cả KnockbackRoutine vừa start
-
-            // Restart knockback sau StopAll (không bị kill lần này)
-            StartKnockback(knockbackForce);
-
-            SwitchState(EnemyState.Hurt);
-            if (anim != null) { anim.ResetTrigger("Attack"); anim.SetTrigger("Hurt"); }
-            if (info.attacker != null) { playerTarget = info.attacker.transform; FacePlayer(); }
-            StartCoroutine(RecoverFromHurt());
-        }
-    }
-
     /// <summary>
     /// Thời gian bị choáng/khựng lại khi nhận sát thương chí mạng hoặc bị dồn sát thương lớn.
     /// </summary>
@@ -445,46 +408,44 @@ public class EnemyController : EnemyBase
         SwitchState(EnemyState.Chase);
     }
 
-    /// <summary>
-    /// Quái chết. Ngắt toàn bộ Coroutine, vô hiệu hóa Hitbox vật lý để Player không kẹt, và tiến hành dọn dẹp.
-    /// </summary>
-    protected override void Die()
-    {
-        CancelCurrentAttackHitbox();
-        StopAllCoroutines();
-        SwitchState(EnemyState.Dead);
-        if (anim != null) anim.SetBool("isDead", true);
-
-        GetComponent<Collider2D>().enabled = false;
-
-        // Quái bay: chuyển về Dynamic để ngã xuống sau khi chết
-        if (isFlying && rb != null)
-        {
-            rb.bodyType    = RigidbodyType2D.Dynamic;
-            rb.gravityScale = 2f;
-        }
-
-        StartCoroutine(DeathRoutine());
-    }
-
     private IEnumerator DeathRoutine()
     {
         yield return new WaitForSeconds(0.833f);
         ReturnOrDestroy();
     }
-
-    private void ReturnOrDestroy()
-    {
-        PooledObject po = GetComponent<PooledObject>();
-        if (po != null) po.ReturnToPool();
-        else Destroy(gameObject);
-    }
-
     #endregion
 
-    // ==========================================
-    #region HELPERS & DETECTION
-    // ==========================================
+    #region HELPER METHODS
+    /// <summary>Raycast theo hướng moveDir để kiểm tra có Player không.</summary>
+    private bool IsPlayerBlockingPath(int moveDir, float distance)
+    {
+        return Physics2D.Raycast(
+            rb.position + Vector2.up * 0.5f,
+            Vector2.right * moveDir,
+            distance,
+            playerLayer);
+    }
+
+    /// <summary>Hành vi khi bị Player chặn: tấn công ngay nếu sẵn sàng, không thì đứng yên.</summary>
+    private void HandleBlockedByPlayer()
+    {
+        if (CanAttack(0))
+        {
+            currentAttackIndex = 0;
+            SwitchState(EnemyState.Attack);
+        }
+        // Nếu CD chưa xong: đứng yên, chờ (không đẩy player)
+    }
+
+    private bool CanUseAnyAttack(float dist, out int attackToUse)
+    {
+        attackToUse = -1;
+        if (dist <= attackRange && CanAttack(0)) { attackToUse = 0; return true; }
+        if (rank == EnemyRank.Elite && !isRepositioning
+            && dist > attackRange && dist <= rangedAttackRange && CanAttack(1))
+        { attackToUse = 1; return true; }
+        return false;
+    }
 
     /// <summary>
     /// Quản lý việc chuyển đổi giữa các State AI (Idle -> Patrol -> Chase -> Attack).
@@ -567,6 +528,5 @@ public class EnemyController : EnemyBase
         Gizmos.color = new Color(0f, 0.5f, 1f, 0.3f);
         Gizmos.DrawWireSphere(transform.position, rangedAttackRange);
     }
-
     #endregion
 }

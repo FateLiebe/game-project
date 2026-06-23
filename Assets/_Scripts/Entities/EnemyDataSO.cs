@@ -3,6 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewEnemyData", menuName = "Data/Enemy Data", order = 2)]
 public class EnemyDataSO : ScriptableObject
 {
+    #region VARIABLES & PROPERTIES
     [Header("RPG Base Stats")]
     public float baseMaxHealth = 150f;
     public float baseAttack = 12f;
@@ -22,4 +23,5 @@ public class EnemyDataSO : ScriptableObject
 
     [Header("Elite / Ranged Settings")]
     public float rangedAttackRange = 6f;
+    #endregion
 }

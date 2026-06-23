@@ -9,6 +9,7 @@ using System.IO;
 /// </summary>
 public class MainMenuController : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [Header("UI Buttons")]
     public Button continueButton; 
     
@@ -16,7 +17,9 @@ public class MainMenuController : MonoBehaviour
     public string gameplaySceneName = "Core_Gameplay";
 
     private string saveFilePath;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Start()
     {
         Time.timeScale = 1f;
@@ -33,7 +36,9 @@ public class MainMenuController : MonoBehaviour
             continueButton.interactable = File.Exists(saveFilePath);
         }
     }
+    #endregion
 
+    #region PUBLIC METHODS
     public void StartNewGame()
     {
         if (SaveDataManager.Instance != null) SaveDataManager.Instance.NewGame();
@@ -48,15 +53,18 @@ public class MainMenuController : MonoBehaviour
         LoadGameplayScene();
     }
 
-    private void LoadGameplayScene()
-    {
-        if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.Loading);
-        SceneManager.LoadScene(gameplaySceneName);
-    }
-
     public void QuitGame()
     {
         Debug.Log("Đã bấm Thoát Game ngoài Menu!");
         Application.Quit();
     }
+    #endregion
+
+    #region PRIVATE METHODS
+    private void LoadGameplayScene()
+    {
+        if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.Loading);
+        SceneManager.LoadScene(gameplaySceneName);
+    }
+    #endregion
 }

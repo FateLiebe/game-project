@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public class ParallaxEffect : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [Header("Tỷ lệ dịch chuyển (0 = Gắn chặt vào Map, 1 = Đi theo Camera)")]
     public Vector2 parallaxMultiplier;
 
@@ -13,7 +14,9 @@ public class ParallaxEffect : MonoBehaviour
     
     // Chỉ cần duy nhất 1 mỏ neo: Vị trí gốc của Bức ảnh
     private Vector3 startPos;     
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Start()
     {
         cameraTransform = Camera.main.transform;
@@ -36,4 +39,5 @@ public class ParallaxEffect : MonoBehaviour
         // 3. Gán thẳng vị trí mới. Không cộng dồn, không cần biết frame trước Camera ở đâu!
         transform.position = new Vector3(newX, newY, transform.position.z);
     }
+    #endregion
 }

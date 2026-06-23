@@ -6,10 +6,13 @@ using UnityEngine;
 /// </summary>
 public class AuraEffect : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     private BaseEntity ownerEntity;
     private float activeAttackBuff;
     private float activeDefenseBuff;
+    #endregion
 
+    #region PUBLIC METHODS
     // Boss hoặc Player sẽ gọi hàm này và truyền chỉ số cụ thể vào
     /// <summary>
     /// Khởi tạo và thiết lập các chỉ số buff cho Aura.
@@ -29,7 +32,9 @@ public class AuraEffect : MonoBehaviour
         // Hẹn giờ thu hồi Buff và xóa hiệu ứng
         Invoke(nameof(RemoveAura), duration);
     }
+    #endregion
 
+    #region UNITY LIFECYCLE
     /// <summary>
     /// Theo dõi và đếm ngược thời gian duy trì Aura.
     /// Có hỗ trợ ảnh hưởng bởi tính năng ngưng đọng thời gian (timeMultiplier).
@@ -49,7 +54,9 @@ public class AuraEffect : MonoBehaviour
     {
         ownerEntity = null;
     }
+    #endregion
 
+    #region PRIVATE METHODS
     /// <summary>
     /// Hủy bỏ hiệu ứng buff khỏi chủ thể và dọn dẹp các trạng thái.
     /// </summary>
@@ -74,4 +81,5 @@ public class AuraEffect : MonoBehaviour
         if (po != null) po.ReturnToPool();
         else Destroy(gameObject);
     }
+    #endregion
 }

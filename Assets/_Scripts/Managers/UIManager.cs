@@ -9,6 +9,7 @@ using System.Collections;
 /// </summary>
 public class UIManager : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     public static UIManager Instance;
 
     [Header("HUD")]
@@ -30,7 +31,9 @@ public class UIManager : MonoBehaviour
 
     [Header("Victory UI")]
     public GameObject victoryMenu;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -85,12 +88,10 @@ public class UIManager : MonoBehaviour
 
             GameManager.Instance.TogglePause();
         }
-
-        // [CHẶN BÀN PHÍM]: Khóa tín hiệu bàn phím (B/E/Q...) từ màn hình In-game trong lúc Menu Pause đang mở
-        // Các script khác nên check GameManager.CurrentState == Paused trước khi xử lý input
-        // Cách đơn giản nhất: block input trong Update của StatsUIManager (đã làm bên dưới)
     }
+    #endregion
 
+    #region EVENT HANDLERS
     /// <summary>
     /// Tự động lắng nghe sự kiện từ GameManager để bật/tắt các màn hình tương ứng.
     /// Đảm bảo UI luôn đồng bộ tuyệt đối với logic của Game.
@@ -111,11 +112,9 @@ public class UIManager : MonoBehaviour
         if (perfectDodgeCDBorder != null)
             perfectDodgeCDBorder.fillAmount = currentTimer / maxCooldown;
     }
+    #endregion
 
-    // ==========================================
-    // NÚT BẤM
-    // ==========================================
-
+    #region PUBLIC METHODS
     public void ResumeGame() 
     { 
         AudioManager.Instance?.PlayUIClick();
@@ -158,11 +157,9 @@ public class UIManager : MonoBehaviour
         }
         SceneManager.LoadScene(mainMenuSceneName);
     }
+    #endregion
 
-    // ==========================================
-    // GAME OVER & VICTORY
-    // ==========================================
-
+    #region GAME OVER & VICTORY
     public void LoadLastSave()
     {
         AudioManager.Instance?.PlayUIClick();
@@ -190,11 +187,9 @@ public class UIManager : MonoBehaviour
         GameLoader loader = FindAnyObjectByType<GameLoader>();
         if (loader != null) loader.StartLoad();
     }
+    #endregion
 
-    // ==========================================
-    // AUDIO SETTINGS
-    // ==========================================
-
+    #region AUDIO SETTINGS
     public void OnVolumeSliderChanged(float value) => AudioManager.Instance?.SetVolume(value);
     public void OnAudioToggleChanged(bool isOn)    => AudioManager.Instance?.SetMute(!isOn);
     public void OnUIButtonClick()                  => AudioManager.Instance?.PlayUIClick();
@@ -206,4 +201,5 @@ public class UIManager : MonoBehaviour
         volumeSlider?.SetValueWithoutNotify(AudioManager.Instance.masterSliderValue);
         audioToggle?.SetIsOnWithoutNotify(!AudioManager.Instance.isMuted);
     }
+    #endregion
 }

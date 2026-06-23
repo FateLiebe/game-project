@@ -10,6 +10,7 @@ using System.Collections.Generic;
 /// </summary>
 public class TimeAnomalyManager : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     public static TimeAnomalyManager Instance;
 
     [Header("Time Stop Settings")]
@@ -17,13 +18,17 @@ public class TimeAnomalyManager : MonoBehaviour
     [SerializeField] private float slowFactor = 0.07f; 
     [Tooltip("Thời gian duy trì trạng thái Ngưng Đọng (tính theo giây thực tế)")]
     [SerializeField] private float duration = 3f;      
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
+    #endregion
 
+    #region PUBLIC METHODS
     /// <summary>
     /// Hàm này được gọi từ PlayerController_Combat khi người chơi lướt (Dash) đúng lúc quái đánh.
     /// </summary>
@@ -43,7 +48,9 @@ public class TimeAnomalyManager : MonoBehaviour
         AudioManager.Instance?.RevertTimeStop(); // Trả lại cao độ âm thanh (pitch) bình thường trước khi bóp lại
         StartCoroutine(TimeStopRoutine());
     }
+    #endregion
 
+    #region COROUTINES
     /// <summary>
     /// Coroutine chính xử lý quá trình Làm Chậm -> Chờ 3 giây -> Trả lại bình thường.
     /// </summary>
@@ -130,4 +137,5 @@ public class TimeAnomalyManager : MonoBehaviour
             if (anim != null) anim.speed = 1f;
         }
     }
+    #endregion
 }

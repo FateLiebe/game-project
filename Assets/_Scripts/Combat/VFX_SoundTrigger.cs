@@ -14,6 +14,7 @@ using UnityEngine;
 /// </summary>
 public class VFX_SoundTrigger : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [Tooltip("Chế độ 1: Kéo AudioClip thẳng vào đây (ưu tiên hơn Skill Index)")]
     public AudioClip directClip;
 
@@ -29,7 +30,9 @@ public class VFX_SoundTrigger : MonoBehaviour
     public bool stopAudioOnDestroy = false;
 
     private AudioSource mySource;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void OnEnable()
     {
         if (AudioManager.Instance == null) return;
@@ -81,4 +84,5 @@ public class VFX_SoundTrigger : MonoBehaviour
             mySource.Stop();
         }
     }
+    #endregion
 }

@@ -7,6 +7,7 @@ using System;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     public static GameManager Instance { get; private set; }
 
     // Định nghĩa 6 trạng thái cốt lõi của trò chơi
@@ -15,7 +16,9 @@ public class GameManager : MonoBehaviour
 
     // Event này dùng để báo cho UIManager, Audio, Enemy... biết mỗi khi trạng thái Game thay đổi
     public event Action<GameState> OnGameStateChanged;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         if (Instance == null)
@@ -34,10 +37,9 @@ public class GameManager : MonoBehaviour
         // Khởi động ở MainMenu. GameLoader sẽ chủ động gọi ChangeState(Gameplay)
         ChangeState(GameState.MainMenu); 
     }
+    #endregion
 
-    // ==========================================
-    // HÀM CHUYỂN TRẠNG THÁI TRUNG TÂM
-    // ==========================================
+    #region PUBLIC METHODS
     /// <summary>
     /// Chuyển đổi trạng thái game. Kèm theo đó là can thiệp vào Time.timeScale (Đóng băng thời gian khi Pause/Victory, Làm chậm khi chết).
     /// </summary>
@@ -51,22 +53,16 @@ public class GameManager : MonoBehaviour
         switch (newState)
         {
             case GameState.MainMenu:
-                Time.timeScale = 1f;
-                break;
             case GameState.Loading:
-                Time.timeScale = 1f;
-                break;
             case GameState.Gameplay:
                 Time.timeScale = 1f;
                 break;
             case GameState.Paused:
+            case GameState.Victory:
                 Time.timeScale = 0f; // Đóng băng mọi hoạt động vật lý/animation
                 break;
             case GameState.GameOver:
                 Time.timeScale = 0.5f; // Hiệu ứng Slow-motion khi chết cho kịch tính
-                break;
-            case GameState.Victory:
-                Time.timeScale = 0f; // Đóng băng game khi hiện bảng Chiến thắng
                 break;
         }
 
@@ -75,10 +71,9 @@ public class GameManager : MonoBehaviour
         
         Debug.Log($"<color=orange>[GameManager] Trạng thái Game đã chuyển sang: {newState}</color>");
     }
+    #endregion
 
-    // ==========================================
-    // CÁC HÀM TIỆN ÍCH CHO NÚT BẤM UI GỌI
-    // ==========================================
+    #region UI BUTTON HANDLERS
     public void TogglePause()
     {
         if (CurrentState == GameState.Gameplay) ChangeState(GameState.Paused);
@@ -89,4 +84,5 @@ public class GameManager : MonoBehaviour
     {
         if (CurrentState != GameState.GameOver) ChangeState(GameState.GameOver);
     }
+    #endregion
 }

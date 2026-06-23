@@ -9,12 +9,29 @@ using System.Collections.Generic;
 /// </summary>
 public partial class PlayerController : BaseEntity
 {
+    #region STATE MACHINE & EVENTS
     public enum PlayerState { Grounded, Airborne, Dashing, DashStalling, Attacking, Countering }
     public PlayerState CurrentState => currentState; // [AUDIO] Cho phép PlayerAudio đọc state
 
     [Header("State Machine")]
     [SerializeField] private PlayerState currentState = PlayerState.Airborne;
 
+    public static PlayerController Instance { get; private set; }
+
+    /// <summary>Dodge cooldown thay đổi — (currentTimer, maxCooldown)</summary>
+    public event Action<float, float> OnDodgeCooldownChanged;
+
+    /// <summary>Support skill state thay đổi — (skill, cdTimer, usesLeft)</summary>
+    public event Action<ItemSO, float, int> OnSupportSkillUpdated;
+
+    /// <summary>Boss mới được phát hiện trong tầm</summary>
+    public event Action<BaseEntity> OnBossDetected;
+
+    /// <summary>Boss đã rời khỏi tầm hoặc chết</summary>
+    public event Action OnBossLost;
+    #endregion
+
+    #region VARIABLES: RUNTIME & FLAGS
     [Header("Runtime Resources")]
     private int jumpsLeft;
     private int currentDashCharges;
@@ -27,7 +44,9 @@ public partial class PlayerController : BaseEntity
     private bool canAirAttack = true;
     public bool isPerfectDodge; 
     private bool isPhasingThrough = false; 
+    #endregion
 
+    #region VARIABLES: COMBAT SYSTEM
     [Header("Combat System")]
     [SerializeField] private GameObject attackHitbox;
     [SerializeField] private float[] attackDurations = new float[] { 0.3f, 0.4f, 0.6f }; 
@@ -39,7 +58,6 @@ public partial class PlayerController : BaseEntity
     [SerializeField] private float perfectDodgeCooldown = 15f;
     
     private bool perfectDodgeTriggered;
-
     private float perfectDodgeTimer = 0f;
     private float currentAttackDuration = 0f;
     
@@ -53,6 +71,11 @@ public partial class PlayerController : BaseEntity
     private bool isAttacking = false;
     private Hurtbox hurtbox;
 
+    // Biến cờ đánh dấu đòn đánh là Counter Attack
+    private bool isCounterAttacking = false;
+    #endregion
+
+    #region VARIABLES: PHYSICS & DETECTION
     [Header("Physics & Detection")]
     [SerializeField] private LayerMask groundLayer;
 
@@ -61,6 +84,16 @@ public partial class PlayerController : BaseEntity
     public LayerMask bossLayer; 
     private BaseEntity activeBoss;
 
+    private Collider2D[] threatColliders = new Collider2D[20];
+    
+    // [PHASE 2] Buffer tái sử dụng cho OverlapCircleNonAlloc — tránh cấp phát RAM mỗi frame
+    private static readonly Collider2D[] _enemyScanBuffer = new Collider2D[24];
+    
+    // Lưu BaseEntity để đồng nhất danh tính của kẻ địch
+    private List<BaseEntity> ignoredAttackers = new List<BaseEntity>();
+    #endregion
+
+    #region VARIABLES: SUPPORT SKILL & CURRENCY
     [Header("--- SUPPORT SKILL ---")]
     public ItemSO equippedSupportSkill; 
     private float supportSkillCDTimer = 0f;
@@ -74,7 +107,9 @@ public partial class PlayerController : BaseEntity
     private Transform lockedTarget;
     private float lockedTargetTimer = 0f;
     private const float LOCK_DURATION = 45f;
+    #endregion
 
+    #region VARIABLES: INTERNAL COMPONENTS & TIMERS
     // [COMBAT POPUP] chống spam
     //private float lastCombatWarningTime = -99f;
     private const float COMBAT_WARNING_COOLDOWN = 2f;
@@ -96,40 +131,12 @@ public partial class PlayerController : BaseEntity
     //private float lastGroundedTime = 0f;
     private const float COYOTE_TIME = 0.12f;
 
-    // Thêm vào phần khai báo biến
     private int groundedFrameCount = 0;
     private int notGroundedFrameCount = 0;
     private const int GROUND_CONFIRM_FRAMES = 3;
-    
-    private Collider2D[] threatColliders = new Collider2D[20];
-    
-    // [PHASE 2] Buffer tái sử dụng cho OverlapCircleNonAlloc — tránh cấp phát RAM mỗi frame
-    private static readonly Collider2D[] _enemyScanBuffer = new Collider2D[24];
-    
-    // Lưu BaseEntity để đồng nhất danh tính của kẻ địch
-    private List<BaseEntity> ignoredAttackers = new List<BaseEntity>();
+    #endregion
 
-    // ==========================================
-    // [PHASE 3] EVENTS — UI subscribe, Player chỉ phát signal
-    // ==========================================
-    public static PlayerController Instance { get; private set; }
-
-    /// <summary>Dodge cooldown thay đổi — (currentTimer, maxCooldown)</summary>
-    public event Action<float, float> OnDodgeCooldownChanged;
-
-    /// <summary>Support skill state thay đổi — (skill, cdTimer, usesLeft)</summary>
-    public event Action<ItemSO, float, int> OnSupportSkillUpdated;
-
-    /// <summary>Boss mới được phát hiện trong tầm</summary>
-    public event Action<BaseEntity> OnBossDetected;
-
-    /// <summary>Boss đã rời khỏi tầm hoặc chết</summary>
-    public event Action OnBossLost;
-
-    // ==========================================
-    #region CORE UNITY METHODS
-    // ==========================================
-
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         // Đăng ký singleton — dùng bởi UI scripts để subscribe events
@@ -189,7 +196,6 @@ public partial class PlayerController : BaseEntity
         }
 
         HandleBossDetection();
-
         HandleSupportSkill();
 
         HandleInput();
@@ -208,8 +214,5 @@ public partial class PlayerController : BaseEntity
 
         rb.linearVelocity = new Vector2(targetSpeed, rb.linearVelocity.y);
     }
-    
     #endregion
-
-    // ==========================================
 }

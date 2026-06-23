@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public class Projectile : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [Header("Cài đặt Đạn")]
     public float speed = 8f;
     public float homingDuration = 0.5f;
@@ -20,12 +21,9 @@ public class Projectile : MonoBehaviour
     private float timer = 0f;
     private UniversalHitbox hitbox;
     private bool hasHit = false;
+    #endregion
 
-    public void SetTarget(Transform customTarget)
-    {
-        target = customTarget;
-    }
-
+    #region UNITY LIFECYCLE
     private void OnEnable()
     {
         timer = 0f;
@@ -35,40 +33,6 @@ public class Projectile : MonoBehaviour
         hitbox = GetComponent<UniversalHitbox>();
         
         StartCoroutine(InitAndLifeTimeRoutine());
-    }
-
-    private void OnDisable()
-    {
-        target = null;
-    }
-
-    private System.Collections.IEnumerator InitAndLifeTimeRoutine()
-    {
-        yield return null; // Chờ 1 frame để SetTarget() kịp chạy nếu được gọi ngay sau khi Get() từ pool
-
-        if (target == null)
-        {
-            bool isOwnedByPlayer = false;
-            if (hitbox != null && hitbox.owner != null)
-                isOwnedByPlayer = hitbox.owner.CompareTag("Player") || hitbox.owner.transform.root.CompareTag("Player");
-
-            if (!isOwnedByPlayer)
-            {
-                GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-                if (playerObj != null) target = playerObj.transform;
-            }
-        }
-
-        if (target != null)
-            currentDirection = (target.position - transform.position).normalized;
-        else
-        {
-            // Không có target: bay theo hướng rotation hiện tại của prefab
-            currentDirection = transform.right;
-        }
-
-        yield return new WaitForSeconds(lifeTime);
-        ReturnOrDestroy();
     }
 
     private void Update()
@@ -107,16 +71,62 @@ public class Projectile : MonoBehaviour
         StartCoroutine(HitDelayRoutine());
     }
 
+    private void OnDisable()
+    {
+        target = null;
+    }
+    #endregion
+
+    #region PUBLIC METHODS
+    public void SetTarget(Transform customTarget)
+    {
+        target = customTarget;
+    }
+    #endregion
+
+    #region COROUTINES
+    private System.Collections.IEnumerator InitAndLifeTimeRoutine()
+    {
+        yield return null; // Chờ 1 frame để SetTarget() kịp chạy nếu được gọi ngay sau khi Get() từ pool
+
+        if (target == null)
+        {
+            bool isOwnedByPlayer = false;
+            if (hitbox != null && hitbox.owner != null)
+                isOwnedByPlayer = hitbox.owner.CompareTag("Player") || hitbox.owner.transform.root.CompareTag("Player");
+
+            if (!isOwnedByPlayer)
+            {
+                GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+                if (playerObj != null) target = playerObj.transform;
+            }
+        }
+
+        if (target != null)
+            currentDirection = (target.position - transform.position).normalized;
+        else
+        {
+            // Không có target: bay theo hướng rotation hiện tại của prefab
+            currentDirection = transform.right;
+        }
+
+        yield return new WaitForSeconds(lifeTime);
+        ReturnOrDestroy();
+    }
+
     private System.Collections.IEnumerator HitDelayRoutine()
     {
         yield return new WaitForSeconds(0.05f);
         ReturnOrDestroy();
     }
+    #endregion
 
+    #region PRIVATE METHODS
     private void ReturnOrDestroy()
     {
         PooledObject po = GetComponent<PooledObject>();
         if (po != null) po.ReturnToPool();
         else Destroy(gameObject);
     }
+    #endregion
 }

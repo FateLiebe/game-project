@@ -9,9 +9,12 @@ using UnityEditor;
 /// </summary>
 public class CopyTilemap : EditorWindow
 {
+    #region VARIABLES & PROPERTIES
     Tilemap source;
     Tilemap destination;
+    #endregion
 
+    #region UNITY EDITOR LOGIC
     [MenuItem("Tools/Copy Tilemap Tiles")]
     public static void ShowWindow()
     {
@@ -46,5 +49,6 @@ public class CopyTilemap : EditorWindow
             Debug.Log("Done! Đã chuyển toàn bộ tile.");
         }
     }
+    #endregion
 }
 #endif

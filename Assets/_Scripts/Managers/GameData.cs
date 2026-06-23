@@ -5,6 +5,8 @@ using UnityEngine;
 /// Cấu trúc dữ liệu dùng để nén (Serialize) và ghi ra file JSON.
 /// Lưu trữ toàn bộ thông tin về chỉ số, tọa độ hiện tại, trang bị đang mặc và danh sách vật phẩm trong túi đồ.
 /// </summary>
+
+#region DATA CLASSES
 [System.Serializable]
 public class InventorySlotData
 {
@@ -33,6 +35,7 @@ public class GameData
     public float audioMasterVolume = 10f; // 1-10
     public bool  audioIsMuted      = false;
 
+    #region CONSTRUCTOR
     public GameData()
     {
         currentHealth = 30f; currentLevel = 1; currentEXP = 0f; expToNextLevel = 30f; 
@@ -41,4 +44,6 @@ public class GameData
         weaponID = ""; helmetID = ""; armorID = ""; pantsID = ""; bootsID = ""; accessoryID = ""; equippedSupportSkillID = ""; currentSupportSkillUses = 0;
         inventoryItems = new List<InventorySlotData>();
     }
+    #endregion
 }
+#endregion

@@ -6,9 +6,12 @@ using UnityEngine;
 /// </summary>
 public class OutlineFollower : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     public SpriteRenderer mainRenderer;
     private SpriteRenderer outlineRenderer;
+    #endregion
 
+    #region UNITY LIFECYCLE
     void Awake()
     {
         outlineRenderer = GetComponent<SpriteRenderer>();
@@ -22,4 +25,5 @@ public class OutlineFollower : MonoBehaviour
         outlineRenderer.flipX = mainRenderer.flipX;
         outlineRenderer.flipY = mainRenderer.flipY;
     }
+    #endregion
 }

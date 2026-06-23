@@ -9,6 +9,7 @@ using System.Collections;
 /// </summary>
 public class ItemTooltipUI : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     public static ItemTooltipUI Instance { get; private set; }
 
     [Header("UI References")]
@@ -36,7 +37,9 @@ public class ItemTooltipUI : MonoBehaviour
     // Cờ báo hiệu: Chỉ cho phép click chuột để tắt Tooltip sau khi nó đã hiện được 1 frame
     // Tránh tình trạng người chơi vừa click mở Tooltip lên thì nó tự hiểu là click tắt luôn.
     private bool canCloseTooltip;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         // Thiết lập Singleton
@@ -116,7 +119,9 @@ public class ItemTooltipUI : MonoBehaviour
                 alpha);
         }
     }
+    #endregion
 
+    #region PUBLIC METHODS
     /// <summary>
     /// Hiển thị Tooltip. Nếu customPrice = -1 thì lấy giá gốc, nếu truyền vào thì lấy giá Shop.
     /// </summary>
@@ -242,13 +247,6 @@ public class ItemTooltipUI : MonoBehaviour
         StartCoroutine(EnableCloseNextFrame());
     }
 
-    private IEnumerator EnableCloseNextFrame()
-    {
-        canCloseTooltip = false;
-        yield return null; // Đợi 1 frame
-        canCloseTooltip = true;
-    }
-
     public void HideTooltip()
     {
         if (tooltipPanel != null)
@@ -257,7 +255,9 @@ public class ItemTooltipUI : MonoBehaviour
         currentItem = null;
         canCloseTooltip = false;
     }
+    #endregion
 
+    #region PRIVATE METHODS
     /// <summary>
     /// Trả về màu sắc chuẩn cho Tên vật phẩm dựa vào mức độ Hiếm.
     /// </summary>
@@ -287,4 +287,14 @@ public class ItemTooltipUI : MonoBehaviour
             default: return 25;
         }
     }
+    #endregion
+
+    #region COROUTINES
+    private IEnumerator EnableCloseNextFrame()
+    {
+        canCloseTooltip = false;
+        yield return null; // Đợi 1 frame
+        canCloseTooltip = true;
+    }
+    #endregion
 }

@@ -7,6 +7,7 @@ using TMPro;
 /// </summary>
 public class DamagePopup : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     private TextMeshPro textMesh;           // Text 3D hiển thị nội dung
     private float disappearTimer;           // Thời gian chờ trước khi chữ bắt đầu mờ đi
     private Color textColor;                // Màu sắc của nội dung
@@ -17,7 +18,9 @@ public class DamagePopup : MonoBehaviour
     private float blinkSpeed = 25f;         // Tốc độ nhấp nháy cực nhanh giữa 2 màu
     private Color colorYellow = Color.yellow;
     private Color colorOrange = new Color(1f, 0.5f, 0f); // Màu cam
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         // Cache lại TextMeshPro để tối ưu hiệu suất
@@ -37,6 +40,48 @@ public class DamagePopup : MonoBehaviour
         colorOrange.a   = 1f;
     }
 
+    private void Update()
+    {
+        // 1. Di chuyển văn bản nhích dần lên trên theo trục Y
+        transform.position += new Vector3(0, moveYSpeed) * Time.deltaTime;
+
+        // 2. Xử lý hiệu ứng nhấp nháy đặc biệt (Chỉ dành cho Level Up)
+        if (isLevelUp)
+        {
+            textMesh.color = Color.Lerp(colorYellow, colorOrange, Mathf.PingPong(Time.time * blinkSpeed, 1f));
+        }
+
+        // 3. Bắt đầu quá trình mờ dần và thu hồi khi hết thời gian chờ
+        disappearTimer -= Time.deltaTime;
+        if (disappearTimer < 0) 
+        {
+            float disappearSpeed = 3f;
+            if (!isLevelUp)
+            {
+                // Giảm dần giá trị Alpha (Độ đục) của màu sắc
+                textColor.a -= disappearSpeed * Time.deltaTime;
+                textMesh.color = textColor;
+                
+                // Trở nên hoàn toàn trong suốt -> Trả về hồ bơi
+                if (textColor.a < 0) ReturnOrDestroy();
+            }
+            else
+            {
+                // Mờ dần cho cả 2 màu nhấp nháy cùng lúc
+                colorYellow.a -= disappearSpeed * Time.deltaTime;
+                colorOrange.a -= disappearSpeed * Time.deltaTime;
+                
+                Color currentColor = textMesh.color;
+                currentColor.a = colorYellow.a; // Áp dụng độ đục cho màu thực tế
+                textMesh.color = currentColor;
+                
+                if (colorYellow.a < 0) ReturnOrDestroy();
+            }
+        }
+    }
+    #endregion
+
+    #region SETUP METHODS
     /// <summary>
     /// Thiết lập thông số hiển thị cho Popup Sát thương (Combat).
     /// </summary>
@@ -146,47 +191,9 @@ public class DamagePopup : MonoBehaviour
         disappearTimer = 1.5f;
         moveYSpeed = 1.2f;
     }
+    #endregion
 
-    private void Update()
-    {
-        // 1. Di chuyển văn bản nhích dần lên trên theo trục Y
-        transform.position += new Vector3(0, moveYSpeed) * Time.deltaTime;
-
-        // 2. Xử lý hiệu ứng nhấp nháy đặc biệt (Chỉ dành cho Level Up)
-        if (isLevelUp)
-        {
-            textMesh.color = Color.Lerp(colorYellow, colorOrange, Mathf.PingPong(Time.time * blinkSpeed, 1f));
-        }
-
-        // 3. Bắt đầu quá trình mờ dần và thu hồi khi hết thời gian chờ
-        disappearTimer -= Time.deltaTime;
-        if (disappearTimer < 0) 
-        {
-            float disappearSpeed = 3f;
-            if (!isLevelUp)
-            {
-                // Giảm dần giá trị Alpha (Độ đục) của màu sắc
-                textColor.a -= disappearSpeed * Time.deltaTime;
-                textMesh.color = textColor;
-                
-                // Trở nên hoàn toàn trong suốt -> Trả về hồ bơi
-                if (textColor.a < 0) ReturnOrDestroy();
-            }
-            else
-            {
-                // Mờ dần cho cả 2 màu nhấp nháy cùng lúc
-                colorYellow.a -= disappearSpeed * Time.deltaTime;
-                colorOrange.a -= disappearSpeed * Time.deltaTime;
-                
-                Color currentColor = textMesh.color;
-                currentColor.a = colorYellow.a; // Áp dụng độ đục cho màu thực tế
-                textMesh.color = currentColor;
-                
-                if (colorYellow.a < 0) ReturnOrDestroy();
-            }
-        }
-    }
-
+    #region CORE LOGIC & PRIVATE METHODS
     /// <summary>
     /// Hàm dọn dẹp. Cố gắng trả Prefab về ObjectPool để tái sử dụng.
     /// Nếu không có ObjectPool thì đành phải Destroy (tốn tài nguyên hơn).
@@ -197,4 +204,5 @@ public class DamagePopup : MonoBehaviour
         if (po != null) po.ReturnToPool();
         else Destroy(gameObject);
     }
+    #endregion
 }

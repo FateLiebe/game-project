@@ -9,6 +9,7 @@ using System.Collections.Generic;
 /// </summary>
 public class ShopManager : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     public static ShopManager Instance { get; private set; }
 
     [Header("UI Panels")]
@@ -49,7 +50,9 @@ public class ShopManager : MonoBehaviour
 
     // Danh sách lưu lại tất cả các ô vật phẩm đã tạo ra để dễ dàng xóa sạch khi cần
     private List<GameObject> shopSlots = new List<GameObject>();
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         // Khởi tạo Singleton
@@ -82,7 +85,9 @@ public class ShopManager : MonoBehaviour
     {
         hasGeneratedShopItems = false;
     }
+    #endregion
 
+    #region UI CONTROLS & UPDATES
     /// <summary>
     /// Mở giao diện Cửa hàng, sắp xếp lại các Panel và tạo hàng hóa nếu chưa tạo.
     /// </summary>
@@ -144,7 +149,9 @@ public class ShopManager : MonoBehaviour
             if (txtGoldInventory != null) txtGoldInventory.text = PlayerController.Instance.coins.ToString();
         }
     }
+    #endregion
 
+    #region SHOP LOGIC
     /// <summary>
     /// Thuật toán sinh ngẫu nhiên 15 mặt hàng để bán trong Shop.
     /// Tính toán giá đội lên (thay đổi giá trị ngẫu nhiên chút xíu) cho từng mặt hàng.
@@ -214,7 +221,9 @@ public class ShopManager : MonoBehaviour
     {
         txtBtnSellBuy.text = "Sell"; // Đổi chức năng nút thành Bán
     }
+    #endregion
 
+    #region BUY & SELL LOGIC
     /// <summary>
     /// Xử lý logic Mua vật phẩm (Trừ tiền, thêm đồ, làm trống ô trên kệ).
     /// </summary>
@@ -255,6 +264,48 @@ public class ShopManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Xử lý logic Bán vật phẩm (Cộng tiền, xóa đồ).
+    /// </summary>
+    public void SellItem(ItemSO item)
+    {
+        if (item == null) return;
+
+        int price = GetBasePrice(item); // Bán thì chỉ nhận được Base Price (Giá gốc) thôi
+        PlayerController.Instance.coins += price;
+        InventoryManager.Instance.RemoveItem(item, 1);
+        UpdateCoinDisplay();
+        
+        AudioManager.Instance?.PlayUnequip(); // Tiếng mua bán
+        
+        if (ItemTooltipUI.Instance != null) ItemTooltipUI.Instance.HideTooltip();
+    }
+
+    /// <summary>
+    /// Xử lý đầu vào khi người chơi click vào nút trung tâm (Nút Sell/Buy).
+    /// </summary>
+    private void OnSellBuyClicked()
+    {
+        AudioManager.Instance?.PlayUIClick();
+        
+        // Phân luồng dựa trên chữ đang hiển thị trên nút
+        if (txtBtnSellBuy.text == "Buy")
+        {
+            BuySelectedItem();
+        }
+        else if (txtBtnSellBuy.text == "Sell")
+        {
+            // Lấy món hàng đang được Focus bên khu vực Túi Đồ
+            ItemSO invSelectedItem = InventoryManager.Instance.GetSelectedItem();
+            if (invSelectedItem != null)
+            {
+                SellItem(invSelectedItem);
+            }
+        }
+    }
+    #endregion
+
+    #region COROUTINES
     // Biến giữ Coroutine để nếu click liên tục thì ngắt cái cũ, chạy lại cái mới
     private Coroutine notEnoughCoinCoroutine;
 
@@ -314,44 +365,5 @@ public class ShopManager : MonoBehaviour
             txtBtnSellBuy.text = "Buy";
         }
     }
-
-    /// <summary>
-    /// Xử lý logic Bán vật phẩm (Cộng tiền, xóa đồ).
-    /// </summary>
-    public void SellItem(ItemSO item)
-    {
-        if (item == null) return;
-
-        int price = GetBasePrice(item); // Bán thì chỉ nhận được Base Price (Giá gốc) thôi
-        PlayerController.Instance.coins += price;
-        InventoryManager.Instance.RemoveItem(item, 1);
-        UpdateCoinDisplay();
-        
-        AudioManager.Instance?.PlayUnequip(); // Tiếng mua bán
-        
-        if (ItemTooltipUI.Instance != null) ItemTooltipUI.Instance.HideTooltip();
-    }
-
-    /// <summary>
-    /// Xử lý đầu vào khi người chơi click vào nút trung tâm (Nút Sell/Buy).
-    /// </summary>
-    private void OnSellBuyClicked()
-    {
-        AudioManager.Instance?.PlayUIClick();
-        
-        // Phân luồng dựa trên chữ đang hiển thị trên nút
-        if (txtBtnSellBuy.text == "Buy")
-        {
-            BuySelectedItem();
-        }
-        else if (txtBtnSellBuy.text == "Sell")
-        {
-            // Lấy món hàng đang được Focus bên khu vực Túi Đồ
-            ItemSO invSelectedItem = InventoryManager.Instance.GetSelectedItem();
-            if (invSelectedItem != null)
-            {
-                SellItem(invSelectedItem);
-            }
-        }
-    }
+    #endregion
 }

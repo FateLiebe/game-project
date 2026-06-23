@@ -8,12 +8,16 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "ItemDatabase", menuName = "Data/Item Database")]
 public class ItemDatabaseSO : ScriptableObject
 {
+    #region VARIABLES & PROPERTIES
     public List<ItemSO> allItemsInGame = new List<ItemSO>();
+    #endregion
 
+    #region PUBLIC METHODS
     public ItemSO GetItemByID(string id)
     {
         if (string.IsNullOrEmpty(id)) return null;
         foreach (ItemSO item in allItemsInGame) if (item != null && item.itemID == id) return item;
         return null;
     }
+    #endregion
 }

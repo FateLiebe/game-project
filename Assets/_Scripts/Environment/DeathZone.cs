@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public class DeathZone : MonoBehaviour
 {
+    #region CORE LOGIC & UNITY LIFECYCLE
     private void OnTriggerEnter2D(Collider2D collision)
     {
         // 1. Xử lý các Entity (Player, Boss, Enemy)
@@ -45,4 +46,5 @@ public class DeathZone : MonoBehaviour
             }
         }
     }
+    #endregion
 }

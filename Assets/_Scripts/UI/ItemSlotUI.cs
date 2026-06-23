@@ -8,6 +8,7 @@ using TMPro;
 /// </summary>
 public class ItemSlotUI : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     private Image slotImage; 
     private Button slotButton; 
     private ItemSO currentItem; 
@@ -19,7 +20,9 @@ public class ItemSlotUI : MonoBehaviour
 
     [Header("UI Cài đặt thêm")]
     public TextMeshProUGUI quantityText; // Kéo TextMeshPro hiển thị số lượng vào đây
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         slotImage = GetComponent<Image>();
@@ -32,7 +35,9 @@ public class ItemSlotUI : MonoBehaviour
             slotButton.onClick.AddListener(OnSlotClicked);
         }
     }
+    #endregion
 
+    #region PUBLIC METHODS
     // Đã nâng cấp hàm UpdateSlot để nhận thêm tham số quantity
     public void UpdateSlot(ItemSO item, int quantity = 1)
     {
@@ -62,7 +67,9 @@ public class ItemSlotUI : MonoBehaviour
             if (quantityText != null) quantityText.gameObject.SetActive(false);
         }
     }
+    #endregion
 
+    #region PRIVATE METHODS
     private void OnSlotClicked()
     {
         if (currentItem == null) return;
@@ -100,4 +107,5 @@ public class ItemSlotUI : MonoBehaviour
             }
         }
     }
+    #endregion
 }

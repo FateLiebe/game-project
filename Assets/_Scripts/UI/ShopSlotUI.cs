@@ -8,6 +8,7 @@ using TMPro;
 /// </summary>
 public class ShopSlotUI : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [Header("UI Components")]
     [Tooltip("Hình ảnh của món đồ hiển thị trên ô")]
     public Image itemIcon;
@@ -24,7 +25,9 @@ public class ShopSlotUI : MonoBehaviour
     // --- HỆ THỐNG PHÁT HIỆN DOUBLE CLICK ---
     private float lastClickTime = 0f;                   // Thời điểm click chuột lần cuối
     private float doubleClickThreshold = 0.25f;         // Thời gian chờ tối đa giữa 2 lần click (250ms)
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         // Gắn sự kiện lắng nghe click chuột vào nút bấm của ô
@@ -33,7 +36,9 @@ public class ShopSlotUI : MonoBehaviour
             slotButton.onClick.AddListener(OnSlotClicked);
         }
     }
+    #endregion
 
+    #region PUBLIC METHODS
     /// <summary>
     /// Hàm này được ShopManager gọi khi khởi tạo Cửa hàng để đổ dữ liệu vật phẩm vào ô.
     /// </summary>
@@ -55,7 +60,9 @@ public class ShopSlotUI : MonoBehaviour
             txtPrice.text = price.ToString();
         }
     }
+    #endregion
 
+    #region PRIVATE METHODS
     /// <summary>
     /// Xử lý logic khi người chơi click chuột vào ô vật phẩm này.
     /// Bao gồm tính năng Double-Click cực kỳ tiện lợi để mua nhanh mà không cần bấm nút Buy ở giữa.
@@ -82,4 +89,5 @@ public class ShopSlotUI : MonoBehaviour
             shopManager.SelectShopItem(currentItem, itemPrice, gameObject);
         }
     }
+    #endregion
 }

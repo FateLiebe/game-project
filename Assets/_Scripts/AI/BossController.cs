@@ -7,6 +7,7 @@ using System.Collections.Generic;
 /// </summary>
 public class BossController : EnemyBase
 {
+    #region VARIABLES & PROPERTIES
     [Header("--- RANGES & GIZMOS ---")]
     public float meleeRange = 3f;
     public float midRange = 7f;
@@ -51,7 +52,6 @@ public class BossController : EnemyBase
     public override float MaxHealth => (enemyData != null ? enemyData.baseMaxHealth + ((currentLevel - 1) * enemyData.healthGrowth) : 150f + ((currentLevel - 1) * 30f)) * (bossData != null ? bossData.bossHealthMultiplier : 8f);
 
     [Header("--- BOSS SHIELD & BUFF ---")]
-    //public float currentShield = 0f;
     public float maxShield = 0f;
     private float originalAttack;
     private float originalDefense;
@@ -76,7 +76,9 @@ public class BossController : EnemyBase
 
     private Queue<int> recentSkills = new Queue<int>();
     private const int RECENT_SKILL_LIMIT = 3;
+    #endregion
 
+    #region UNITY LIFECYCLE
     protected override void Start()
     {
         base.Start();
@@ -95,6 +97,73 @@ public class BossController : EnemyBase
         StartCoroutine(BehaviorTreeLoop());
     }
 
+    protected override void Update()
+    {
+        base.Update();
+        if (isDead) return;
+
+        if (globalAttackTimer > 0f)
+        {
+            globalAttackTimer -= Time.deltaTime * timeMultiplier;
+        }
+
+        timeSinceLastDamage += Time.deltaTime * timeMultiplier;
+
+        if (Mathf.Approximately(currentTargetHeight, maxFlightHeight) && timeSinceLastDamage >= timeAtMaxHeight)
+        {
+            currentTargetHeight = minFlightHeight;
+            accumulatedDamage = 0f;
+        }
+    }
+    #endregion
+
+    #region OVERRIDES & INTERFACES
+    /// <summary>
+    /// Ghi đè hàm sát thương cơ bản để tích hợp cơ chế Khiên Năng Lượng và bay lên trời nếu bị dồn dame quá nhanh (anti-burst).
+    /// </summary>
+    public override void ApplyDamage(DamageInfo info)
+    {
+        if (currentHealth <= 0f || isDead) return;
+
+        // Gọi hàm từ lớp cha (EnemyBase) để thực sự trừ máu và hiện Popup
+        if (info.damage > 0f)
+        {
+            base.ApplyDamage(info); 
+        }
+
+        if (currentHealth > 0f && !isDead)
+        {
+            if (info.attacker != null) playerTarget = info.attacker.transform;
+
+            timeSinceLastDamage = 0f;
+            accumulatedDamage += info.damage;
+
+            if (accumulatedDamage >= damageToFlyUp)
+            {
+                currentTargetHeight = maxFlightHeight;
+                accumulatedDamage = 0f;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Xử lý logic khi Boss tử vong: Dừng toàn bộ Coroutine, vô hiệu hóa Hitbox vật lý, rơi tự do và gọi Animation chết.
+    /// </summary>
+    protected override void Die()
+    {
+        StopAllCoroutines();
+
+        if (anim != null) anim.SetBool("isDead", true);
+        if (rb != null) { rb.linearVelocity = Vector2.zero; rb.gravityScale = 2f; }
+
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null) col.enabled = false;
+
+        StartCoroutine(DeathRoutine());
+    }
+    #endregion
+
+    #region PUBLIC METHODS
     /// <summary>
     /// Đồng bộ cấp độ và chỉ số của Boss dựa trên cấp độ hiện tại của Player.
     /// Hàm này xử lý linh động để đảm bảo Boss luôn mạnh hơn Player một khoảng cố định.
@@ -130,25 +199,142 @@ public class BossController : EnemyBase
         originalDefense = Defense;
     }
 
-    protected override void Update()
+    /// <summary>
+    /// Hàm này được gọi từ Animation Event để kích hoạt VFX/Hitbox ngay tại thời điểm vung vũ khí.
+    /// Chuyển quyền xử lý chiêu thức sang BossSkillManager.
+    /// </summary>
+    public void TriggerVFXEvent()
     {
-        base.Update();
-        if (isDead) return;
-
-        if (globalAttackTimer > 0f)
+        if (skillManager != null && currentSelectedSkill != -1)
         {
-            globalAttackTimer -= Time.deltaTime * timeMultiplier;
-        }
-
-        timeSinceLastDamage += Time.deltaTime * timeMultiplier;
-
-        if (Mathf.Approximately(currentTargetHeight, maxFlightHeight) && timeSinceLastDamage >= timeAtMaxHeight)
-        {
-            currentTargetHeight = minFlightHeight;
-            accumulatedDamage = 0f;
+            skillManager.SpawnVFXInstant(currentSelectedSkill, facingDir);
         }
     }
 
+    /// <summary>
+    /// Kích hoạt khiên năng lượng dựa trên lượng máu đã mất.
+    /// Khiên này hấp thụ toàn bộ sát thương của Player trước khi trừ vào máu thật.
+    /// </summary>
+    public void ActivateEnergyShield()
+    {
+        float missingHP = MaxHealth - currentHealth;
+        maxShield = missingHP * 1.5f;
+        currentShield = maxShield;
+
+        // Dùng coroutine để chịu tác động Time Stop, thay cho Invoke
+        if (shieldCoroutine != null) StopCoroutine(shieldCoroutine);
+        shieldCoroutine = StartCoroutine(ShieldDurationRoutine());
+    }
+
+    /// <summary>
+    /// Kích hoạt trạng thái Nổi điên (Smack Buff). 
+    /// Gia tăng tạm thời cả sức mạnh tấn công lẫn phòng thủ dựa trên cấu hình trong BossDataSO.
+    /// </summary>
+    public void ActivateSmackBuff()
+    {
+        if (buffCoroutine != null) StopCoroutine(buffCoroutine);
+        buffCoroutine = StartCoroutine(SmackBuffRoutine());
+    }
+    #endregion
+
+    #region CORE LOGIC & PRIVATE METHODS
+    /// <summary>
+    /// Thu thập và chọn lọc kỹ năng tốt nhất dựa trên khoảng cách tới mục tiêu.
+    /// Ưu tiên các đòn đánh gần (Melee) nếu mục tiêu ở gần, và đòn đánh xa (Ranged) nếu mục tiêu ở xa.
+    /// </summary>
+    private int ChooseBestSkillByDistance(float dist)
+    {
+        List<int> candidates = new List<int>();
+
+        if (dist <= meleeRange)
+        {
+            AddIfAvailable(candidates, 6, dist);
+            AddIfAvailable(candidates, 4, dist);
+            AddIfAvailable(candidates, 3, dist);
+            AddIfAvailable(candidates, 0, dist);
+        }
+        else if (dist <= midRange)
+        {
+            AddIfAvailable(candidates, 0, dist);
+            AddIfAvailable(candidates, 1, dist);
+            AddIfAvailable(candidates, 2, dist);
+            AddIfAvailable(candidates, 4, dist);
+            AddIfAvailable(candidates, 3, dist);
+            AddIfAvailable(candidates, 6, dist);
+        }
+        else if (dist <= maxRange)
+        {
+            AddIfAvailable(candidates, 2, dist);
+            AddIfAvailable(candidates, 5, dist);
+            AddIfAvailable(candidates, 1, dist);
+            AddIfAvailable(candidates, 3, dist);
+            AddIfAvailable(candidates, 4, dist);
+        }
+        else
+        {
+            AddIfAvailable(candidates, 2, dist);
+            AddIfAvailable(candidates, 5, dist);
+            AddIfAvailable(candidates, 3, dist);
+            AddIfAvailable(candidates, 4, dist);
+        }
+
+        if (candidates.Count == 0)
+        {
+            // Fallback: bỏ luật chống spam
+            if (dist <= meleeRange)
+            {
+                ForceAdd(candidates, 6, dist);
+                ForceAdd(candidates, 4, dist);
+                ForceAdd(candidates, 0, dist);
+                ForceAdd(candidates, 3, dist);
+            }
+            else if (dist <= midRange)
+            {
+                ForceAdd(candidates, 0, dist);
+                ForceAdd(candidates, 1, dist);
+                ForceAdd(candidates, 4, dist);
+                ForceAdd(candidates, 6, dist);
+                ForceAdd(candidates, 3, dist);
+            }
+            else if (dist <= maxRange)
+            {
+                ForceAdd(candidates, 2, dist);
+                ForceAdd(candidates, 5, dist);
+                ForceAdd(candidates, 1, dist);
+                ForceAdd(candidates, 3, dist);
+                ForceAdd(candidates, 4, dist);
+            }
+            else
+            {
+                ForceAdd(candidates, 2, dist);
+                ForceAdd(candidates, 5, dist);
+                ForceAdd(candidates, 3, dist);
+                ForceAdd(candidates, 4, dist);
+            }
+        }
+
+        if (candidates.Count == 0)
+            return -1;
+
+        return candidates[Random.Range(0, candidates.Count)];
+    }
+
+    /// <summary>
+    /// Phóng Raycast xuống dưới để tìm mặt đất, cập nhật cao độ hiện tại để Boss luôn bay song song với địa hình.
+    /// </summary>
+    private void UpdateGroundLevel()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 30f, groundLayer);
+        if (hit.collider != null)
+        {
+            currentGroundY = hit.point.y;
+            isOverGround = true;
+        }
+        else isOverGround = false;
+    }
+    #endregion
+
+    #region COROUTINES
     /// <summary>
     /// Vòng lặp ra quyết định của Behavior Tree. 
     /// Liên tục kiểm tra trạng thái và môi trường sau mỗi khoảng thời gian (decisionInterval) để quyết định hành động tiếp theo.
@@ -236,121 +422,6 @@ public class BossController : EnemyBase
     }
 
     /// <summary>
-    /// Thu thập và chọn lọc kỹ năng tốt nhất dựa trên khoảng cách tới mục tiêu.
-    /// Ưu tiên các đòn đánh gần (Melee) nếu mục tiêu ở gần, và đòn đánh xa (Ranged) nếu mục tiêu ở xa.
-    /// </summary>
-    private int ChooseBestSkillByDistance(float dist)
-    {
-        List<int> candidates = new List<int>();
-
-        if (dist <= meleeRange)
-        {
-            AddIfAvailable(candidates, 6, dist);
-            AddIfAvailable(candidates, 4, dist);
-            AddIfAvailable(candidates, 3, dist);
-            AddIfAvailable(candidates, 0, dist);
-        }
-        else if (dist <= midRange)
-        {
-            AddIfAvailable(candidates, 0, dist);
-            AddIfAvailable(candidates, 1, dist);
-            AddIfAvailable(candidates, 2, dist);
-            AddIfAvailable(candidates, 4, dist);
-            AddIfAvailable(candidates, 3, dist);
-            AddIfAvailable(candidates, 6, dist);
-        }
-        else if (dist <= maxRange)
-        {
-            AddIfAvailable(candidates, 2, dist);
-            AddIfAvailable(candidates, 5, dist);
-            AddIfAvailable(candidates, 1, dist);
-            AddIfAvailable(candidates, 3, dist);
-            AddIfAvailable(candidates, 4, dist);
-        }
-        else
-        {
-            AddIfAvailable(candidates, 2, dist);
-            AddIfAvailable(candidates, 5, dist);
-            AddIfAvailable(candidates, 3, dist);
-            AddIfAvailable(candidates, 4, dist);
-        }
-
-        if (candidates.Count == 0)
-        {
-            // Fallback: bỏ luật chống spam
-            if (dist <= meleeRange)
-            {
-                ForceAdd(candidates, 6, dist);
-                ForceAdd(candidates, 4, dist);
-                ForceAdd(candidates, 0, dist);
-                ForceAdd(candidates, 3, dist);
-            }
-            else if (dist <= midRange)
-            {
-                ForceAdd(candidates, 0, dist);
-                ForceAdd(candidates, 1, dist);
-                ForceAdd(candidates, 4, dist);
-                ForceAdd(candidates, 6, dist);
-                ForceAdd(candidates, 3, dist);
-            }
-            else if (dist <= maxRange)
-            {
-                ForceAdd(candidates, 2, dist);
-                ForceAdd(candidates, 5, dist);
-                ForceAdd(candidates, 1, dist);
-                ForceAdd(candidates, 3, dist);
-                ForceAdd(candidates, 4, dist);
-            }
-            else
-            {
-                ForceAdd(candidates, 2, dist);
-                ForceAdd(candidates, 5, dist);
-                ForceAdd(candidates, 3, dist);
-                ForceAdd(candidates, 4, dist);
-            }
-        }
-
-        if (candidates.Count == 0)
-            return -1;
-
-        return candidates[Random.Range(0, candidates.Count)];
-    }
-
-    /// <summary>
-    /// Thêm kỹ năng vào danh sách có thể sử dụng nếu thỏa mãn các điều kiện về HP, Phase, Cooldown, Khoảng cách và không bị trùng lặp.
-    /// </summary>
-    /// <param name="candidates">Danh sách ứng cử viên</param>
-    /// <param name="skillIndex">ID Kỹ năng cần kiểm tra</param>
-    /// <param name="dist">Khoảng cách hiện tại đến Player</param>
-    private void AddIfAvailable(List<int> candidates, int skillIndex, float dist)
-    {
-        // Skill 4 chỉ dùng khi phase 2 (HP ≤ 50%)
-        if (skillIndex == 4 && !isPhase2) return;
-
-        // Skill 3 chỉ dùng khi HP ≤ 75%
-        if (skillIndex == 3)
-        {
-            float hpPercent = (MaxHealth > 0f) ? currentHealth / MaxHealth : 1f;
-            if (hpPercent > 0.75f) return;
-        }
-
-        float reqRange = (skillIndex < skillRanges.Length)
-            ? skillRanges[skillIndex]
-            : 99f;
-
-        if (!CanAttack(skillIndex)) return;
-
-        if (dist > reqRange) return;
-
-        // Chống spam ngay cả khi danh sách chỉ có 1
-        if (recentSkills.Contains(skillIndex)) return;
-
-        candidates.Add(skillIndex);
-    }
-
-    private bool IsMeleeSkill(int skillIndex) { return skillIndex == 4 || skillIndex == 6; }
-
-    /// <summary>
     /// Thực hiện di chuyển chiến thuật.
     /// Boss có khả năng lùi lại (BackOff) nếu Player tiếp cận quá gần (Panic Distance), hoặc rà quanh (Strafe) để tạo khoảng cách an toàn.
     /// </summary>
@@ -415,69 +486,9 @@ public class BossController : EnemyBase
     }
 
     /// <summary>
-    /// Phóng Raycast xuống dưới để tìm mặt đất, cập nhật cao độ hiện tại để Boss luôn bay song song với địa hình.
-    /// </summary>
-    private void UpdateGroundLevel()
-    {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 30f, groundLayer);
-        if (hit.collider != null)
-        {
-            currentGroundY = hit.point.y;
-            isOverGround = true;
-        }
-        else isOverGround = false;
-    }
-
-    /// <summary>
-    /// Kiểm tra xem phía trước có mặt đất không (chống đâm đầu vào vách núi hoặc bay ra ngoài vực).
-    /// </summary>
-    /// <param name="dirX">Hướng di chuyển dự kiến (-1 hoặc 1)</param>
-    private bool HasGroundAhead(float dirX)
-    {
-        if (dirX == 0f) return true;
-        Vector2 checkPos = transform.position + new Vector3(dirX * 1.5f, 0f, 0f);
-        float rayLength = maxFlightHeight + 10f;
-        RaycastHit2D hit = Physics2D.Raycast(checkPos, Vector2.down, rayLength, groundLayer);
-        return hit.collider != null;
-    }
-
-    // ==========================================
-    // LOGIC ÁP DỤNG SÁT THƯƠNG & TRỪ KHIÊN
-    // ==========================================
-    /// <summary>
-    /// Ghi đè hàm sát thương cơ bản để tích hợp cơ chế Khiên Năng Lượng và bay lên trời nếu bị dồn dame quá nhanh (anti-burst).
-    /// </summary>
-    public override void ApplyDamage(DamageInfo info)
-    {
-        if (currentHealth <= 0f || isDead) return;
-
-        // Gọi hàm từ lớp cha (EnemyBase) để thực sự trừ máu và hiện Popup
-        if (info.damage > 0f)
-        {
-            base.ApplyDamage(info); 
-        }
-
-        if (currentHealth > 0f && !isDead)
-        {
-            if (info.attacker != null) playerTarget = info.attacker.transform;
-
-            timeSinceLastDamage = 0f;
-            accumulatedDamage += info.damage;
-
-            if (accumulatedDamage >= damageToFlyUp)
-            {
-                currentTargetHeight = maxFlightHeight;
-                accumulatedDamage = 0f;
-            }
-        }
-    }
-
-    /// <summary>
     /// Thực thi quá trình vận chiêu của Boss. Đóng băng di chuyển và kích hoạt Animation tương ứng.
     /// Khóa trạng thái Boss cho đến khi kỹ năng hoàn thành cast.
     /// </summary>
-    /// <param name="skillIndex">ID của kỹ năng được chọn</param>
-    /// <param name="castTime">Thời gian vận chiêu thực tế (ảnh hưởng bởi Time Stop)</param>
     private IEnumerator ExecuteSkillState(int skillIndex, float castTime)
     {
         currentSelectedSkill = skillIndex;
@@ -495,62 +506,6 @@ public class BossController : EnemyBase
         }
     }
 
-    /// <summary>
-    /// Hàm này được gọi từ Animation Event để kích hoạt VFX/Hitbox ngay tại thời điểm vung vũ khí.
-    /// Chuyển quyền xử lý chiêu thức sang BossSkillManager.
-    /// </summary>
-    public void TriggerVFXEvent()
-    {
-        if (skillManager != null && currentSelectedSkill != -1)
-        {
-            skillManager.SpawnVFXInstant(currentSelectedSkill, facingDir);
-        }
-    }
-
-    // ==========================================
-    #region BOSS BUFF & DEFENSIVE SKILLS
-    // ==========================================
-
-    /// <summary>
-    /// Kích hoạt khiên năng lượng dựa trên lượng máu đã mất.
-    /// Khiên này hấp thụ toàn bộ sát thương của Player trước khi trừ vào máu thật.
-    /// </summary>
-    public void ActivateEnergyShield()
-    {
-        float missingHP = MaxHealth - currentHealth;
-        maxShield = missingHP * 1.5f;
-        currentShield = maxShield;
-
-        // Dùng coroutine để chịu tác động Time Stop, thay cho Invoke
-        if (shieldCoroutine != null) StopCoroutine(shieldCoroutine);
-        shieldCoroutine = StartCoroutine(ShieldDurationRoutine());
-    }
-
-    /// <summary>
-    /// Bộ đếm thời gian hiệu lực của Khiên năng lượng.
-    /// Hỗ trợ đóng băng thời gian (Time Stop) bằng cách dùng deltaTime * timeMultiplier.
-    /// </summary>
-    private IEnumerator ShieldDurationRoutine()
-    {
-        float timer = 0f;
-        while (timer < 10f)
-        {
-            timer += Time.deltaTime * timeMultiplier;
-            yield return null;
-        }
-        currentShield = 0f;
-        maxShield = 0f;
-    }
-
-    /// <summary>
-    /// Kích hoạt trạng thái Nổi điên (Smack Buff). 
-    /// Gia tăng tạm thời cả sức mạnh tấn công lẫn phòng thủ dựa trên cấu hình trong BossDataSO.
-    /// </summary>
-    public void ActivateSmackBuff()
-    {
-        if (buffCoroutine != null) StopCoroutine(buffCoroutine);
-        buffCoroutine = StartCoroutine(SmackBuffRoutine());
-    }
     /// <summary>
     /// Bộ đếm thời gian duy trì Smack Buff. 
     /// Sau khi kết thúc thời gian hiệu lực (7s), tự động gỡ bỏ lượng buff đã cộng.
@@ -576,12 +531,33 @@ public class BossController : EnemyBase
         buffDefense -= extraDEF;
     }
 
+    /// <summary>
+    /// Bộ đếm thời gian hiệu lực của Khiên năng lượng.
+    /// Hỗ trợ đóng băng thời gian (Time Stop) bằng cách dùng deltaTime * timeMultiplier.
+    /// </summary>
+    private IEnumerator ShieldDurationRoutine()
+    {
+        float timer = 0f;
+        while (timer < 10f)
+        {
+            timer += Time.deltaTime * timeMultiplier;
+            yield return null;
+        }
+        currentShield = 0f;
+        maxShield = 0f;
+    }
+
+    private IEnumerator DeathRoutine()
+    {
+        yield return new WaitForSeconds(2.5f);
+        Destroy(gameObject);
+    }
     #endregion
 
+    #region HELPER METHODS
     /// <summary>
     /// Cập nhật hướng mặt của Boss sao cho luôn nhìn về phía mục tiêu (Player).
     /// </summary>
-    /// <param name="targetPos">Vị trí hiện tại của mục tiêu</param>
     private void FaceTarget(Vector2 targetPos)
     {
         float directionToTarget = Mathf.Sign(targetPos.x - transform.position.x);
@@ -595,57 +571,32 @@ public class BossController : EnemyBase
         }
     }
 
-    /// <summary>
-    /// Xử lý logic khi Boss tử vong: Dừng toàn bộ Coroutine, vô hiệu hóa Hitbox vật lý, rơi tự do và gọi Animation chết.
-    /// </summary>
-    protected override void Die()
+    private void AddIfAvailable(List<int> candidates, int skillIndex, float dist)
     {
-        StopAllCoroutines();
+        // Skill 4 chỉ dùng khi phase 2 (HP ≤ 50%)
+        if (skillIndex == 4 && !isPhase2) return;
 
-        if (anim != null) anim.SetBool("isDead", true);
-        if (rb != null) { rb.linearVelocity = Vector2.zero; rb.gravityScale = 2f; }
-
-        Collider2D col = GetComponent<Collider2D>();
-        if (col != null) col.enabled = false;
-
-        StartCoroutine(DeathRoutine());
-    }
-
-    private IEnumerator DeathRoutine()
-    {
-        yield return new WaitForSeconds(2.5f);
-        Destroy(gameObject);
-    }
-
-    /// <summary>
-    /// Ghi nhớ kỹ năng vừa sử dụng vào bộ nhớ tạm thời (Queue).
-    /// Boss sẽ không dùng lại các kỹ năng vừa xài gần nhất nhằm tạo sự đa dạng trong combat.
-    /// </summary>
-    /// <param name="skillIndex">ID của kỹ năng vừa tung ra</param>
-    private void RegisterUsedSkill(int skillIndex)
-    {
-        // Loại bỏ kỹ năng khỏi hàng chờ nếu nó đã tồn tại để tránh trùng lặp
-
-        if (recentSkills.Contains(skillIndex))
+        // Skill 3 chỉ dùng khi HP ≤ 75%
+        if (skillIndex == 3)
         {
-            Queue<int> temp = new Queue<int>();
-            foreach (int s in recentSkills)
-            {
-                if (s != skillIndex) temp.Enqueue(s);
-            }
-            recentSkills = temp;
+            float hpPercent = (MaxHealth > 0f) ? currentHealth / MaxHealth : 1f;
+            if (hpPercent > 0.75f) return;
         }
 
-        recentSkills.Enqueue(skillIndex);
+        float reqRange = (skillIndex < skillRanges.Length)
+            ? skillRanges[skillIndex]
+            : 99f;
 
-        while (recentSkills.Count > RECENT_SKILL_LIMIT)
-            recentSkills.Dequeue();
+        if (!CanAttack(skillIndex)) return;
+
+        if (dist > reqRange) return;
+
+        // Chống spam ngay cả khi danh sách chỉ có 1
+        if (recentSkills.Contains(skillIndex)) return;
+
+        candidates.Add(skillIndex);
     }
 
-    /// <summary>
-    /// Sàng lọc và đưa một kỹ năng vào danh sách ứng cử viên có thể sử dụng (Candidates) 
-    /// nếu thỏa mãn các điều kiện về khoảng cách (Range) và Phase hiện tại.
-    /// </summary>
     private void ForceAdd(List<int> candidates, int skillIndex, float dist)
     {
         // Skill 4 chỉ được mở khóa khi Boss bước sang Phase 2 (Máu < 50%)
@@ -668,6 +619,39 @@ public class BossController : EnemyBase
         }
     }
 
+    private bool IsMeleeSkill(int skillIndex) { return skillIndex == 4 || skillIndex == 6; }
+
+    /// <summary>
+    /// Ghi nhớ kỹ năng vừa sử dụng vào bộ nhớ tạm thời (Queue).
+    /// Boss sẽ không dùng lại các kỹ năng vừa xài gần nhất nhằm tạo sự đa dạng trong combat.
+    /// </summary>
+    private void RegisterUsedSkill(int skillIndex)
+    {
+        if (recentSkills.Contains(skillIndex))
+        {
+            Queue<int> temp = new Queue<int>();
+            foreach (int s in recentSkills)
+            {
+                if (s != skillIndex) temp.Enqueue(s);
+            }
+            recentSkills = temp;
+        }
+
+        recentSkills.Enqueue(skillIndex);
+
+        while (recentSkills.Count > RECENT_SKILL_LIMIT)
+            recentSkills.Dequeue();
+    }
+
+    private bool HasGroundAhead(float dirX)
+    {
+        if (dirX == 0f) return true;
+        Vector2 checkPos = transform.position + new Vector3(dirX * 1.5f, 0f, 0f);
+        float rayLength = maxFlightHeight + 10f;
+        RaycastHit2D hit = Physics2D.Raycast(checkPos, Vector2.down, rayLength, groundLayer);
+        return hit.collider != null;
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(1f, 0f, 0f, 0.2f);
@@ -677,4 +661,5 @@ public class BossController : EnemyBase
         Gizmos.color = new Color(0f, 1f, 0f, 0.2f);
         Gizmos.DrawWireSphere(transform.position, maxRange);
     }
+    #endregion
 }

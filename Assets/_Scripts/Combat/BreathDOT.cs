@@ -8,6 +8,7 @@ using System.Collections;
 [RequireComponent(typeof(BoxCollider2D))]
 public class BreathDOT : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [Header("DOT Settings")]
     [Tooltip("Tổng thời gian hiệu ứng tồn tại (giây)")]
     public float totalDuration = 2f;
@@ -27,7 +28,9 @@ public class BreathDOT : MonoBehaviour
 
     private BoxCollider2D box;
     private Transform spawnTransform;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         box = GetComponent<BoxCollider2D>();
@@ -61,6 +64,17 @@ public class BreathDOT : MonoBehaviour
             transform.position = spawnTransform.position;
     }
 
+    private void OnDrawGizmosSelected()
+    {
+        if (box == null) box = GetComponent<BoxCollider2D>();
+        if (box == null) return;
+        Gizmos.color = new Color(1f, 0.4f, 0f, 0.35f);
+        Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, transform.lossyScale);
+        Gizmos.DrawWireCube(box.offset, box.size);
+    }
+    #endregion
+
+    #region COROUTINES
     /// <summary>
     /// Vòng lặp chia nhỏ sát thương thành nhiều lần (Ticks) dựa trên tổng thời gian và tổng tỷ lệ sát thương.
     /// Hỗ trợ chịu ảnh hưởng bởi ngưng đọng thời gian (timeMultiplier).
@@ -88,7 +102,9 @@ public class BreathDOT : MonoBehaviour
 
         ReturnOrDestroy();
     }
+    #endregion
 
+    #region PRIVATE METHODS
     private float GetBaseDamage()
     {
         if (owner == null) return 10f;
@@ -128,15 +144,6 @@ public class BreathDOT : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmosSelected()
-    {
-        if (box == null) box = GetComponent<BoxCollider2D>();
-        if (box == null) return;
-        Gizmos.color = new Color(1f, 0.4f, 0f, 0.35f);
-        Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, transform.lossyScale);
-        Gizmos.DrawWireCube(box.offset, box.size);
-    }
-
     /// <summary>
     /// Trả Prefab về lại Object Pool để tái sử dụng.
     /// </summary>
@@ -146,4 +153,5 @@ public class BreathDOT : MonoBehaviour
         if (po != null) po.ReturnToPool();
         else Destroy(gameObject);
     }
+    #endregion
 }

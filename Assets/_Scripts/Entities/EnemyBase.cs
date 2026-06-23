@@ -7,10 +7,9 @@ using System.Collections;
 /// </summary>
 public class EnemyBase : BaseEntity 
 {
+    #region VARIABLES & PROPERTIES
     public enum EnemyRank { Normal, Elite, Boss }
 
-    // ==========================================
-    #region CONFIGURATION
     [Header("--- ENEMY CONFIG ---")]
     public EnemyDataSO enemyData;
     public EnemyRank rank = EnemyRank.Normal;
@@ -23,17 +22,10 @@ public class EnemyBase : BaseEntity
     public float[] attackCooldowns = new float[] { 3f };
     protected float[] currentAttackCooldowns;
 
-    // Chuyển từ EnemyController lên đây để KnockbackRoutine truy cập được
     [Header("--- MOVEMENT BASE ---")]
     [Tooltip("Tích vào nếu là quái bay")]
     public bool isFlying = false;
     [SerializeField] protected LayerMask groundLayerMask;
-
-    #endregion
-
-    // ==========================================
-    #region INTERNAL REFS & STATE
-    // ==========================================
 
     protected SpriteRenderer sr;
     protected Rigidbody2D rb;
@@ -45,19 +37,20 @@ public class EnemyBase : BaseEntity
     private const float MAX_FALL_SPEED  = -22f;
     private const float GROUND_RAY_DIST =  0.2f;
 
-    // Knockback state — protected agar EnemyController có thể đọc
+    // Knockback state
     protected bool isKnockedBack = false;
+    private Coroutine knockbackCoroutine;
+
+    [Header("Combat References")]
+    [SerializeField] protected GameObject attackHitbox;
+    [SerializeField] protected GameObject rangedAttackHitbox;
 
     public override float MaxHealth => enemyData != null ? enemyData.baseMaxHealth + ((currentLevel - 1) * enemyData.healthGrowth) : 150f + ((currentLevel - 1) * 30f);
     public override float Attack    => (enemyData != null ? enemyData.baseAttack + ((currentLevel - 1) * enemyData.attackGrowth) : 12f + ((currentLevel - 1) * 4f)) + buffAttack;
     public override float Defense   => (enemyData != null ? enemyData.baseDefense + ((currentLevel - 1) * enemyData.defenseGrowth) : 3f + ((currentLevel - 1) * 1f)) + buffDefense;
-
     #endregion
 
-    // ==========================================
     #region UNITY LIFECYCLE
-    // ==========================================
-
     protected override void Start()
     {
         base.Start();
@@ -92,13 +85,96 @@ public class EnemyBase : BaseEntity
 
         ApplyGravity();
     }
-
     #endregion
 
-    // ==========================================
-    #region KINEMATIC GRAVITY
-    // ==========================================
+    #region OVERRIDES & INTERFACES
+    public override void ApplyDamage(DamageInfo info)
+    {
+        base.ApplyDamage(info);
 
+        if (isDead || currentHealth <= 0)
+        {
+            CancelInvoke(nameof(ResetColor));
+            return;
+        }
+
+        // Nhấp nháy đỏ khi bị chém
+        if (sr != null)
+        {
+            sr.color = Color.red;
+            Invoke(nameof(ResetColor), 0.1f);
+        }
+
+        // Knockback an toàn qua coroutine
+        StartKnockback(info.knockbackForce);
+    }
+
+    protected override void InitializeStats()
+    {
+        currentHealth = MaxHealth;
+        base.InitializeStats();
+    }
+    #endregion
+
+    #region PUBLIC METHODS
+    public void StartKnockback(Vector2 force)
+    {
+        if (rb == null) return;
+        
+        // Vô hiệu hóa knockback nếu đang trong Time Stop
+        if (timeMultiplier < 1f) return;
+
+        if (knockbackCoroutine != null) StopCoroutine(knockbackCoroutine);
+        isKnockedBack = false;
+        knockbackCoroutine = StartCoroutine(KnockbackRoutine(force));
+    }
+
+    public bool CanAttack(int attackIndex)
+    {
+        if (attackIndex < 0 || attackIndex >= attackCooldowns.Length) return false;
+        return currentAttackCooldowns[attackIndex] <= 0f;
+    }
+
+    public void RecordAttackUsage(int attackIndex)
+    {
+        if (attackIndex >= 0 && attackIndex < attackCooldowns.Length)
+            currentAttackCooldowns[attackIndex] = attackCooldowns[attackIndex];
+    }
+
+    public float GetExpReward()
+    {
+        float baseExp = currentLevel * expMultiplier;
+        switch (rank)
+        {
+            case EnemyRank.Elite: baseExp *= 2f; break;
+            case EnemyRank.Boss:  baseExp *= 5f; break;
+        }
+        float finalExp = Mathf.Round(baseExp * Random.Range(0.85f, 1.15f) * 1000f) / 1000f;
+        if (Random.value < 0.05f)
+        {
+            finalExp *= 2f;
+            Debug.Log("<color=yellow>JACKPOT! X2 EXP TỪ QUÁI VẬT!</color>");
+        }
+        return finalExp;
+    }
+
+    public void EnableHitbox()
+    {
+        if (attackHitbox != null)
+        {
+            attackHitbox.SetActive(true);
+            CancelInvoke(nameof(DisableHitbox));
+            Invoke(nameof(DisableHitbox), 0.5f);
+        }
+    }
+
+    public void DisableHitbox()
+    {
+        if (attackHitbox != null) attackHitbox.SetActive(false);
+    }
+    #endregion
+
+    #region CORE LOGIC & PRIVATE METHODS
     /// <summary>
     /// Giả lập trọng lực thủ công cho Kinematic Body bằng Raycast.
     /// Giúp quái rơi từ từ xuống đất mượt mà thay vì dùng Rigidbody2D.Dynamic gây giật lag.
@@ -126,30 +202,17 @@ public class EnemyBase : BaseEntity
         }
     }
 
+    private void ResetColor()
+    {
+        if (sr != null) sr.color = defaultColor;
+    }
     #endregion
 
-    // ==========================================
-    #region KNOCKBACK (SAFE — KINEMATIC)
-    // ==========================================
-
+    #region COROUTINES
     /// <summary>
     /// Xử lý lực đẩy lùi (Knockback) an toàn bằng Coroutine.
     /// Tự động kiểm tra hẻm vực/tường phía sau để chặn lại, tránh tình trạng quái bị văng ra khỏi bản đồ.
     /// </summary>
-    private Coroutine knockbackCoroutine;
-
-    public void StartKnockback(Vector2 force)
-    {
-        if (rb == null) return;
-        
-        // Vô hiệu hóa knockback nếu đang trong Time Stop
-        if (timeMultiplier < 1f) return;
-
-        if (knockbackCoroutine != null) StopCoroutine(knockbackCoroutine);
-        isKnockedBack = false;
-        knockbackCoroutine = StartCoroutine(KnockbackRoutine(force));
-    }
-
     private IEnumerator KnockbackRoutine(Vector2 force)
     {
         isKnockedBack = true;
@@ -188,104 +251,5 @@ public class EnemyBase : BaseEntity
 
         isKnockedBack = false;
     }
-
-    #endregion
-
-    // ==========================================
-    #region COMBAT
-    // ==========================================
-
-    public override void ApplyDamage(DamageInfo info)
-    {
-        base.ApplyDamage(info);
-
-        if (isDead || currentHealth <= 0)
-        {
-            CancelInvoke(nameof(ResetColor));
-            return;
-        }
-
-        // Nhấp nháy đỏ khi bị chém
-        if (sr != null)
-        {
-            sr.color = Color.red;
-            Invoke(nameof(ResetColor), 0.1f);
-        }
-
-        // Knockback an toàn qua coroutine
-        StartKnockback(info.knockbackForce);
-    }
-
-    private void ResetColor()
-    {
-        if (sr != null) sr.color = defaultColor;
-    }
-
-    public bool CanAttack(int attackIndex)
-    {
-        if (attackIndex < 0 || attackIndex >= attackCooldowns.Length) return false;
-        return currentAttackCooldowns[attackIndex] <= 0f;
-    }
-
-    public void RecordAttackUsage(int attackIndex)
-    {
-        if (attackIndex >= 0 && attackIndex < attackCooldowns.Length)
-            currentAttackCooldowns[attackIndex] = attackCooldowns[attackIndex];
-    }
-
-    #endregion
-
-    // ==========================================
-    #region STATS & EXP
-    // ==========================================
-
-    protected override void InitializeStats()
-    {
-        currentHealth = MaxHealth;
-        base.InitializeStats();
-    }
-
-    public float GetExpReward()
-    {
-        float baseExp = currentLevel * expMultiplier;
-        switch (rank)
-        {
-            case EnemyRank.Elite: baseExp *= 2f; break;
-            case EnemyRank.Boss:  baseExp *= 5f; break;
-        }
-        float finalExp = Mathf.Round(baseExp * Random.Range(0.85f, 1.15f) * 1000f) / 1000f;
-        if (Random.value < 0.05f)
-        {
-            finalExp *= 2f;
-            Debug.Log("<color=yellow>JACKPOT! X2 EXP TỪ QUÁI VẬT!</color>");
-        }
-        return finalExp;
-    }
-
-    #endregion
-
-    // ==========================================
-    #region HITBOX HELPERS
-    // ==========================================
-
-    [Header("Combat References")]
-    [SerializeField] protected GameObject attackHitbox;
-    [SerializeField] protected GameObject rangedAttackHitbox;
-
-    public void EnableHitbox()
-    {
-        if (attackHitbox != null)
-        {
-            attackHitbox.SetActive(true);
-            CancelInvoke(nameof(DisableHitbox));
-            Invoke(nameof(DisableHitbox), 0.5f);
-        }
-    }
-
-    public void DisableHitbox()
-    {
-        if (attackHitbox != null) attackHitbox.SetActive(false);
-    }
-
     #endregion
 }

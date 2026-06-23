@@ -7,6 +7,7 @@ using UnityEngine.UI;
 /// </summary>
 public class EquipmentSlotUI : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [Header("Quy định loại trang bị")]
     public ItemType allowedItemType; // Ô này chỉ được chứa loại đồ gì?
 
@@ -17,7 +18,9 @@ public class EquipmentSlotUI : MonoBehaviour
     private Sprite defaultSprite; // Ảnh trống lúc chưa mặc đồ
     private float lastClickTime = 0f;
     private float doubleClickThreshold = 0.25f;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         slotImage = GetComponent<Image>();
@@ -31,7 +34,9 @@ public class EquipmentSlotUI : MonoBehaviour
             slotButton.onClick.AddListener(OnSlotClicked);
         }
     }
+    #endregion
 
+    #region PUBLIC METHODS
     public void UpdateSlot(ItemSO item)
     {
         equippedItem = item;
@@ -45,7 +50,9 @@ public class EquipmentSlotUI : MonoBehaviour
             slotImage.sprite = defaultSprite; // Trả về ảnh trống ban đầu
         }
     }
+    #endregion
 
+    #region PRIVATE METHODS
     private void OnSlotClicked()
     {
         if (equippedItem == null) return;
@@ -66,4 +73,5 @@ public class EquipmentSlotUI : MonoBehaviour
             if (ItemTooltipUI.Instance != null) ItemTooltipUI.Instance.ShowTooltip(equippedItem);
         }
     }
+    #endregion
 }

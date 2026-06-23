@@ -11,15 +11,10 @@ using System.Collections.Generic;
 public partial class PlayerController
 {
     #region BOSS DETECTION
-    // ==========================================
-
-    /// <summary>
-    /// Radar quét Boss: Tự động chạy mỗi frame trong Update (thuộc PlayerController gốc).
-    /// Bắn ra một vòng tròn quét tìm Layer Boss, nếu phát hiện sẽ bắn Event gọi BossUIManager hiện thanh máu.
-    /// </summary>
     /// <summary>
     /// Kiểm tra xem người chơi có đang đứng trong khu vực đánh Boss hay không.
     /// Kích hoạt event hiển thị thanh máu Boss nếu có.
+    /// Tự động chạy mỗi frame trong Update (thuộc PlayerController gốc).
     /// </summary>
     private void HandleBossDetection()
     {
@@ -45,19 +40,12 @@ public partial class PlayerController
             OnBossLost?.Invoke(); // [PHASE 3]
         }
     }
-
     #endregion
 
-    // ==========================================
     #region SUPPORT SKILLS
-    // ==========================================
     /// <summary>
-    /// Vòng lặp chính xử lý Bùa chú (Support Skill). 
-    /// Tính toán thời gian hồi chiêu, tự động gửi dữ liệu cho UI và nhận nút E để xuất chiêu.
-    /// </summary>
-    /// <summary>
-    /// Xử lý logic nhấn phím sử dụng Kỹ năng Hỗ trợ (Support Skill - Phím Q).
-    /// Quản lý thời gian hồi chiêu và gửi sự kiện cập nhật lên UI.
+    /// Vòng lặp chính xử lý Bùa chú (Support Skill - Phím Q/E). 
+    /// Tính toán thời gian hồi chiêu, tự động gửi dữ liệu cho UI và nhận nút để xuất chiêu.
     /// </summary>
     private void HandleSupportSkill()
     {
@@ -76,98 +64,18 @@ public partial class PlayerController
         // 2. Trừ thời gian hồi chiêu
         if (supportSkillCDTimer > 0) supportSkillCDTimer -= Time.deltaTime;
 
-        // 3. Cập nhật UI liên tục — [PHASE 3] qua event, không gọi SupportSkillUI trực tiếp
+        // 3. Cập nhật UI liên tục qua event, không gọi UI trực tiếp
         OnSupportSkillUpdated?.Invoke(equippedSupportSkill, supportSkillCDTimer, currentSupportSkillUses);
 
         // 4. Lắng nghe phím E để xuất chiêu
         if (Input.GetKeyDown(KeyCode.E)) UseSupportSkill();
     }
 
-    // ==========================================
-    // LOCK TARGET
-    // ==========================================
-    /// <summary>
-    /// Tự động dò tìm và khóa mục tiêu gần nhất.
-    /// Theo dõi và đếm ngược thời gian mất dấu (nếu kẻ địch ra khỏi tầm).
-    /// </summary>
-    private void UpdateLockedTarget()
-    {
-        if (lockedTarget == null) return;
-        lockedTargetTimer -= Time.deltaTime;
-        if (lockedTargetTimer <= 0f) { lockedTarget = null; return; }
-
-        BaseEntity e = lockedTarget.GetComponentInParent<BaseEntity>();
-        if (e == null || e.currentHealth <= 0) { lockedTarget = null; return; }
-
-        // Hủy nếu ngoài tầm bắn
-        float maxRange = (equippedSupportSkill != null && equippedSupportSkill.skillRange > 0f)
-                         ? equippedSupportSkill.skillRange : 15f;
-        if (Vector2.Distance(transform.position, lockedTarget.position) > maxRange)
-            lockedTarget = null;
-    }
-
-    /// <summary>Gọi từ UniversalHitbox khi skill chạm trúng — làm mới timer nếu đúng locked target.</summary>
-    public void RefreshLockTimerIfMatch(Transform hitTransform)
-    {
-        if (lockedTarget == null || hitTransform == null) return;
-        // So sánh root transform để tránh nhầm child collider
-        if (hitTransform.root == lockedTarget.root || hitTransform == lockedTarget)
-            lockedTargetTimer = LOCK_DURATION;
-    }
-
-    // Backward compat — giữ nguyên để không phá code cũ
-    public void RefreshLockTimer()
-    {
-        if (lockedTarget != null) lockedTargetTimer = LOCK_DURATION;
-    }
-
-    /// <summary>
-    /// Quét một vùng tròn quanh Player để tìm kẻ địch hoặc Boss gần nhất.
-    /// Dùng Physics2D.OverlapCircleNonAlloc để tối ưu hiệu năng (không tạo rác Garbage Collector).
-    /// </summary>
-    private Transform FindNearestEnemy(float radius)
-    {
-        // Nếu đang có locked target hợp lệ → dùng nó (kể cả quay hướng khác)
-        UpdateLockedTarget();
-        if (lockedTarget != null) return lockedTarget;
-
-        float facingDir = transform.localScale.x >= 0 ? 1f : -1f;
-        // Tối ưu hóa bộ nhớ: Tái sử dụng mảng tĩnh _enemyScanBuffer thay vì cấp phát (Allocate) mảng mới mỗi lần gọi hàm
-        int count = Physics2D.OverlapCircle(transform.position, radius, ContactFilter2D.noFilter, _enemyScanBuffer);
-        Transform nearest = null;
-        float minDist = Mathf.Infinity;
-
-        for (int i = 0; i < count; i++)
-        {
-            Collider2D hit = _enemyScanBuffer[i];
-            if (hit == null) continue;
-            if (hit.transform.root == this.transform) continue;
-            if (hit.GetComponentInParent<BreakableCrate>() != null) continue;
-
-            BaseEntity enemy = hit.GetComponentInParent<BaseEntity>();
-            if (enemy == null || enemy.currentHealth <= 0 || (!enemy.CompareTag("Enemy") && !enemy.CompareTag("Boss"))) continue;
-
-            // Chỉ chọn enemy cùng hướng mặt
-            float dx = enemy.transform.position.x - transform.position.x;
-            if (Mathf.Sign(dx) != facingDir && Mathf.Abs(dx) > 0.5f) continue;
-
-            float dist = Vector2.Distance(transform.position, enemy.transform.position);
-            if (dist < minDist) { minDist = dist; nearest = enemy.transform; }
-        }
-
-        if (nearest != null) { lockedTarget = nearest; lockedTargetTimer = LOCK_DURATION; }
-        return nearest;
-    }
-
-    /// <summary>
-    /// Hàm Xử Lý Bắn Bùa.
-    /// Tính toán sát thương tổng (Crit + Modifier). Nhận diện loại Kỹ năng: 
-    /// - Nếu là Đạn Lửa (Projectile): Bắn từ tay Player bay tới địch.
-    /// - Nếu là Sét: Giáng thẳng xuống đầu vị trí của kẻ địch.
-    /// </summary>
     /// <summary>
     /// Triển khai sử dụng kỹ năng hỗ trợ: Trừ số lượt dùng, reset hồi chiêu, sinh ra VFX và định vị đòn đánh.
-    /// Hỗ trợ cả cơ chế tự động tìm mục tiêu (Auto Lock-on).
+    /// Tính toán sát thương tổng (Crit + Modifier). Nhận diện loại Kỹ năng: 
+    /// - Đạn Lửa (Projectile): Bắn từ tay Player bay tới địch.
+    /// - Sét: Giáng thẳng xuống đầu vị trí của kẻ địch.
     /// </summary>
     private void UseSupportSkill()
     {
@@ -256,7 +164,9 @@ public partial class PlayerController
             }
         }
     }
+    #endregion
 
+    #region SKILL UTILITIES & INVENTORY INTEGRATION
     // Hàm này để hệ thống Inventory/Trang bị gọi khi bạn nhặt hoặc mặc bùa mới vào
     public void EquipSupportSkill(ItemSO newSkill)
     {
@@ -265,9 +175,6 @@ public partial class PlayerController
         supportSkillCDTimer = 0f;
     }
 
-    /// <summary>
-    /// Buộc Kỹ năng hỗ trợ hiện tại lập tức bước vào thời gian hồi chiêu (Cooldown).
-    /// </summary>
     /// <summary>
     /// Đưa kỹ năng hỗ trợ hiện tại vào trạng thái hồi chiêu (Cooldown).
     /// Thường được gọi sau khi Auto Equip (tự động gắn bùa mới) để tránh spam.
@@ -292,6 +199,80 @@ public partial class PlayerController
         supportSkillCDTimer = 0f;
         OnSupportSkillUpdated?.Invoke(equippedSupportSkill, 0f, currentSupportSkillUses); // [PHASE 3]
     }
-    
+    #endregion
+
+    #region LOCK TARGET CORE LOGIC
+    /// <summary>
+    /// Tự động dò tìm và khóa mục tiêu gần nhất.
+    /// Theo dõi và đếm ngược thời gian mất dấu (nếu kẻ địch ra khỏi tầm).
+    /// </summary>
+    private void UpdateLockedTarget()
+    {
+        if (lockedTarget == null) return;
+        lockedTargetTimer -= Time.deltaTime;
+        if (lockedTargetTimer <= 0f) { lockedTarget = null; return; }
+
+        BaseEntity e = lockedTarget.GetComponentInParent<BaseEntity>();
+        if (e == null || e.currentHealth <= 0) { lockedTarget = null; return; }
+
+        // Hủy nếu ngoài tầm bắn
+        float maxRange = (equippedSupportSkill != null && equippedSupportSkill.skillRange > 0f)
+                         ? equippedSupportSkill.skillRange : 15f;
+        if (Vector2.Distance(transform.position, lockedTarget.position) > maxRange)
+            lockedTarget = null;
+    }
+
+    /// <summary>Gọi từ UniversalHitbox khi skill chạm trúng — làm mới timer nếu đúng locked target.</summary>
+    public void RefreshLockTimerIfMatch(Transform hitTransform)
+    {
+        if (lockedTarget == null || hitTransform == null) return;
+        // So sánh root transform để tránh nhầm child collider
+        if (hitTransform.root == lockedTarget.root || hitTransform == lockedTarget)
+            lockedTargetTimer = LOCK_DURATION;
+    }
+
+    // Backward compat — giữ nguyên để không phá code cũ
+    public void RefreshLockTimer()
+    {
+        if (lockedTarget != null) lockedTargetTimer = LOCK_DURATION;
+    }
+
+    /// <summary>
+    /// Quét một vùng tròn quanh Player để tìm kẻ địch hoặc Boss gần nhất.
+    /// Dùng Physics2D.OverlapCircleNonAlloc để tối ưu hiệu năng (không tạo rác Garbage Collector).
+    /// </summary>
+    private Transform FindNearestEnemy(float radius)
+    {
+        // Nếu đang có locked target hợp lệ → dùng nó (kể cả quay hướng khác)
+        UpdateLockedTarget();
+        if (lockedTarget != null) return lockedTarget;
+
+        float facingDir = transform.localScale.x >= 0 ? 1f : -1f;
+        // Tối ưu hóa bộ nhớ: Tái sử dụng mảng tĩnh _enemyScanBuffer thay vì cấp phát (Allocate) mảng mới mỗi lần gọi hàm
+        int count = Physics2D.OverlapCircle(transform.position, radius, ContactFilter2D.noFilter, _enemyScanBuffer);
+        Transform nearest = null;
+        float minDist = Mathf.Infinity;
+
+        for (int i = 0; i < count; i++)
+        {
+            Collider2D hit = _enemyScanBuffer[i];
+            if (hit == null) continue;
+            if (hit.transform.root == this.transform) continue;
+            if (hit.GetComponentInParent<BreakableCrate>() != null) continue;
+
+            BaseEntity enemy = hit.GetComponentInParent<BaseEntity>();
+            if (enemy == null || enemy.currentHealth <= 0 || (!enemy.CompareTag("Enemy") && !enemy.CompareTag("Boss"))) continue;
+
+            // Chỉ chọn enemy cùng hướng mặt
+            float dx = enemy.transform.position.x - transform.position.x;
+            if (Mathf.Sign(dx) != facingDir && Mathf.Abs(dx) > 0.5f) continue;
+
+            float dist = Vector2.Distance(transform.position, enemy.transform.position);
+            if (dist < minDist) { minDist = dist; nearest = enemy.transform; }
+        }
+
+        if (nearest != null) { lockedTarget = nearest; lockedTargetTimer = LOCK_DURATION; }
+        return nearest;
+    }
     #endregion
 }

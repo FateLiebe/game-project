@@ -23,6 +23,7 @@ public class TypeWeight
 /// </summary>
 public class BreakableCrate : BaseEntity
 {
+    #region VARIABLES & PROPERTIES
     [Header("Crate Settings")]
     public Sprite brokenSprite;
     public GameObject droppedItemPrefab;
@@ -58,14 +59,18 @@ public class BreakableCrate : BaseEntity
     private SpriteRenderer sr;
     private BoxCollider2D col;
     private bool isBroken = false;
+    #endregion
 
+    #region UNITY LIFECYCLE
     protected override void Start()
     {
         currentHealth = 10;
         sr = GetComponent<SpriteRenderer>();
         col = GetComponent<BoxCollider2D>();
     }
+    #endregion
 
+    #region OVERRIDES & INTERFACES
     public override void ApplyDamage(DamageInfo info)
     {
         if (isBroken) return;
@@ -74,8 +79,6 @@ public class BreakableCrate : BaseEntity
         if (currentHealth <= 0) Die();
     }
 
-    private void ResetColor() { if (sr != null) sr.color = Color.white; }
-
     protected override void Die()
     {
         isBroken = true;
@@ -83,6 +86,10 @@ public class BreakableCrate : BaseEntity
         if (col != null) col.enabled = false;
         DropLoot();
     }
+    #endregion
+
+    #region PRIVATE METHODS
+    private void ResetColor() { if (sr != null) sr.color = Color.white; }
 
     /// <summary>
     /// Thuật toán quay số (Gacha) vật phẩm:
@@ -155,4 +162,5 @@ public class BreakableCrate : BaseEntity
         }
         return list[list.Count - 1];
     }
+    #endregion
 }

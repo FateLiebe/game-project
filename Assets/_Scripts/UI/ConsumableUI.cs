@@ -8,19 +8,24 @@ using TMPro;
 /// </summary>
 public class ConsumableUI : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     public static ConsumableUI Instance;
 
     [Header("UI References")]
     public Image iconImage;
     public TextMeshProUGUI quantityText;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake() 
     { 
         Instance = this; 
         // Vừa vào game thì tự động ẩn đi
         UpdateUI(null, 0); 
     }
+    #endregion
 
+    #region PUBLIC METHODS
     // Hàm này sẽ được InventoryManager gọi liên tục mỗi khi túi đồ có sự thay đổi
     public void UpdateUI(ItemSO consumableItem, int totalQuantity)
     {
@@ -39,4 +44,5 @@ public class ConsumableUI : MonoBehaviour
         iconImage.sprite = consumableItem.icon;
         quantityText.text = totalQuantity.ToString();
     }
+    #endregion
 }

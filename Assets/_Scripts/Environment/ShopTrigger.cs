@@ -6,9 +6,12 @@ using UnityEngine;
 /// </summary>
 public class ShopTrigger : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [SerializeField] private GameObject interactPrompt;
     private bool isPlayerInRange = false;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Start()
     {
         if (interactPrompt != null)
@@ -54,4 +57,5 @@ public class ShopTrigger : MonoBehaviour
             }
         }
     }
+    #endregion
 }

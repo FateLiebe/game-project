@@ -7,6 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerController))]
 public class PlayerAudio : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     private PlayerController player;
     private Rigidbody2D rb;
 
@@ -15,7 +16,9 @@ public class PlayerAudio : MonoBehaviour
     private bool fallLoopActive = false;
     private float airTime = 0f;
     private const float FALL_LOOP_DELAY = 1.5f;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         player = GetComponent<PlayerController>();
@@ -67,7 +70,9 @@ public class PlayerAudio : MonoBehaviour
 
         wasGrounded = grounded;
     }
+    #endregion
 
+    #region PRIVATE METHODS
     private void OnLanded()
     {
         AudioManager.Instance.StopFallLoop();
@@ -75,11 +80,14 @@ public class PlayerAudio : MonoBehaviour
         airTime = 0f;
         AudioManager.Instance.PlayLand();
     }
+    #endregion
 
+    #region PUBLIC METHODS
     // ============================================================
     // GỌI TỪ PLAYERCONTROLLER
     // ============================================================
     public void NotifyJump()             => AudioManager.Instance?.PlayJump();
     public void NotifyDash()             => AudioManager.Instance?.PlayDash();
     public void NotifyAttack(int combo)  => AudioManager.Instance?.PlayAttack(combo);
+    #endregion
 }

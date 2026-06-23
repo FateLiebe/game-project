@@ -5,4 +5,7 @@ using UnityEngine;
 /// </summary>
 public class MapSpawnPoint : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
+    // Empty class used as a location marker
+    #endregion
 }

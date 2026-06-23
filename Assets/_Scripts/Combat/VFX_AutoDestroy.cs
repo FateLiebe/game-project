@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public class VFX_AutoDestroy : MonoBehaviour
 {
+    #region UNITY LIFECYCLE
     private void OnEnable()
     {
         Animator anim = GetComponent<Animator>();
@@ -17,7 +18,9 @@ public class VFX_AutoDestroy : MonoBehaviour
         }
         StartCoroutine(AutoDestroyRoutine(delay));
     }
+    #endregion
 
+    #region COROUTINES
     private System.Collections.IEnumerator AutoDestroyRoutine(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -25,4 +28,5 @@ public class VFX_AutoDestroy : MonoBehaviour
         if (po != null) po.ReturnToPool();
         else Destroy(gameObject);
     }
+    #endregion
 }

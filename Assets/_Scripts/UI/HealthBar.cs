@@ -8,6 +8,7 @@ using TMPro;
 /// </summary>
 public class HealthBar : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [Tooltip("Kéo đối tượng chứa BaseEntity (Player hoặc Slime) vào đây")]
     [SerializeField] private BaseEntity entity;
     
@@ -20,7 +21,9 @@ public class HealthBar : MonoBehaviour
     
     [Tooltip("Kéo UI Slider thanh EXP vào đây (Chỉ dùng cho Player)")]
     [SerializeField] private Slider expSlider;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void OnEnable()
     {
         if (entity != null)
@@ -55,7 +58,9 @@ public class HealthBar : MonoBehaviour
             transform.localScale = currentScale;
         }
     }
+    #endregion
 
+    #region PRIVATE METHODS
     private void UpdateHealthBar(float currentHealth, float maxHealth)
     {
         if (healthSlider != null)
@@ -81,4 +86,5 @@ public class HealthBar : MonoBehaviour
             expSlider.value = currentExp;
         }
     }
+    #endregion
 }

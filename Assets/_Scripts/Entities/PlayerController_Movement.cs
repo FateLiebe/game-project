@@ -6,9 +6,7 @@ using System.Collections;
 /// </summary>
 public partial class PlayerController
 {
-    #region INPUT & MOVEMENT
-    // ==========================================
-
+    #region CORE INPUT & MOVEMENT LOGIC
     /// <summary>
     /// Nhận diện phím bấm và chặn tương tác khi đang phản đòn (Counter) hoặc lướt (Dash).
     /// </summary>
@@ -128,40 +126,9 @@ public partial class PlayerController
 
         HandleFastFall();
     }
-
     #endregion
 
-    // ==========================================
-    #region MOVEMENT LOGIC EXTENSIONS
-    // ==========================================
-
-    private bool CanDash()
-    {
-        if (currentDashCharges <= 0) return false;
-        if (verticalInput > 0 && jumpsLeft <= 0) return false;
-        if (currentState == PlayerState.Grounded) return true;
-        if (dashesUsedInAir >= baseData.maxAirDashes) return false;
-        if (dashesUsedInAir == 1 && !dashResetByJump && !canAirAttack) return false;
-        return true;
-    }
-
-    /// <summary>
-    /// Xử lý quá trình phục hồi (Recharge) số lần lướt (Dash Charge) theo thời gian.
-    /// Giới hạn số charge tối đa theo baseData.maxDashes.
-    /// </summary>
-    private void HandleDashRecharge()
-    {
-        if (currentDashCharges < baseData.maxDashes)
-        {
-            dashRechargeTimer += Time.deltaTime;
-            if (dashRechargeTimer >= baseData.dashRechargeTime)
-            {
-                currentDashCharges = baseData.maxDashes; 
-                dashRechargeTimer = 0;
-            }
-        }
-    }
-
+    #region JUMP & GROUNDED LOGIC
     /// <summary>
     /// Xử lý logic Nhảy (Jump). Áp dụng lực nhảy dựa trên thông số nhân vật và gọi sự kiện âm thanh.
     /// Cho phép hủy hoạt ảnh đang diễn ra để phản ứng ngay lập tức.
@@ -218,47 +185,6 @@ public partial class PlayerController
     }
 
     /// <summary>
-    /// Lật sprite của nhân vật theo hướng di chuyển hiện tại.
-    /// </summary>
-    private void Flip()
-    {
-        if (currentState == PlayerState.Dashing || currentState == PlayerState.DashStalling) return;
-        if (horizontalInput > 0 && transform.localScale.x < 0 || horizontalInput < 0 && transform.localScale.x > 0)
-        {
-            Vector3 localScale = transform.localScale;
-            localScale.x *= -1f;
-            transform.localScale = localScale;
-        }
-    }
-
-    private void UpdateAnimations()
-    {
-        float visualSpeed = isAttacking ? 0 : Mathf.Abs(horizontalInput);
-        anim.SetFloat("speed", visualSpeed);
-
-        bool grounded = currentState == PlayerState.Grounded;
-        
-        // isJumping chỉ true khi player CHỦ ĐỘNG nhảy
-        // dùng lastJumpTime thay vì velocity để tránh false positive
-        bool jumping = !grounded 
-                    && currentState == PlayerState.Airborne 
-                    && (Time.time - lastJumpTime) < 0.5f  // ← chỉ true trong 0.5s sau khi nhảy
-                    && rb.linearVelocity.y > 0.1f;
-                    
-        bool falling = !grounded 
-                    && currentState == PlayerState.Airborne 
-                    && rb.linearVelocity.y < -0.1f;
-
-        anim.SetBool("isGrounded", grounded);
-        //anim.SetBool("isJumping",  jumping);
-        anim.SetBool("isFalling",  falling);
-    }
-
-    /// <summary>
-    /// Cơ chế kiểm tra mặt đất siêu an toàn bằng Raycast.
-    /// Đòi hỏi nhân vật phải chạm đất liên tục 3 frame để chống hiện tượng giật lag bay trên không.
-    /// </summary>
-    /// <summary>
     /// Bắn Raycast xuống dưới chân để xác định xem Player có đang đứng trên mặt đất không.
     /// Cập nhật trạng thái Grounded/Airborne tương ứng.
     /// </summary>
@@ -304,40 +230,6 @@ public partial class PlayerController
         }
     }
 
-    /// <summary>
-    /// Trả về lượng sát thương cận chiến hiện tại, đã bao gồm các hệ số nhân từ Combo, Buff, và Chí mạng.
-    /// </summary>
-    /// <param name="isCrit">Trạng thái (out) báo hiệu cú đánh này có phải là chí mạng hay không</param>
-    public float GetCurrentMeleeDamage(out bool isCrit)
-    {
-        isCrit = false;
-        
-        int currentComboIndex = Mathf.Clamp(comboStep - 1, 0, comboDamageMultipliers.Length - 1);
-        float multiplier = comboDamageMultipliers[currentComboIndex];
-        
-        if (isCounterAttacking) 
-        {
-            // Khi ở trạng thái Counter Attack, sát thương đánh ra sẽ được cường hóa (Hệ số x2)
-            multiplier = 2f;
-        }
-        
-        float finalDamage = Attack * multiplier;
-
-        if (UnityEngine.Random.Range(0f, 100f) <= CritRate)
-        {
-            finalDamage *= baseData.critDamageMultiplier; 
-            isCrit = true;
-        }
-
-        return finalDamage; 
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, 3.5f);
-    }
-
     public void ForceGroundedState()
     {
         currentState = PlayerState.Grounded;
@@ -347,12 +239,73 @@ public partial class PlayerController
         dashResetByJump = false;
         rb.gravityScale = originalGravity;
     }
-
     #endregion
 
-    // ==========================================
+    #region UTILITIES & ANIMATION
+    private bool CanDash()
+    {
+        if (currentDashCharges <= 0) return false;
+        if (verticalInput > 0 && jumpsLeft <= 0) return false;
+        if (currentState == PlayerState.Grounded) return true;
+        if (dashesUsedInAir >= baseData.maxAirDashes) return false;
+        if (dashesUsedInAir == 1 && !dashResetByJump && !canAirAttack) return false;
+        return true;
+    }
+
+    /// <summary>
+    /// Xử lý quá trình phục hồi (Recharge) số lần lướt (Dash Charge) theo thời gian.
+    /// Giới hạn số charge tối đa theo baseData.maxDashes.
+    /// </summary>
+    private void HandleDashRecharge()
+    {
+        if (currentDashCharges < baseData.maxDashes)
+        {
+            dashRechargeTimer += Time.deltaTime;
+            if (dashRechargeTimer >= baseData.dashRechargeTime)
+            {
+                currentDashCharges = baseData.maxDashes; 
+                dashRechargeTimer = 0;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Lật sprite của nhân vật theo hướng di chuyển hiện tại.
+    /// </summary>
+    private void Flip()
+    {
+        if (currentState == PlayerState.Dashing || currentState == PlayerState.DashStalling) return;
+        if (horizontalInput > 0 && transform.localScale.x < 0 || horizontalInput < 0 && transform.localScale.x > 0)
+        {
+            Vector3 localScale = transform.localScale;
+            localScale.x *= -1f;
+            transform.localScale = localScale;
+        }
+    }
+
+    private void UpdateAnimations()
+    {
+        float visualSpeed = isAttacking ? 0 : Mathf.Abs(horizontalInput);
+        anim.SetFloat("speed", visualSpeed);
+
+        bool grounded = currentState == PlayerState.Grounded;
+        
+        bool falling = !grounded 
+                    && currentState == PlayerState.Airborne 
+                    && rb.linearVelocity.y < -0.1f;
+
+        anim.SetBool("isGrounded", grounded);
+        anim.SetBool("isFalling",  falling);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, 3.5f);
+    }
+    #endregion
+
     #region UI BUTTON HANDLERS
-    // ==========================================
     public void UIButton_Attack()
     {
         if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay) return;

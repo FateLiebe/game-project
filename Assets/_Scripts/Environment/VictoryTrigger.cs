@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public class VictoryTrigger : MonoBehaviour
 {
+    #region UNITY LIFECYCLE
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
@@ -13,4 +14,5 @@ public class VictoryTrigger : MonoBehaviour
             if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.Victory);
         }
     }
+    #endregion
 }

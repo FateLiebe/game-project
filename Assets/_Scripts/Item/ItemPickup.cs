@@ -7,6 +7,7 @@ using System.Collections;
 /// </summary>
 public class ItemPickup : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     public ItemSO itemData;
     private SpriteRenderer sr;
     private Collider2D col;
@@ -15,7 +16,9 @@ public class ItemPickup : MonoBehaviour
     [Tooltip("Thời gian trước khi item tự biến mất (giây). 0 = không bao giờ biến mất")]
     public float despawnTime = 45f;
     private const float FADE_DURATION = 5f; // Mờ dần 5s trước khi xóa
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
@@ -29,6 +32,24 @@ public class ItemPickup : MonoBehaviour
         if (despawnTime > 0f) StartCoroutine(DespawnRoutine());
     }
 
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (!canPickUp) return;
+        if (!other.CompareTag("Player")) return;
+        if (itemData == null) return;
+        
+        if (InventoryManager.Instance == null)
+        {
+            Debug.LogWarning("InventoryManager.Instance NULL khi nhặt đồ!");
+            return;
+        }
+        
+        if (InventoryManager.Instance.AddItem(itemData))
+            ReturnOrDestroy();
+    }
+    #endregion
+
+    #region PUBLIC METHODS
     /// <summary>
     /// Gắn dữ liệu vật phẩm (ItemSO) vào model rớt trên sàn.
     /// Hàm này thường được gọi bởi InventoryManager hoặc DropManager khi vứt/rớt đồ.
@@ -41,7 +62,9 @@ public class ItemPickup : MonoBehaviour
 
         StartCoroutine(SetupCoroutine(lockPickup)); // Bắt đầu Coroutine để tạm thời vô hiệu hóa nhặt đồ
     }
+    #endregion
 
+    #region COROUTINES
     /// <summary>
     /// Vô hiệu hóa Collider 1 giây khi vật phẩm vừa sinh ra. 
     /// Kích hoạt trạng thái khóa nhặt đồ trong thời gian ngắn để tạo cảm giác vật phẩm văng ra chạm đất rồi mới nhặt được.
@@ -79,22 +102,6 @@ public class ItemPickup : MonoBehaviour
         if (col != null) col.enabled = true; // Kích hoạt lại collider để cho phép nhặt đồ
     }
 
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        if (!canPickUp) return;
-        if (!other.CompareTag("Player")) return;
-        if (itemData == null) return;
-        
-        if (InventoryManager.Instance == null)
-        {
-            Debug.LogWarning("InventoryManager.Instance NULL khi nhặt đồ!");
-            return;
-        }
-        
-        if (InventoryManager.Instance.AddItem(itemData))
-            ReturnOrDestroy();
-    }
-
     /// <summary>
     /// Tự động đếm ngược thời gian (despawnTime). Khi gần hết giờ (còn 5 giây), vật phẩm sẽ nhấp nháy/mờ dần rồi bị hủy để chống Memory Leak.
     /// </summary>
@@ -118,7 +125,9 @@ public class ItemPickup : MonoBehaviour
         }
         ReturnOrDestroy();
     }
+    #endregion
 
+    #region PRIVATE METHODS
     /// <summary>Trả về pool nếu được tạo qua ObjectPoolManager, ngược lại thì Destroy.</summary>
     private void ReturnOrDestroy()
     {
@@ -126,4 +135,5 @@ public class ItemPickup : MonoBehaviour
         if (po != null) po.ReturnToPool();
         else Destroy(gameObject);
     }
+    #endregion
 }

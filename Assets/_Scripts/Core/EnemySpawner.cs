@@ -8,6 +8,7 @@ using System.Collections.Generic;
 /// </summary>
 public class EnemySpawner : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [Header("--- CÀI ĐẶT QUÁI VẬT ---")]
     public GameObject[] enemyPrefabs; 
     
@@ -31,7 +32,9 @@ public class EnemySpawner : MonoBehaviour
 
     private GameObject[] enemiesAtNodes; 
     private float[] nodeRespawnTimers; 
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         int nodeCount = transform.childCount;
@@ -66,6 +69,13 @@ public class EnemySpawner : MonoBehaviour
         StartCoroutine(RespawnRoutine());
     }
 
+    private void OnDestroy()
+    {
+        if (player != null) player.OnLevelChanged -= HandlePlayerLevelUp;
+    }
+    #endregion
+
+    #region SPAWN LOGIC
     private void InitialSpawnAll()
     {
         if (spawnNodes == null || spawnNodes.Length == 0 || enemyPrefabs == null || enemyPrefabs.Length == 0) return;
@@ -126,44 +136,6 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    private void ShuffleList(List<int> list)
-    {
-        for (int i = list.Count - 1; i > 0; i--)
-        {
-            int j = Random.Range(0, i + 1);
-            int temp = list[i];
-            list[i] = list[j];
-            list[j] = temp;
-        }
-    }
-
-    // ============================================================
-    // ĐẾM SỐ ELITE ĐANG SỐNG
-    // ============================================================
-    private int CountAliveElites()
-    {
-        int count = 0;
-        foreach (var obj in enemiesAtNodes)
-        {
-            if (obj == null) continue;
-            EnemyController ec = obj.GetComponent<EnemyController>();
-            if (ec != null && ec.rank == EnemyBase.EnemyRank.Elite)
-                count++;
-        }
-        return count;
-    }
-
-    private int CountAliveEnemies()
-    {
-        int count = 0;
-        foreach (var obj in enemiesAtNodes)
-            if (obj != null) count++;
-        return count;
-    }
-
-    // ============================================================
-    // SPAWN
-    // ============================================================
     /// <summary>
     /// Xử lý sinh quái. Giới hạn tự động: Nếu đã có quá 30% quái Elite trên bản đồ thì ép buộc sinh quái thường để tránh game quá tải.
     /// </summary>
@@ -217,7 +189,43 @@ public class EnemySpawner : MonoBehaviour
         enemiesAtNodes[nodeIndex] = newEnemy;
         nodeRespawnTimers[nodeIndex] = spawnDelay;
     }
+    #endregion
 
+    #region HELPER METHODS
+    private void ShuffleList(List<int> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            int temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
+        }
+    }
+
+    private int CountAliveElites()
+    {
+        int count = 0;
+        foreach (var obj in enemiesAtNodes)
+        {
+            if (obj == null) continue;
+            EnemyController ec = obj.GetComponent<EnemyController>();
+            if (ec != null && ec.rank == EnemyBase.EnemyRank.Elite)
+                count++;
+        }
+        return count;
+    }
+
+    private int CountAliveEnemies()
+    {
+        int count = 0;
+        foreach (var obj in enemiesAtNodes)
+            if (obj != null) count++;
+        return count;
+    }
+    #endregion
+
+    #region EVENT HANDLERS
     private void HandlePlayerLevelUp(int newLevel)
     {
         if (player == null || enemiesAtNodes == null) return;
@@ -236,12 +244,9 @@ public class EnemySpawner : MonoBehaviour
             }
         }
     }
+    #endregion
     
-    private void OnDestroy()
-    {
-        if (player != null) player.OnLevelChanged -= HandlePlayerLevelUp;
-    }
-    
+    #region DEBUG & GIZMOS
     private void OnDrawGizmos()
     {
         if (spawnNodes != null)
@@ -259,4 +264,5 @@ public class EnemySpawner : MonoBehaviour
             Gizmos.DrawWireSphere(player.transform.position, minDistanceFromPlayer);
         }
     }
+    #endregion
 }

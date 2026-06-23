@@ -8,6 +8,7 @@ using TMPro;
 /// </summary>
 public class StatsUIManager : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     // Khởi tạo biến cục bộ (Singleton) để các script khác dễ dàng gọi tới cập nhật UI
     public static StatsUIManager Instance { get; private set; } 
     public bool IsOpen => uiPanel != null && uiPanel.activeSelf;
@@ -39,7 +40,9 @@ public class StatsUIManager : MonoBehaviour
     // Biến phụ trợ chống spam hiển thị thông báo khi đang trong giao tranh
     private float lastCombatWarningTime = -99f;
     private const float COMBAT_WARNING_COOLDOWN = 2f;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -98,7 +101,9 @@ public class StatsUIManager : MonoBehaviour
 
         if (IsOpen) UpdateUI();
     }
+    #endregion
 
+    #region PUBLIC METHODS
     public void ToggleUI()
     {
         if (uiPanel != null)
@@ -136,15 +141,6 @@ public class StatsUIManager : MonoBehaviour
         if (ItemTooltipUI.Instance != null) ItemTooltipUI.Instance.HideTooltip();
     }
 
-    private void UpgradeStat(string statType)
-    {
-        if (player != null && player.currentStatPoints > 0)
-        {
-            player.AllocateStatPoint(statType); 
-            UpdateUI();
-        }
-    }
-
     public void UpdateUI()
     {
         if (player == null) return;
@@ -168,4 +164,16 @@ public class StatsUIManager : MonoBehaviour
         if (btnAddDEF != null) btnAddDEF.gameObject.SetActive(hasPoints);
         if (btnAddCRIT != null) btnAddCRIT.gameObject.SetActive(hasPoints);
     }
+    #endregion
+
+    #region UI CONTROLS & UPDATES
+    private void UpgradeStat(string statType)
+    {
+        if (player != null && player.currentStatPoints > 0)
+        {
+            player.AllocateStatPoint(statType); 
+            UpdateUI();
+        }
+    }
+    #endregion
 }

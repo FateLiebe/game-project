@@ -6,9 +6,12 @@ using UnityEngine;
 /// </summary>
 public class Hurtbox : MonoBehaviour, IDamageable
 {
+    #region VARIABLES & PROPERTIES
     [SerializeField] private BaseEntity owner;
     public bool isPerfectDodging = false;
+    #endregion
 
+    #region INTERFACE IMPLEMENTATIONS
     public void TakeDamage(DamageInfo info)
     {
         if (isPerfectDodging)
@@ -35,4 +38,5 @@ public class Hurtbox : MonoBehaviour, IDamageable
             owner.ApplyDamage(info);
         }
     }
+    #endregion
 }

@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public class SaveStation : MonoBehaviour
 {
+    #region UNITY LIFECYCLE
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
@@ -20,4 +21,5 @@ public class SaveStation : MonoBehaviour
             }
         }
     }
+    #endregion
 }

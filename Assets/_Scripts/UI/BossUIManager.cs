@@ -7,6 +7,7 @@ using UnityEngine.UI;
 /// </summary>
 public class BossUIManager : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     public static BossUIManager Instance;
 
     public Slider hpSlider;
@@ -14,7 +15,9 @@ public class BossUIManager : MonoBehaviour
     public CanvasGroup canvasGroup;
 
     private BaseEntity currentBoss;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         Instance = this;
@@ -41,6 +44,24 @@ public class BossUIManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (currentBoss == null) return;
+
+        hpSlider.value = currentBoss.currentHealth / currentBoss.MaxHealth;
+
+        if (currentBoss is BossController bossCtrl)
+        {
+            bool hasShield = bossCtrl.maxShield > 0;
+            shieldSlider.gameObject.SetActive(hasShield);
+            if (hasShield) shieldSlider.value = bossCtrl.currentShield / bossCtrl.maxShield;
+        }
+
+        if (currentBoss.currentHealth <= 0) HideBossUI();
+    }
+    #endregion
+
+    #region PUBLIC METHODS
     public void SetupBoss(BaseEntity boss)
     {
         currentBoss = boss;
@@ -62,20 +83,5 @@ public class BossUIManager : MonoBehaviour
             AudioManager.Instance.RestartAmbientCycle();
         }
     }
-
-    private void Update()
-    {
-        if (currentBoss == null) return;
-
-        hpSlider.value = currentBoss.currentHealth / currentBoss.MaxHealth;
-
-        if (currentBoss is BossController bossCtrl)
-        {
-            bool hasShield = bossCtrl.maxShield > 0;
-            shieldSlider.gameObject.SetActive(hasShield);
-            if (hasShield) shieldSlider.value = bossCtrl.currentShield / bossCtrl.maxShield;
-        }
-
-        if (currentBoss.currentHealth <= 0) HideBossUI();
-    }
+    #endregion
 }

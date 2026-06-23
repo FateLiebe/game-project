@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public class BossHitboxData : MonoBehaviour
 {
+    #region ENUMS
     public enum BossSkillType 
     { 
         Breath, 
@@ -14,7 +15,9 @@ public class BossHitboxData : MonoBehaviour
         FireBall, 
         ElectroShock 
     }
+    #endregion
 
+    #region VARIABLES & PROPERTIES
     [Header("Loại skill — set trong prefab")]
     public BossSkillType skillType;
 
@@ -24,7 +27,9 @@ public class BossHitboxData : MonoBehaviour
 
     // Set tự động bởi BossSkillManager khi spawn VFX
     [HideInInspector] public Vector3 spawnPosition;
+    #endregion
 
+    #region PUBLIC METHODS
     public float CalculateDamage(float bossAttack, Vector3 currentPosition)
     {
         switch (skillType)
@@ -51,4 +56,5 @@ public class BossHitboxData : MonoBehaviour
                 return bossAttack;
         }
     }
+    #endregion
 }

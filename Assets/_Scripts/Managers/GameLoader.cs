@@ -8,15 +8,22 @@ using System.Collections;
 /// </summary>
 public class GameLoader : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     public string firstMapName = "Map_1";
 
-    // KHAI BÁO ENUM MỚI ĐỂ CHỮA LỖI CS0117
     public enum LoadMode { NewGame, Continue, Respawn }
     public static LoadMode currentLoadMode = LoadMode.NewGame;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private IEnumerator Start() { yield return StartCoroutine(LoadRoutine()); }
-    public void StartLoad() { StartCoroutine(LoadRoutine()); }
+    #endregion
 
+    #region PUBLIC METHODS
+    public void StartLoad() { StartCoroutine(LoadRoutine()); }
+    #endregion
+
+    #region COROUTINES
     /// <summary>
     /// Luồng xử lý nạp không gian: Tự động phân luồng theo Save/Load hoặc Checkpoint.
     /// Dọn sạch EventSystem rác khi dùng Additive Load để tránh lỗi dội âm thanh/UI.
@@ -88,4 +95,5 @@ public class GameLoader : MonoBehaviour
 
         if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.Gameplay);
     }
+    #endregion
 }

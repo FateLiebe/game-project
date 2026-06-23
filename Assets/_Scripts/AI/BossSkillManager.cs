@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public class BossSkillManager : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [Header("--- KHO VFX (7 KỸ NĂNG) ---")]
     public GameObject breathPrefab;
     public GameObject breathFirePrefab;
@@ -23,12 +24,16 @@ public class BossSkillManager : MonoBehaviour
     public bool isVfxFacingLeftDefault = true; // Chuyển mặc định thành True do ảnh của bạn gốc quay trái
 
     private BaseEntity bossEntity;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         bossEntity = GetComponent<BaseEntity>();
     }
+    #endregion
 
+    #region PUBLIC METHODS
     /// <summary>
     /// Nơi "đúc" ra kỹ năng dựa trên Index từ Behavior Tree.
     /// Xử lý định vị động (Sét đánh theo vị trí Player hiện tại) hoặc gán sát thương duy trì (Breath DOT).
@@ -139,4 +144,5 @@ public class BossSkillManager : MonoBehaviour
             }
         }
     }
+    #endregion
 }

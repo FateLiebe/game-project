@@ -1,5 +1,6 @@
 using UnityEngine;
 
+#region ENUMS
 public enum ItemType 
 { 
     Consumable,     // Đồ tiêu hao (Bình máu, v.v.)
@@ -19,6 +20,7 @@ public enum ItemRarity
     Epic,       // Tinh Anh (Tím)
     Legendary   // Huyền Thoại (Vàng)
 }
+#endregion
 
 /// <summary>
 /// Thẻ Dữ Liệu Tĩnh (ScriptableObject) định nghĩa chi tiết một Vật phẩm.
@@ -27,7 +29,7 @@ public enum ItemRarity
 [CreateAssetMenu(fileName = "NewItem", menuName = "Data/Item")]
 public class ItemSO : ScriptableObject
 {
-
+    #region VARIABLES & PROPERTIES
     [Header("System")]
     [Tooltip("ID duy nhất để lưu Save/Load (VD: wp_sword_01)")]
     public string itemID;
@@ -67,4 +69,5 @@ public class ItemSO : ScriptableObject
         
     [Tooltip("Số lần sử dụng tối đa")]
     public int maxUses = 3;
+    #endregion
 }

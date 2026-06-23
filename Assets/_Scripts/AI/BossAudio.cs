@@ -8,8 +8,11 @@ using UnityEngine;
 [RequireComponent(typeof(BossController))]
 public class BossAudio : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     private BossController boss;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         boss = GetComponent<BossController>();
@@ -32,4 +35,5 @@ public class BossAudio : MonoBehaviour
             AudioManager.Instance.StopBossWingFlap();
         }
     }
+    #endregion
 }

@@ -8,6 +8,7 @@ using System.Collections;
 /// </summary>
 public class MapPortal : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [Header("--- THÔNG TIN CỔNG ---")]
     [Tooltip("Số thứ tự của cổng này")]
     public int portalID = 1;
@@ -16,7 +17,9 @@ public class MapPortal : MonoBehaviour
     public string nextMapName;
     [Tooltip("Số thứ tự của cổng bên Map kia mà Player sẽ chui ra")]
     public int destinationPortalID = 1;
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
@@ -30,7 +33,9 @@ public class MapPortal : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region COROUTINES
     /// <summary>
     /// Chuỗi quy trình chuyển không gian: 
     /// 1. Đóng băng (Freeze) Player.
@@ -103,4 +108,5 @@ public class MapPortal : MonoBehaviour
         if (portalCollider != null)
             portalCollider.enabled = true;
     }
+    #endregion
 }

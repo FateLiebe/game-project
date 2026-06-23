@@ -7,6 +7,7 @@ using System;
 /// </summary>
 public class BaseEntity : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [Header("Data Configuration")]
     public CharacterDataSO baseData;
 
@@ -60,7 +61,9 @@ public class BaseEntity : MonoBehaviour
     public float CritRate => baseData.baseCritRate + ((currentLevel - 1) * baseData.critRateGrowth) + (addedCritPoints * 0.2f) + equipCritRateBonus;
     public float CritDamage => (baseData.critDamageMultiplier * 100f) + equipCritDamageBonus;    
     public float Speed => baseData.moveSpeed + equipSpeedBonus;
+    #endregion
 
+    #region UNITY LIFECYCLE
     protected virtual void Start()
     {
         InitializeStats();
@@ -74,7 +77,9 @@ public class BaseEntity : MonoBehaviour
         buffAttack = 0;
         buffDefense = 0;
     }
+    #endregion
 
+    #region PUBLIC METHODS
     /// <summary>
     /// Tính toán trừ máu. Trừ đi giáp, hiển thị con số sát thương nảy lên (Damage Popup).
     /// Xử lý luôn logic chết và rơi tiền/EXP nếu đối tượng này là Quái vật.
@@ -171,24 +176,6 @@ public class BaseEntity : MonoBehaviour
         }
     }
 
-    protected virtual void Die()
-    {
-        // [FIX #1 & #11]: Xóa gameObject.SetActive(false);
-        // Để các class con (Player/Enemy) tự quyền quyết định cách chết
-    }
-
-    protected virtual void InitializeStats()
-    {
-        if (baseData != null)
-        {
-            currentMoveSpeed = Speed; 
-            currentHealth = MaxHealth; 
-            
-            OnHealthChanged?.Invoke(currentHealth, MaxHealth);
-            OnLevelChanged?.Invoke(currentLevel);
-            OnExpChanged?.Invoke(currentEXP, expToNextLevel);
-        }
-    }
     public void RefreshUIAfterLoad()
     {
         OnHealthChanged?.Invoke(currentHealth, MaxHealth);
@@ -215,43 +202,6 @@ public class BaseEntity : MonoBehaviour
         {
             LevelUp();
         }
-    }
-
-    /// <summary>
-    /// Xử lý lên cấp. 
-    /// Reset EXP, cộng điểm tiềm năng, bơm đầy máu và khuếch đại yêu cầu EXP cho cấp tiếp theo.
-    /// </summary>
-    protected virtual void LevelUp()
-    {
-        currentEXP -= expToNextLevel; 
-        currentLevel++;
-        currentStatPoints += baseData.statPointsPerLevel;
-        
-        float multiplier = 1.2f;
-        if (currentLevel >= 10 && currentLevel < 30) multiplier = 1.3f;
-        else if (currentLevel >= 30) multiplier = 1.4f; 
-
-        expToNextLevel *= multiplier;
-        expToNextLevel = Mathf.Round(expToNextLevel); 
-
-        currentHealth = MaxHealth; 
-        
-        OnHealthChanged?.Invoke(currentHealth, MaxHealth);
-        OnLevelChanged?.Invoke(currentLevel);
-        OnExpChanged?.Invoke(currentEXP, expToNextLevel);
-
-        if (damagePopupPrefab != null)
-        {
-            GameObject popup;
-            if (ObjectPoolManager.Instance != null) popup = ObjectPoolManager.Instance.Get(damagePopupPrefab, transform.position + new Vector3(0, 1.5f, 0), Quaternion.identity);
-            else popup = Instantiate(damagePopupPrefab, transform.position + new Vector3(0, 1.5f, 0), Quaternion.identity);
-            DamagePopup popupScript = popup.GetComponent<DamagePopup>();
-            if (popupScript != null) popupScript.SetupLevelUp();
-        }
-
-        // [AUDIO] Chỉ phát âm thanh level up cho Player
-        if (CompareTag("Player"))
-            AudioManager.Instance?.PlayLevelUp();
     }
 
     public void AllocateStatPoint(string statType)
@@ -299,4 +249,63 @@ public class BaseEntity : MonoBehaviour
         OnLevelChanged?.Invoke(currentLevel); 
         OnHealthChanged?.Invoke(currentHealth, MaxHealth); 
     }
+    #endregion
+
+    #region CORE LOGIC & PROTECTED METHODS
+    protected virtual void Die()
+    {
+        // [FIX #1 & #11]: Xóa gameObject.SetActive(false);
+        // Để các class con (Player/Enemy) tự quyền quyết định cách chết
+    }
+
+    protected virtual void InitializeStats()
+    {
+        if (baseData != null)
+        {
+            currentMoveSpeed = Speed; 
+            currentHealth = MaxHealth; 
+            
+            OnHealthChanged?.Invoke(currentHealth, MaxHealth);
+            OnLevelChanged?.Invoke(currentLevel);
+            OnExpChanged?.Invoke(currentEXP, expToNextLevel);
+        }
+    }
+
+    /// <summary>
+    /// Xử lý lên cấp. 
+    /// Reset EXP, cộng điểm tiềm năng, bơm đầy máu và khuếch đại yêu cầu EXP cho cấp tiếp theo.
+    /// </summary>
+    protected virtual void LevelUp()
+    {
+        currentEXP -= expToNextLevel; 
+        currentLevel++;
+        currentStatPoints += baseData.statPointsPerLevel;
+        
+        float multiplier = 1.2f;
+        if (currentLevel >= 10 && currentLevel < 30) multiplier = 1.3f;
+        else if (currentLevel >= 30) multiplier = 1.4f; 
+
+        expToNextLevel *= multiplier;
+        expToNextLevel = Mathf.Round(expToNextLevel); 
+
+        currentHealth = MaxHealth; 
+        
+        OnHealthChanged?.Invoke(currentHealth, MaxHealth);
+        OnLevelChanged?.Invoke(currentLevel);
+        OnExpChanged?.Invoke(currentEXP, expToNextLevel);
+
+        if (damagePopupPrefab != null)
+        {
+            GameObject popup;
+            if (ObjectPoolManager.Instance != null) popup = ObjectPoolManager.Instance.Get(damagePopupPrefab, transform.position + new Vector3(0, 1.5f, 0), Quaternion.identity);
+            else popup = Instantiate(damagePopupPrefab, transform.position + new Vector3(0, 1.5f, 0), Quaternion.identity);
+            DamagePopup popupScript = popup.GetComponent<DamagePopup>();
+            if (popupScript != null) popupScript.SetupLevelUp();
+        }
+
+        // [AUDIO] Chỉ phát âm thanh level up cho Player
+        if (CompareTag("Player"))
+            AudioManager.Instance?.PlayLevelUp();
+    }
+    #endregion
 }

@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public class UniversalHitbox : MonoBehaviour 
 {
+    #region VARIABLES & PROPERTIES
     [Header("Damage Settings")]
     public Vector2 baseKnockback = new Vector2(5f, 2f);
     
@@ -14,7 +15,9 @@ public class UniversalHitbox : MonoBehaviour
 
     [Header("Hitbox Owner")]
     public GameObject owner;
+    #endregion
 
+    #region CORE LOGIC & UNITY LIFECYCLE
     /// <summary>
     /// Xử lý va chạm và truyền sát thương. Lọc cẩn thận để quái không đánh trúng quái, Player không đánh trúng Player.
     /// Tính toán cả hệ số đòn đánh chí mạng (Crit) và chiều đẩy lùi (Knockback).
@@ -94,4 +97,5 @@ public class UniversalHitbox : MonoBehaviour
             }
         }
     }
+    #endregion
 }

@@ -10,21 +10,22 @@ using UnityEngine;
 /// </summary>
 public class ObjectPoolManager : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     public static ObjectPoolManager Instance { get; private set; }
 
     // Key = prefab InstanceID, Value = stack các bản inactive đang chờ tái sử dụng
     private readonly Dictionary<int, Queue<GameObject>> _pools = new Dictionary<int, Queue<GameObject>>();
+    #endregion
 
+    #region UNITY LIFECYCLE
     private void Awake()
     {
         if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); }
         else Destroy(gameObject);
     }
+    #endregion
 
-    // ==========================================
     #region PUBLIC API
-    // ==========================================
-
     /// <summary>
     /// Lấy một Object từ kho (hoặc tạo mới nếu kho đã rỗng).
     /// PooledObject component được tự động gắn vào để Object "nhớ" mình thuộc kho nào.
@@ -75,12 +76,13 @@ public class ObjectPoolManager : MonoBehaviour
             Return(id, obj);
         }
     }
-
     #endregion
 
+    #region PRIVATE METHODS
     private void EnsurePool(int id)
     {
         if (!_pools.ContainsKey(id))
             _pools[id] = new Queue<GameObject>();
     }
+    #endregion
 }

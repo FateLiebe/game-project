@@ -7,8 +7,11 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class PooledObject : MonoBehaviour
 {
+    #region VARIABLES & PROPERTIES
     [HideInInspector] public int prefabId;
+    #endregion
 
+    #region PUBLIC METHODS
     public void ReturnToPool()
     {
         if (ObjectPoolManager.Instance != null)
@@ -16,4 +19,5 @@ public class PooledObject : MonoBehaviour
         else
             Destroy(gameObject); // Fallback an toàn nếu pool chưa tồn tại
     }
+    #endregion
 }

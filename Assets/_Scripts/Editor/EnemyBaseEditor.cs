@@ -9,6 +9,7 @@ using UnityEditor;
 [CustomEditor(typeof(EnemyBase), true)]
 public class EnemyBaseEditor : Editor
 {
+    #region UNITY EDITOR LOGIC
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
@@ -64,5 +65,6 @@ public class EnemyBaseEditor : Editor
             }
         }
     }
+    #endregion
 }
 #endif
