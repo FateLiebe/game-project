@@ -12,6 +12,19 @@ public partial class PlayerController
 {
     #region BOSS DETECTION
     /// <summary>
+    /// Buộc ẩn UI Boss ngay lập tức và reset trạng thái phát hiện Boss.
+    /// Dùng khi PlayerController bị disabled (ví dụ: chuyển map) nên Update() không thể tự phát OnBossLost.
+    /// </summary>
+    public void ForceHideBossUI()
+    {
+        if (activeBoss != null)
+        {
+            activeBoss = null;
+            OnBossLost?.Invoke();
+        }
+    }
+
+    /// <summary>
     /// Kiểm tra xem người chơi có đang đứng trong khu vực đánh Boss hay không.
     /// Kích hoạt event hiển thị thanh máu Boss nếu có.
     /// Tự động chạy mỗi frame trong Update (thuộc PlayerController gốc).

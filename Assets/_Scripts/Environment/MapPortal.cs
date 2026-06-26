@@ -62,7 +62,13 @@ public class MapPortal : MonoBehaviour
         
         // 1. ĐÓNG BĂNG
         if (rb != null) { rb.linearVelocity = Vector2.zero; rb.simulated = false; }
-        if (playerCtrl != null) { playerCtrl.DisableHitbox(); playerCtrl.enabled = false; }
+        if (playerCtrl != null)
+        {
+            // Gọi thẳng ForceHideBossUI() để đảm bảo BossUIManager nhận được tín hiệu reset UI.
+            playerCtrl.ForceHideBossUI();
+            playerCtrl.DisableHitbox();
+            playerCtrl.enabled = false;
+        }
 
         // 2. TẢI MAP MỚI
         AsyncOperation loadOp = SceneManager.LoadSceneAsync(nextMapName, LoadSceneMode.Additive);
