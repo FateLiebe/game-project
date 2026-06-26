@@ -251,7 +251,9 @@ public partial class PlayerController
         // Tối ưu hóa bộ nhớ: Tái sử dụng mảng tĩnh _enemyScanBuffer thay vì cấp phát (Allocate) mảng mới mỗi lần gọi hàm
         int count = Physics2D.OverlapCircle(transform.position, radius, ContactFilter2D.noFilter, _enemyScanBuffer);
         Transform nearest = null;
+        Transform nearestBoss = null;
         float minDist = Mathf.Infinity;
+        float minBossDist = Mathf.Infinity;
 
         for (int i = 0; i < count; i++)
         {
@@ -263,16 +265,26 @@ public partial class PlayerController
             BaseEntity enemy = hit.GetComponentInParent<BaseEntity>();
             if (enemy == null || enemy.currentHealth <= 0 || (!enemy.CompareTag("Enemy") && !enemy.CompareTag("Boss"))) continue;
 
-            // Chỉ chọn enemy cùng hướng mặt
+            float dist = Vector2.Distance(transform.position, enemy.transform.position);
+
+            // Boss: Ưu tiên tuyệt đối — không cần cùng hướng mặt
+            if (enemy.CompareTag("Boss"))
+            {
+                if (dist < minBossDist) { minBossDist = dist; nearestBoss = enemy.transform; }
+                continue;
+            }
+
+            // Quái thường: Chỉ chọn enemy cùng hướng mặt
             float dx = enemy.transform.position.x - transform.position.x;
             if (Mathf.Sign(dx) != facingDir && Mathf.Abs(dx) > 0.5f) continue;
 
-            float dist = Vector2.Distance(transform.position, enemy.transform.position);
             if (dist < minDist) { minDist = dist; nearest = enemy.transform; }
         }
 
-        if (nearest != null) { lockedTarget = nearest; lockedTargetTimer = LOCK_DURATION; }
-        return nearest;
+        // Boss được ưu tiên hơn quái thường nếu tìm thấy
+        Transform result = nearestBoss != null ? nearestBoss : nearest;
+        if (result != null) { lockedTarget = result; lockedTargetTimer = LOCK_DURATION; }
+        return result;
     }
     #endregion
 }
