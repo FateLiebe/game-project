@@ -102,6 +102,9 @@ public partial class PlayerController
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         this.enabled = false; 
 
+        // [FIX] Ép ẩn giao diện Boss ngay khi Player chết
+        ForceHideBossUI();
+
         // Lưu trạng thái hiện tại (level, item) vào tệp trước khi nhân vật chết hẳn.
         // để khi Reload Save Point thì chỉ phục hồi vị trí nhưng giữ nguyên cấp độ/đồ.
         // [FIX BUG BẤT TỬ]: Lưu MaxHealth thay vì 0 vào file để tránh trường hợp

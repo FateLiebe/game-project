@@ -224,6 +224,7 @@ MonoBehaviour:
   directClip: {fileID: 8300000, guid: 2e2b146145dd0604696cd9cd6ad3ba24, type: 3}
   skillIndex: 0
   volume: 1
+  stopAudioOnDestroy: 0
 --- !u!114 &557305530220967238
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,7 +238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreathDOT
   totalDuration: 1
-  damageScaleTotal: 1.2
+  damageScaleTotal: 2
   tickCount: 4
   followSpawnPoint: 1
   owner: {fileID: 0}

@@ -124,7 +124,13 @@ public class SaveDataManager : MonoBehaviour
         inv.LoadEquippedItemFromSave(itemDatabase.GetItemByID(currentData.accessoryID));
 
         ItemSO savedSkill = itemDatabase.GetItemByID(currentData.equippedSupportSkillID);
-        if (savedSkill != null) player.LoadSupportSkillFromSave(savedSkill, currentData.currentSupportSkillUses);
+        if (savedSkill != null) 
+        {
+            // Bước 1: Nạp vào logic của Player (sẽ tạo instance có runtimeUses chính xác)
+            player.LoadSupportSkillFromSave(savedSkill, currentData.currentSupportSkillUses);
+            // Bước 2: Báo cho InventoryManager cập nhật UI slot SupportSkill (để Inventory window không bị trống)
+            inv.LoadEquippedItemFromSave(player.equippedSupportSkill);
+        }
 
         // Nạp tiền
         player.coins = currentData.coins;
@@ -155,7 +161,22 @@ public class SaveDataManager : MonoBehaviour
             ItemSO item = itemDatabase.GetItemByID(slotData.itemID);
             if (item != null) 
             {
-                for (int i = 0; i < slotData.quantity; i++) inv.inventoryList.Add(item);
+                for (int i = 0; i < slotData.quantity; i++) 
+                {
+                    // [FIX] Nếu là Support Skill, Instantiate thành object độc lập để có runtimeUses riêng!
+                    if (item.itemType == ItemType.SupportSkill)
+                    {
+                        ItemSO instance = UnityEngine.Object.Instantiate(item);
+                        // Lấy số uses từ save (nếu save cũ chưa có thì dùng maxUses)
+                        instance.runtimeUses = (slotData.savedUses > 0) ? slotData.savedUses : item.maxUses;
+                        instance.name = item.name;
+                        inv.inventoryList.Add(instance);
+                    }
+                    else
+                    {
+                        inv.inventoryList.Add(item);
+                    }
+                }
             }
         }
         inv.UpdateUI(); 
@@ -241,9 +262,18 @@ public class SaveDataManager : MonoBehaviour
         {
             if (item != null)
             {
-                var existing = currentData.inventoryItems.Find(x => x.itemID == item.itemID);
-                if (existing != null) existing.quantity++;
-                else currentData.inventoryItems.Add(new InventorySlotData(item.itemID, 1));
+                if (item.itemType == ItemType.SupportSkill)
+                {
+                    // [FIX DỨT ĐIỂM] SupportSkill không được gộp nhóm (stack) để bảo toàn số uses của TỪNG lá bùa
+                    currentData.inventoryItems.Add(new InventorySlotData(item.itemID, 1, item.runtimeUses));
+                }
+                else
+                {
+                    // Các món đồ tiêu hao khác vẫn gộp nhóm bình thường để tiết kiệm dung lượng save
+                    var existing = currentData.inventoryItems.Find(x => x.itemID == item.itemID && x.savedUses == 0);
+                    if (existing != null) existing.quantity++;
+                    else currentData.inventoryItems.Add(new InventorySlotData(item.itemID, 1, 0));
+                }
             }
         }
 

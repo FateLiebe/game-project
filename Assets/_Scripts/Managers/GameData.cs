@@ -12,7 +12,14 @@ public class InventorySlotData
 {
     public string itemID;
     public int quantity;
-    public InventorySlotData(string id, int amount) { itemID = id; quantity = amount; }
+    public int savedUses; // Lưu runtimeUses của SupportSkill
+    
+    public InventorySlotData(string id, int amount, int uses = 0) 
+    { 
+        itemID = id; 
+        quantity = amount; 
+        savedUses = uses;
+    }
 }
 
 [System.Serializable]
