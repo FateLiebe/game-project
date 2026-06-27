@@ -67,20 +67,13 @@ public partial class PlayerController
         // 0. Cập nhật lock target mỗi frame (đếm ngược timer, kiểm tra còn sống/tầm bắn)
         UpdateLockedTarget();
 
-        // 1. Nạp số lượng đạn khi mới lắp bùa vào
-        if (!isSupportSkillInitialized)
-        {
-            currentSupportSkillUses = equippedSupportSkill.maxUses;
-            isSupportSkillInitialized = true;
-        }
-
-        // 2. Trừ thời gian hồi chiêu
+        // 1. Trừ thời gian hồi chiêu
         if (supportSkillCDTimer > 0) supportSkillCDTimer -= Time.deltaTime;
 
-        // 3. Cập nhật UI liên tục qua event, không gọi UI trực tiếp
+        // 2. Cập nhật UI liên tục qua event, không gọi UI trực tiếp
         OnSupportSkillUpdated?.Invoke(equippedSupportSkill, supportSkillCDTimer, currentSupportSkillUses);
 
-        // 4. Lắng nghe phím E để xuất chiêu
+        // 3. Lắng nghe phím E để xuất chiêu
         if (Input.GetKeyDown(KeyCode.E)) UseSupportSkill();
     }
 
@@ -98,6 +91,9 @@ public partial class PlayerController
 
         supportSkillCDTimer = equippedSupportSkill.skillCooldown;
         currentSupportSkillUses--;
+        // Ghi thẳng vào instance — mỗi bùa là object độc lập, không chia sẻ dữ liệu
+        equippedSupportSkill.runtimeUses = currentSupportSkillUses;
+        Debug.Log($"<color=orange>[SKILL USE] {equippedSupportSkill.itemName} | instanceID={equippedSupportSkill.GetInstanceID()} | Uses còn lại: {currentSupportSkillUses}</color>");
 
         anim.SetTrigger("Attack"); 
         
@@ -167,7 +163,7 @@ public partial class PlayerController
         {
             Debug.Log("<color=yellow>Bùa đã hết số lần sử dụng! Tự động hủy.</color>");
             ItemSO oldSkill = equippedSupportSkill;
-            equippedSupportSkill = null; 
+            equippedSupportSkill = null;
             
             OnSupportSkillUpdated?.Invoke(null, 0, 0); // [PHASE 3]
             if (InventoryManager.Instance != null) 
@@ -183,8 +179,16 @@ public partial class PlayerController
     // Hàm này để hệ thống Inventory/Trang bị gọi khi bạn nhặt hoặc mặc bùa mới vào
     public void EquipSupportSkill(ItemSO newSkill)
     {
+        string oldInfo = equippedSupportSkill != null ? $"{equippedSupportSkill.itemName}(inst={equippedSupportSkill.GetInstanceID()},uses={equippedSupportSkill.runtimeUses})" : "null";
+        string newInfo = newSkill != null ? $"{newSkill.itemName}(inst={newSkill.GetInstanceID()},uses={newSkill.runtimeUses})" : "null";
+
         equippedSupportSkill = newSkill;
-        isSupportSkillInitialized = false; // Ép nạp lại số lượng đạn theo bùa mới
+        // Đọc runtimeUses từ instance — mỗi instance có giá trị độc lập
+        currentSupportSkillUses = (newSkill != null) ? newSkill.runtimeUses : 0;
+
+        Debug.Log($"<color=lime>[EQUIP SKILL] {oldInfo} -> {newInfo} | currentSupportSkillUses={currentSupportSkillUses}</color>");
+
+        isSupportSkillInitialized = true;
         supportSkillCDTimer = 0f;
     }
 
@@ -201,16 +205,28 @@ public partial class PlayerController
     }
 
     /// <summary>
-    /// Tải lại kỹ năng hỗ trợ từ file Save (Ghi đè kỹ năng mặc định).
-    /// Ngăn không cho cơ chế khởi tạo ghi đè lại bằng cờ isSupportSkillInitialized.
+    /// Tải lại kỹ năng hỗ trợ từ file Save.
+    /// Tạo Instantiate mới từ asset gốc và gán đúng số lần dùng đã lưu.
     /// </summary>
     public void LoadSupportSkillFromSave(ItemSO savedSkill, int savedUses)
     {
-        equippedSupportSkill = savedSkill;
-        currentSupportSkillUses = savedUses;
-        isSupportSkillInitialized = true; // [Chặn bug ghi đè]
+        if (savedSkill != null && savedUses > 0)
+        {
+            // Tạo instance độc lập từ asset gốc và gán uses từ save
+            ItemSO instance = UnityEngine.Object.Instantiate(savedSkill);
+            instance.runtimeUses = savedUses;
+            equippedSupportSkill = instance;
+            currentSupportSkillUses = savedUses;
+            Debug.Log($"<color=cyan>[LOAD SKILL] {instance.itemName} | savedUses={savedUses} | instanceID={instance.GetInstanceID()}</color>");
+        }
+        else
+        {
+            equippedSupportSkill = null;
+            currentSupportSkillUses = 0;
+        }
+        isSupportSkillInitialized = true;
         supportSkillCDTimer = 0f;
-        OnSupportSkillUpdated?.Invoke(equippedSupportSkill, 0f, currentSupportSkillUses); // [PHASE 3]
+        OnSupportSkillUpdated?.Invoke(equippedSupportSkill, 0f, currentSupportSkillUses);
     }
     #endregion
 

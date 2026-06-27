@@ -69,5 +69,11 @@ public class ItemSO : ScriptableObject
         
     [Tooltip("Số lần sử dụng tối đa")]
     public int maxUses = 3;
+
+    /// <summary>
+    /// Số lần sử dụng còn lại của INSTANCE này tại runtime.
+    /// [NonSerialized] = không lưu vào asset, mỗi Instantiate() có giá trị riêng độc lập.
+    /// </summary>
+    [System.NonSerialized] public int runtimeUses = 0;
     #endregion
 }

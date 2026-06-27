@@ -103,10 +103,14 @@ public partial class PlayerController
         this.enabled = false; 
 
         // Lưu trạng thái hiện tại (level, item) vào tệp trước khi nhân vật chết hẳn.
-        // để khi Reload Save Point thì chỉ phục hồi vị trí nhưng giữ nguyên cấp độ/đồ
+        // để khi Reload Save Point thì chỉ phục hồi vị trí nhưng giữ nguyên cấp độ/đồ.
+        // [FIX BUG BẤT TỬ]: Lưu MaxHealth thay vì 0 vào file để tránh trường hợp
+        // nhấn "Continue" từ Main Menu sẽ load player với 0 HP (gây miễn nhiễm sát thương do enemy kiểm tra currentHealth > 0).
         if (SaveDataManager.Instance != null && InventoryManager.Instance != null)
         {
             SaveDataManager.Instance.CollectDataFromGame(this, InventoryManager.Instance, false);
+            // Ghi đè health = đầy để đảm bảo Continue luôn bắt đầu với HP đầy
+            SaveDataManager.Instance.currentData.currentHealth = MaxHealth;
             SaveDataManager.Instance.SaveGameToFile();
         }
 

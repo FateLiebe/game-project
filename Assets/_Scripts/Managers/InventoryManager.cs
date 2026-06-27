@@ -114,7 +114,21 @@ public class InventoryManager : MonoBehaviour
             }
         }
 
-        inventoryList.Add(itemToAdd);
+        // Support Skill: Instantiate thành instance độc lập để mỗi bùa nhặt được có uses riêng
+        // Không dùng asset gốc trực tiếp — tránh nhiều bùa cùng loại dùng chung uses
+        if (itemToAdd.itemType == ItemType.SupportSkill)
+        {
+            ItemSO instance = UnityEngine.Object.Instantiate(itemToAdd);
+            instance.runtimeUses = itemToAdd.maxUses;
+            instance.name = itemToAdd.name; // giữ tên gốc cho dễ debug
+            inventoryList.Add(instance);
+            Debug.Log($"<color=cyan>[PICKUP SKILL] {instance.itemName} (ID={instance.itemID}) | runtimeUses={instance.runtimeUses} | instanceID={instance.GetInstanceID()}</color>");
+        }
+        else
+        {
+            inventoryList.Add(itemToAdd);
+        }
+
         UpdateUI(); 
         return true; 
     }
