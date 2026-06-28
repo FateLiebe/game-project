@@ -31,6 +31,10 @@ public class UIManager : MonoBehaviour
 
     [Header("Victory UI")]
     public GameObject victoryMenu;
+
+    [Header("Loading UI")]
+    public CanvasGroup loadingScreen;
+    public float fadeDuration = 0.5f;
     #endregion
 
     #region UNITY LIFECYCLE
@@ -115,6 +119,33 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region PUBLIC METHODS
+    /// <summary>
+    /// Làm mờ màn hình (Fade In/Out) bằng CanvasGroup.
+    /// show = true: màn hình đen dần đi.
+    /// show = false: màn hình sáng dần lên.
+    /// </summary>
+    public IEnumerator FadeLoadingScreen(bool show)
+    {
+        if (loadingScreen == null) yield break;
+
+        float startAlpha = loadingScreen.alpha;
+        float targetAlpha = show ? 1f : 0f;
+        float time = 0;
+
+        if (show) loadingScreen.gameObject.SetActive(true);
+
+        while (time < fadeDuration)
+        {
+            time += Time.unscaledDeltaTime;
+            loadingScreen.alpha = Mathf.Lerp(startAlpha, targetAlpha, time / fadeDuration);
+            yield return null;
+        }
+
+        loadingScreen.alpha = targetAlpha;
+
+        if (!show) loadingScreen.gameObject.SetActive(false);
+    }
+
     public void ResumeGame() 
     { 
         AudioManager.Instance?.PlayUIClick();

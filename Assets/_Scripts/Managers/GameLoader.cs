@@ -30,6 +30,13 @@ public class GameLoader : MonoBehaviour
     /// </summary>
     private IEnumerator LoadRoutine()
     {
+        if (UIManager.Instance != null && UIManager.Instance.loadingScreen != null)
+        {
+            // Bật đen NGAY LẬP TỨC để che đi khoảnh khắc Main Menu vừa bị hủy và Core_Gameplay vừa xuất hiện
+            UIManager.Instance.loadingScreen.alpha = 1f;
+            UIManager.Instance.loadingScreen.gameObject.SetActive(true);
+        }
+
         string mapToLoad = firstMapName;
 
         // 1. CHỌN TÊN MAP DỰA TRÊN CHẾ ĐỘ LOAD
@@ -73,6 +80,8 @@ public class GameLoader : MonoBehaviour
 
         if (player != null)
         {
+            Vector3 oldPos = player.transform.position;
+
             if (currentLoadMode != LoadMode.NewGame && SaveDataManager.Instance != null && inv != null)
             {
                 SaveDataManager.Instance.ApplyLoadedDataToPlayer(player, inv);
@@ -81,7 +90,31 @@ public class GameLoader : MonoBehaviour
             else
             {
                 MapSpawnPoint spawnPoint = FindAnyObjectByType<MapSpawnPoint>();
-                if (spawnPoint != null) player.transform.position = spawnPoint.transform.position;
+                if (spawnPoint != null) 
+                {
+                    Vector3 spawnPos = spawnPoint.transform.position;
+                    // Bắn tia Raycast để tìm mặt đất (tránh lỗi Player rơi tự do đầu game)
+                    RaycastHit2D hit = Physics2D.Raycast(spawnPos, Vector2.down, 15f, LayerMask.GetMask("Ground"));
+                    if (hit.collider != null)
+                    {
+                        Collider2D playerCol = player.GetComponent<Collider2D>();
+                        if (playerCol != null)
+                        {
+                            float pivotToBottom = player.transform.position.y - playerCol.bounds.min.y;
+                            spawnPos.y = hit.point.y + pivotToBottom + 0.05f;
+                        }
+                    }
+                    player.transform.position = spawnPos;
+                }
+            }
+            
+            // Cắt đuôi Camera (Snap Camera) triệt để (Sử dụng delta position thay vì absolute position)
+            Vector3 delta = player.transform.position - oldPos;
+            Unity.Cinemachine.CinemachineCamera cam = FindAnyObjectByType<Unity.Cinemachine.CinemachineCamera>();
+            if (cam != null && delta.sqrMagnitude > 0.01f)
+            {
+                cam.OnTargetObjectWarped(player.transform, delta); 
+                cam.PreviousStateIsValid = false;
             }
             
             // Yêu cầu tất cả Boss trong cảnh đồng bộ lại cấp độ với Player vừa được load
@@ -94,6 +127,15 @@ public class GameLoader : MonoBehaviour
         }
 
         if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.Gameplay);
+
+        // Chờ 1 frame cuối cùng để Camera và Physics đồng bộ vị trí hoàn toàn trước khi sáng màn hình
+        yield return null;
+
+        if (UIManager.Instance != null)
+        {
+            // Mở màn hình sáng lên để cho phép người chơi bắt đầu
+            yield return UIManager.Instance.FadeLoadingScreen(false);
+        }
     }
     #endregion
 }

@@ -50,17 +50,34 @@ public class MapPortal : MonoBehaviour
         //Báo cho toàn game biết đang Loading (để chặn các tương tác rác nếu có)
         if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.Loading);
 
-        Rigidbody2D rb = playerObj.GetComponent<Rigidbody2D>();
+        // 1. CHUẨN BỊ (ĐÓNG BĂNG PLAYER VÀ ANIMATION)
         PlayerController playerCtrl = playerObj.GetComponent<PlayerController>();
+        Rigidbody2D rb = playerObj.GetComponent<Rigidbody2D>();
 
+        // Lấy hướng di chuyển thực tế (để xử lý đúng khi người chơi Backdash ngược vào cổng)
         Vector2 enterDirection = Vector2.right;
-
-        if (rb != null && rb.linearVelocity.sqrMagnitude > 0.01f)
+        if (rb != null && Mathf.Abs(rb.linearVelocity.x) > 0.1f)
         {
-            enterDirection = rb.linearVelocity.normalized;
+            enterDirection = rb.linearVelocity.x > 0 ? Vector2.right : Vector2.left;
         }
-        
-        // 1. ĐÓNG BĂNG
+        else if (playerCtrl != null)
+        {
+            enterDirection = playerObj.transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
+        }
+
+        // Ép nhân vật đứng im hoàn toàn và phát animation Idle ngay lập tức
+        Animator anim = playerObj.GetComponent<Animator>();
+        if (anim != null)
+        {
+            anim.SetFloat("speed", 0f);
+            anim.SetBool("isGrounded", true);
+            anim.SetBool("isFalling", false);
+            
+            // Dùng Rebind để ép Animator reset về trạng thái gốc (Idle) mà không cần quan tâm tên State
+            anim.Rebind();
+            anim.Update(0f);
+        }
+
         if (rb != null) { rb.linearVelocity = Vector2.zero; rb.simulated = false; }
         if (playerCtrl != null)
         {
@@ -68,6 +85,12 @@ public class MapPortal : MonoBehaviour
             playerCtrl.ForceHideBossUI();
             playerCtrl.DisableHitbox();
             playerCtrl.enabled = false;
+        }
+
+        // 1.5. FADE IN MÀN HÌNH CHỜ
+        if (UIManager.Instance != null)
+        {
+            yield return UIManager.Instance.FadeLoadingScreen(true);
         }
 
         // 2. TẢI MAP MỚI
@@ -81,8 +104,33 @@ public class MapPortal : MonoBehaviour
             if (portal.gameObject.scene != currentMap &&
                 portal.portalID == this.destinationPortalID)
             {
-                // Dịch chuyển player lệch khỏi tâm portal một chút
-                playerObj.transform.position = portal.transform.position + (Vector3)(enterDirection * 3f);
+                // Dịch chuyển player lệch khỏi tâm portal một chút theo phương ngang
+                Vector3 newPos = portal.transform.position + (Vector3)(enterDirection * 3f);
+                
+                // Bắn tia Raycast xuống dưới để tìm mặt đất và đặt Player đúng vị trí chạm đất
+                // Đảm bảo Layer "Ground" đang được dùng cho mặt đất trong project của bạn
+                RaycastHit2D hit = Physics2D.Raycast(newPos, Vector2.down, 15f, LayerMask.GetMask("Ground"));
+                if (hit.collider != null)
+                {
+                    Collider2D playerCol = playerObj.GetComponent<Collider2D>();
+                    if (playerCol != null)
+                    {
+                        // Lấy khoảng cách từ tâm (Pivot) của nhân vật đến lòng bàn chân (cạnh dưới Collider)
+                        float pivotToBottom = playerObj.transform.position.y - playerCol.bounds.min.y;
+                        newPos.y = hit.point.y + pivotToBottom + 0.05f; // Chạm đất chính xác
+                    }
+                }
+
+                Vector3 delta = newPos - playerObj.transform.position;
+                playerObj.transform.position = newPos;
+
+                // Sửa lỗi Camera trượt (Snap Camera ngay lập tức tới vị trí mới của Player)
+                Unity.Cinemachine.CinemachineCamera cam = FindAnyObjectByType<Unity.Cinemachine.CinemachineCamera>();
+                if (cam != null)
+                {
+                    cam.OnTargetObjectWarped(playerObj.transform, delta);
+                    cam.PreviousStateIsValid = false;
+                }
                 break;
             }
         }
@@ -100,6 +148,12 @@ public class MapPortal : MonoBehaviour
         }
 
         AudioManager.Instance?.RestartAmbientCycle(); // Reset lại vòng lặp nhạc nền (Ambient) khi đổi màn chơi
+
+        // 6. FADE OUT MÀN HÌNH CHỜ
+        if (UIManager.Instance != null)
+        {
+            yield return UIManager.Instance.FadeLoadingScreen(false);
+        }
 
         //Trả lại trạng thái Gameplay bình thường
         if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.Gameplay);

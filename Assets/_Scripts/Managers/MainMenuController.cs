@@ -17,6 +17,10 @@ public class MainMenuController : MonoBehaviour
     public string gameplaySceneName = "Core_Gameplay";
 
     private string saveFilePath;
+
+    [Header("Loading UI")]
+    public CanvasGroup mainMenuLoadingScreen;
+    public float fadeDuration = 0.5f;
     #endregion
 
     #region UNITY LIFECYCLE
@@ -42,15 +46,15 @@ public class MainMenuController : MonoBehaviour
     public void StartNewGame()
     {
         if (SaveDataManager.Instance != null) SaveDataManager.Instance.NewGame();
-        GameLoader.currentLoadMode = GameLoader.LoadMode.NewGame; // SỬA DÒNG NÀY
-        LoadGameplayScene();
+        GameLoader.currentLoadMode = GameLoader.LoadMode.NewGame; 
+        StartCoroutine(LoadGameplaySceneRoutine());
     }
 
     public void ContinueGame()
     {
         if (SaveDataManager.Instance != null) SaveDataManager.Instance.LoadGameFromFile();
-        GameLoader.currentLoadMode = GameLoader.LoadMode.Continue; // SỬA DÒNG NÀY
-        LoadGameplayScene();
+        GameLoader.currentLoadMode = GameLoader.LoadMode.Continue; 
+        StartCoroutine(LoadGameplaySceneRoutine());
     }
 
     public void QuitGame()
@@ -61,8 +65,22 @@ public class MainMenuController : MonoBehaviour
     #endregion
 
     #region PRIVATE METHODS
-    private void LoadGameplayScene()
+    private System.Collections.IEnumerator LoadGameplaySceneRoutine()
     {
+        // Làm đen màn hình trước khi load
+        if (mainMenuLoadingScreen != null)
+        {
+            float time = 0;
+            mainMenuLoadingScreen.gameObject.SetActive(true);
+            while (time < fadeDuration)
+            {
+                time += Time.unscaledDeltaTime;
+                mainMenuLoadingScreen.alpha = Mathf.Lerp(0f, 1f, time / fadeDuration);
+                yield return null;
+            }
+            mainMenuLoadingScreen.alpha = 1f;
+        }
+
         if (GameManager.Instance != null) GameManager.Instance.ChangeState(GameManager.GameState.Loading);
         SceneManager.LoadScene(gameplaySceneName);
     }

@@ -191,16 +191,28 @@ public class SaveDataManager : MonoBehaviour
         // ==========================================
         // PHÂN LUỒNG TỌA ĐỘ BẮT ĐẦU
         // ==========================================
+        Vector3 targetPos = Vector3.zero;
         if (GameLoader.currentLoadMode == GameLoader.LoadMode.Respawn)
         {
-            // Bị chết: Ném về Trạm Hồi Sinh
-            player.transform.position = new Vector3(currentData.checkX, currentData.checkY, currentData.checkZ);
+            targetPos = new Vector3(currentData.checkX, currentData.checkY, currentData.checkZ);
         }
         else 
         {
-            // Continue bình thường: Ném ra đúng chỗ vừa Save tay (Hoặc Trạm gần nhất nếu chưa Save tay bao giờ)
-            player.transform.position = new Vector3(currentData.posX, currentData.posY, currentData.posZ);
+            targetPos = new Vector3(currentData.posX, currentData.posY, currentData.posZ);
         }
+
+        // Bắn tia Raycast để tìm mặt đất (tránh lỗi Player lơ lửng nếu điểm save nằm hơi cao so với mặt đất)
+        RaycastHit2D hit = Physics2D.Raycast(targetPos, Vector2.down, 15f, LayerMask.GetMask("Ground"));
+        if (hit.collider != null)
+        {
+            Collider2D playerCol = player.GetComponent<Collider2D>();
+            if (playerCol != null)
+            {
+                float pivotToBottom = player.transform.position.y - playerCol.bounds.min.y;
+                targetPos.y = hit.point.y + pivotToBottom + 0.05f;
+            }
+        }
+        player.transform.position = targetPos;
     }
 
     /// <summary>
