@@ -21,7 +21,7 @@ public class BossSkillManager : MonoBehaviour
     public Transform centerSpawnPoint;  
 
     [Header("--- CÀI ĐẶT LẬT HÌNH ---")]
-    public bool isVfxFacingLeftDefault = true; // Chuyển mặc định thành True do ảnh của bạn gốc quay trái
+    public bool isVfxFacingLeftDefault = true; // Chuyển mặc định thành True do ảnh gốc quay trái
 
     private BaseEntity bossEntity;
     #endregion

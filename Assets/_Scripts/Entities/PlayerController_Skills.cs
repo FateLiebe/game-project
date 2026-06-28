@@ -176,7 +176,7 @@ public partial class PlayerController
     #endregion
 
     #region SKILL UTILITIES & INVENTORY INTEGRATION
-    // Hàm này để hệ thống Inventory/Trang bị gọi khi bạn nhặt hoặc mặc bùa mới vào
+    // Hàm này để hệ thống Inventory/Trang bị gọi khi player nhặt hoặc mặc bùa mới vào
     public void EquipSupportSkill(ItemSO newSkill)
     {
         string oldInfo = equippedSupportSkill != null ? $"{equippedSupportSkill.itemName}(inst={equippedSupportSkill.GetInstanceID()},uses={equippedSupportSkill.runtimeUses})" : "null";

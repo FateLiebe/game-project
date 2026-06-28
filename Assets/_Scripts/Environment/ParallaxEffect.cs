@@ -21,7 +21,6 @@ public class ParallaxEffect : MonoBehaviour
     {
         cameraTransform = Camera.main.transform;
         
-        // Lưu lại vị trí của bức ảnh lúc bạn vừa đặt trong Scene
         startPos = transform.position; 
     }
 
