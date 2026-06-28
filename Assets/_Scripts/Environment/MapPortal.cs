@@ -108,7 +108,6 @@ public class MapPortal : MonoBehaviour
                 Vector3 newPos = portal.transform.position + (Vector3)(enterDirection * 3f);
                 
                 // Bắn tia Raycast xuống dưới để tìm mặt đất và đặt Player đúng vị trí chạm đất
-                // Đảm bảo Layer "Ground" đang được dùng cho mặt đất trong project của bạn
                 RaycastHit2D hit = Physics2D.Raycast(newPos, Vector2.down, 15f, LayerMask.GetMask("Ground"));
                 if (hit.collider != null)
                 {
