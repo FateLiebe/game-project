@@ -32,8 +32,15 @@ public partial class PlayerController
             }
         }
 
+        // 1. Đưa hàm nhận diện Input lên TRƯỚC
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return))
+        {
+            lastAttackInputTime = Time.time;
+        }
+
         bool isJumpingUp = currentState == PlayerState.Airborne && rb.linearVelocity.y > 0.1f;
         
+        // 2. Xử lý Input NGAY TRONG FRAME HIỆN TẠI
         if (currentState != PlayerState.Dashing && !isJumpingUp)
         {
             if (Time.time - lastAttackInputTime <= attackInputBufferTime 
@@ -50,11 +57,6 @@ public partial class PlayerController
                     ExecuteAttack();
                 }
             }
-        }
-
-        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return))
-        {
-            lastAttackInputTime = Time.time;
         }
 
         if ((Input.GetKeyDown(KeyCode.LeftShift) || Input.GetMouseButtonDown(1) || uiDashRequested))
@@ -342,6 +344,18 @@ public partial class PlayerController
     {
         if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay) return;
         uiCounterRequested = true;
+    }
+
+    public void UIButton_SupportSkill()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay) return;
+        UseSupportSkill();
+    }
+
+    public void UIButton_Consumable()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gameplay) return;
+        if (InventoryManager.Instance != null) InventoryManager.Instance.QuickUseConsumable();
     }
     #endregion
 }
