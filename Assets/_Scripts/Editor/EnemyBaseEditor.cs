@@ -39,7 +39,11 @@ public class EnemyBaseEditor : Editor
 
         // HIỂN THỊ CÁC THÔNG SỐ CỦA DATA NGAY TRÊN INSPECTOR
         EnemyBase myTarget = (EnemyBase)target;
-        if (myTarget.enemyData != null)
+        bool isBoss = myTarget is BossController;
+
+        // Chỉ hiển thị các thông số Tầm nhìn & Khoảng cách của EnemyData nếu ĐÂY KHÔNG PHẢI LÀ BOSS.
+        // Vì Boss dùng các chỉ số Range và Movement riêng biệt trên script BossController.
+        if (myTarget.enemyData != null && !isBoss)
         {
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("--- ENEMY DATA (Khoảng cách & Tầm nhìn) ---", EditorStyles.boldLabel);

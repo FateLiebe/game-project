@@ -23043,7 +23043,7 @@ PrefabInstance:
     - target: {fileID: 6287053421100623968, guid: 6a64124b90fef404caa30f95216fb1e9, type: 3}
       propertyPath: enemyData
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 11400000, guid: 3fde0d68c6c054f40a39e23055ed3632, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

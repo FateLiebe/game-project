@@ -222,7 +222,7 @@ MonoBehaviour:
   currentShield: 0
   buffAttack: 0
   buffDefense: 0
-  enemyData: {fileID: 0}
+  enemyData: {fileID: 11400000, guid: 3fde0d68c6c054f40a39e23055ed3632, type: 2}
   rank: 2
   expMultiplier: 30
   attackCooldowns:
