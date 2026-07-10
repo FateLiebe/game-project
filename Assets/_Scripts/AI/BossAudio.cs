@@ -27,6 +27,18 @@ public class BossAudio : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        // Nếu boss chết, dừng tiếng vỗ cánh
+        if (boss.isDead)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.StopBossWingFlap();
+            }
+        }
+    }
+
     private void OnDestroy()
     {
         // Khi boss bị Destroy (sau DeathRoutine) → tắt tiếng vỗ cánh

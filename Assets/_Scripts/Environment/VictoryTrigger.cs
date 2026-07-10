@@ -70,9 +70,18 @@ public class VictoryTrigger : MonoBehaviour
         // Bước 1: Lưu Game tự động
         PerformAutoSave();
 
-        // Bước 2: Chuyển trạng thái sang Victory để UIManager hiển thị màn hình Victory
+        // Bước 2: Gọi Coroutine để xử lý delay và chuyển trạng thái
+        StartCoroutine(VictorySequence());
+    }
+
+    private System.Collections.IEnumerator VictorySequence()
+    {
         if (GameManager.Instance != null)
         {
+            // Chờ 2 giây
+            yield return new WaitForSeconds(2f);
+
+            // Chuyển trạng thái sang Victory
             GameManager.Instance.ChangeState(GameManager.GameState.Victory);
         }
         else
